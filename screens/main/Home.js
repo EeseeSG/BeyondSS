@@ -5,44 +5,26 @@ import {
     Text, 
     StyleSheet, 
     TouchableOpacity, 
-    Alert, 
     Dimensions, 
     Image, 
     ScrollView, 
+    FlatList,
 } from 'react-native';
+import * as WebBrowser from 'expo-web-browser';
 
 // DESIGN
 import { defaultStyles } from '../../constants/defaultStyles';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-import Icon from 'react-native-vector-icons/Ionicons';
 import { useTheme } from 'react-native-paper';
 import UserAvatar from 'react-native-user-avatar';
 
 // DISPLAY
-import StickyItemFlatList from '@gorhom/sticky-item';
-import StoryBlock from '../../components/Stories/StoryBlock';
-import FacebookStickyStory from '../../components/Stories/StickyStories';
 import Carousel from 'react-native-snap-carousel';
-import ItemCarousel from '../../components/Store/ItemCarousel';
-import CategoryCarousel from '../../components/Store/CategoryCarousel';
+import PartnerCarousel from '../../components/Store/PartnerCarousel';
 
 // DATA
 import { currentUserData } from '../../database/User';
-import * as ProductData from '../../database/Product';
-
-
-// dummy data
-const data = [...Array(20)]
-.fill(0)
-.map((_, index) => ({ id: `item-${index}` }));
-
-// configs
-export const STORY_WIDTH = 90;
-export const STORY_HEIGHT = 150;
-const STICKY_ITEM_WIDTH = 34;
-const STICKY_ITEM_HEIGHT = 34;
-const SEPARATOR_SIZE = 8;
-const BORDER_RADIUS = 10;
+import moment from 'moment';
 
 const carousel_data = [
     {
@@ -59,32 +41,56 @@ const carousel_data = [
     }
 ]
 
-const categories = [
+const news = [
     {
         id: 1,
-        category: 'Burger',
-        image: require('../../assets/sample/categories/burger.png'),
+        title: 'Another Week Beyond - 2213',
+        date: 1648862568*1000,
+        desc: 'Dear friends, On Sunday evening at 8 pm, a colleague received a text from a mother of 3, I will refer to as Donna. Donna wrote that she was in pain, feeling extremely anxious and frightened. She was texting from the hospital and requested for my colleague to meet her there. A few minutes later, a nurse from the hospital called …',
+        url: 'https://www.beyond.org.sg/another-week-beyond-2213/',
     },
     {
         id: 2,
-        category: 'Cake',
-        image: require('../../assets/sample/categories/cake.png'),
+        title: 'Another Week Beyond - 2212',
+        date: 1648171368*1000,
+        desc: 'Dear friends, This week’s sharing is co-written with Felice, an intern who was moved to pen down her experience after helping with a recent conversation among mothers on the theme of “Health and Dreams”.  Felice was struck by the genuine care and concern people accorded each other even though they did not really know each other well and importantly, how people …',
+        url: 'https://www.beyond.org.sg/another-week-beyond-2212/',
     },
     {
         id: 3,
-        category: 'Dessert',
-        image: require('../../assets/sample/categories/dessert.png'),
+        title: 'Another Week Beyond - 2211',
+        date: 1647566568*1000,
+        desc: 'Dear friends, “We are here to create a safe and brave space. What do you think that is?” This was how we began our very first session for 4 youth to explore if they would like to nurture a small community where members help each other learn strategies for psychological and emotional wellbeing.  A safe space is one where people feel …',
+        url: 'https://www.beyond.org.sg/another-week-beyond-2213/',
+    },
+]
+
+const partners = [
+    {
+        id: 1,
+        img: require('../../assets/partners/FourJs.jpg'),
+        url: 'https://4js.com/',
+    },
+    {
+        id: 2,
+        img: require('../../assets/partners/kuehne-nagel1.jpg'),
+        url: 'https://home.kuehne-nagel.com/',
+    },
+    {
+        id: 3,
+        img: require('../../assets/partners/logoVistalegre_empresa.png'),
+        url: 'https://www.vistalegre.com/',
     },
     {
         id: 4,
-        category: 'Noodle',
-        image: require('../../assets/sample/categories/noodles.png'),
-    },    
+        img: require('../../assets/partners/nuevo_logo_alhambra_color_web-300x85.png'),
+        url: 'https://www.alhambrait.com/',
+    },
     {
         id: 5,
-        category: 'Rice',
-        image: require('../../assets/sample/categories/rice-bowl.png'),
-    }
+        img: require('../../assets/partners/ucalsa.jpg'),
+        url: 'https://www.ucalsa.com/',
+    },
 ]
 
 const in_need_fed = 1000;
@@ -124,28 +130,31 @@ export default function Home({ navigation }) {
 
 
     //=====================================================================================================================
-    //==  GET PRODUCT DETAILS ==
+    //==  GET PROJECT DETAILS ==
     //=====================================================================================================================
-    const [popularItem, setPopularItem] = useState([]);
-    const [offerItem, setOfferItem] = useState([]);
-    const [soldItem, setSoldItem] = useState([]);
 
-    useEffect(() => {
-        async function _getProducts() {
-            // TEMP
-            let products = await ProductData.getAllProductData();
-            let popular_item = products.slice(0,4);
-            let offer_item = products.slice(4,7);
-            let sold_item = products.slice(7, products.length);
+    // useEffect(() => {
+    //     async function _getProducts() {
+    //         // TEMP
+    //         let products = await ProductData.getAllProductData();
+    //         let popular_item = products.slice(0,4);
+    //         let offer_item = products.slice(4,7);
+    //         let sold_item = products.slice(7, products.length);
 
-            setPopularItem(popular_item);
-            setOfferItem(offer_item);
-            setSoldItem(sold_item);
-        }
-        return _getProducts()
-    }, [])
+    //         setPopularItem(popular_item);
+    //         setOfferItem(offer_item);
+    //         setSoldItem(sold_item);
+    //     }
+    //     return _getProducts()
+    // }, [])
 
+    //=====================================================================================================================
+    //==  HANDLE EXTERNAL LINKS ==
+    //=====================================================================================================================
 
+    const _handlePressButtonAsync = async (url) => {
+        await WebBrowser.openBrowserAsync(url);
+    };
 
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
@@ -219,15 +228,27 @@ export default function Home({ navigation }) {
             </View>
 
             <Text style={styles.header}>Partners</Text>
-            <CategoryCarousel
-                data={categories}
-            />
+            <View style={{ backgroundColor: '#fff', borderRadius: 5, }}>
+                <PartnerCarousel
+                    data={partners}
+                />
+            </View>
+
 
             <Text style={styles.header}>Latest News</Text>
-            <ItemCarousel
-                data={popularItem}
-                navigation={navigation}
-            />
+            {
+                news.map((item, index) => (
+                    <TouchableOpacity key={index} style={{ marginVertical: 10, marginHorizontal: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
+                        <View style={{ flexDirection: 'row', marginVertical: 5, }}>
+                            <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
+                            <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic'}} selectable>{moment(item.date).format('LL')}</Text>
+                        </View>
+                        <Text style={{ fontSize: 12, }} selectable>{item.desc}</Text>
+                        <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.5)', fontSize: 12, fontWeight: 'bold' }}>Read More...</Text>
+                    </TouchableOpacity>
+                ))
+            }
+
 
         </ScrollView>
     )
