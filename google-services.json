@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "736791086604",
+    "project_id": "bss-sg",
+    "storage_bucket": "bss-sg.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:736791086604:android:cfa69d3b32d65556c31029",
+        "android_client_info": {
+          "package_name": "com.beyondss.beyondss"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ_r_lmsKEHRU-QS-Q4-uXt6JtmseczEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "736791086604-a5tipln6c97i1diaq0vju6aa3ff8i9kq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.beyondss.beyondss"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
