@@ -88,7 +88,8 @@ export default function FoodItem(props) {
                 // sum them up
                 const reserved_map = arr.map((i) => i.reserved);
                 const count = reserved_map.reduce((a, b) => a + b, 0);
-                setCurrentReservations(count)
+                setCurrentReservations(count);
+                setQuantity(count)
             })
     } 
     
@@ -110,7 +111,7 @@ export default function FoodItem(props) {
             reserved: quantity,
             createdAt: new Date(),
         };
-        let result = await ProjectData.setReservation(reservation_data);
+        let result = await ProjectData.updateReservation(reservation_data);
         if(result.success) {
             Popup.show({
                 type: 'success',
@@ -236,6 +237,11 @@ export default function FoodItem(props) {
                     <DisplayTimer />
                     <View style={{ marginLeft: 30, marginTop: 10, }}>
                         <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 5, flex: 1, marginRight: 30, }}>{data.title}</Text>
+                        <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end', margin: 10, }}>
+                            <Text style={{ fontSize: 22, color: 'black', opacity: 0.7, }}>= </Text>
+                            <Text style={{ fontSize: 22, color: colors.primary, fontWeight: 'bold', marginRight: 5, }}>{data.count.toString()}</Text>
+                            <Text style={{ fontSize: 20, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
+                        </View>
                         <View style={{ marginVertical: 10 }}>
                             <Text style={{ fontWeight: 'bold' }}>Collect at:</Text>
                             <Text>{data.location}</Text>
@@ -247,14 +253,15 @@ export default function FoodItem(props) {
                         />
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
-                        <Text style={styles.header}>Quantity</Text>
+                        <Text style={styles.header}>Change reservation quantity to:</Text>
                         <QuantityPicker
                             quantity={quantity}
                             setQuantity={setQuantity}
                         />
+                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 5, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
-                        <Text style={styles.header}>Message</Text>
+                        <Text style={styles.header}>Message from Chef</Text>
                         <Text style={{ textAlign: 'justify' }}>{data.message}</Text>
                     </View>
 
@@ -265,11 +272,8 @@ export default function FoodItem(props) {
                     style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
                 >
                     <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={_addToCart}>
-                        <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Reserve {quantity} portion</Text>
+                        <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Save reservation</Text>
                     </TouchableOpacity>
-                    <View style={{ marginBottom: 10, }}>
-                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 5, paddingVertical: 5, paddingHorizontal: 10, }}>You have reserved {currentReservations.toString()} portions</Text>
-                    </View>
                 </LinearGradient>
             </Animatable.View>
         </ScrollView>

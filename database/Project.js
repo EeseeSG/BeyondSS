@@ -41,11 +41,12 @@ export const getProjectByID = async (project_id) => {
         })
 }
 
-export const setReservation = async (data) => {
+export const updateReservation = async (data) => {
     try {
         await firebase.firestore()
             .collection('reservations')
-            .add(data)
+            .doc(data.project_id+'-'+data.user_id)
+            .set(data)
         return {
             success: true,
         }
