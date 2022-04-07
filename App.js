@@ -37,7 +37,6 @@ import RootStackScreen from './screens/auth/RootStackScreen';
 import Tabs from './navigation/Tabs';
 import StoreProfile from './screens/store/StoreProfile';
 import Settings from './screens/settings/Settings';
-import Card from './screens/card/Card';
 import FoodItem from './screens/store/FoodItem';
 import Cart from './screens/store/ShoppingCart';
 import PaymentHistory from './screens/user/PaymentHistory';
@@ -122,7 +121,6 @@ export default function App() {
                     <Stack.Group navigationKey={isLoggedIn ? 'user' : 'guest'}>
                       <Stack.Screen name="Tabs"  component={Tabs} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Settings" component={Settings}/>
-                      <Stack.Screen name="Card" component={Card} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Expore" component={Explore} options={{ headerShown: false,}}/>
                       <Stack.Screen name="FoodItem" component={FoodItem} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Cart" component={Cart} options={{ title: ''}}/>

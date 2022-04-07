@@ -10,7 +10,6 @@ const Tab = createBottomTabNavigator();
 import HomeScreen from '../screens/main/Home';
 import ExploreScreen from '../screens/main/Explore';
 import ProfileScreen from '../screens/main/Profile';
-import MapScreen from '../screens/main/Map';
 
 // config
 const tabs = {
@@ -38,22 +37,6 @@ const tabs = {
     icon: {
       name: "search-outline",
       activeName: "search",
-      size: 20,
-      activeColor: 'white',
-      inactiveColor: 'rgba(0,0,0,1)',
-    },
-    background: {
-      activeColor: Colors.primary,
-    }
-  },
-  Map: { // < Screen name
-    screen: MapScreen,
-    labelStyle: {
-      color: '#1194AA',
-    },
-    icon: {
-      name: "location-outline",
-      activeName: "location",
       size: 20,
       activeColor: 'white',
       inactiveColor: 'rgba(0,0,0,1)',

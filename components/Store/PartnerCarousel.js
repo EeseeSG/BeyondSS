@@ -27,7 +27,7 @@ export default function PartnerCarousel(props) {
             <View style={{ width: 100, backgroundColor: 'transparent', borderRadius: 15, padding: 5, justifyContent: 'center', alignItems: 'center', }}> 
                 <Image
                     style={{ width: 70, height: 45, resizeMode: 'contain' }}
-                    source={data.item.img}
+                    source={{ uri: data.item.img }}
                 />
             </View>
             <Text style={{ textAlign: 'center', fontSize: 12, opacity: 0.6, marginTop: 5, }}>{data.item.category}</Text>

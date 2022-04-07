@@ -59,6 +59,7 @@ export default function Explore(props) {
 
     // ===========================================
     // CATEGORIES
+    // ===========================================
     async function _getCategories(arr) {
         let arr_tags = []
         for(const store of arr) {
@@ -91,8 +92,7 @@ export default function Explore(props) {
         }
         return final_text.trim()
     }
-    // END CATEGORIES
-    // ===========================================
+
 
     if(!isLoaded) {
         return (

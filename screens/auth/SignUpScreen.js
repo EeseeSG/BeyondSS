@@ -16,6 +16,9 @@ import { Popup } from 'react-native-popup-confirm-toast';
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
 
+// USER
+import { getUserByPhone, getApplicationByPhone } from '../../database/User';
+
 // ANIMATION
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -32,18 +35,14 @@ const SignInScreen = ({navigation}) => {
 
 	const [data, setData] = useState({
 		email: '',
-		username: '',
-		password: '',
-		confirm_password: '',
-		check_textInputChange: false,
-		secureTextEntry: true,
-		confirm_secureTextEntry: true,
+		name: '',
+		contact: '',
 	});
 
 	// Data validation
 	const [emailValidated, setEmailValidated] = useState(false);
-	const [usernameValidated, setUsernameValidated] = useState(false);
-	const [passwordValidated, setPasswordValidated] = useState(false);
+	const [nameValidated, setNameValidated] = useState(false);
+	const [contactValidated, setContactValidated] = useState(false);
 
 	const handleEmailChange = (val) => {
 		if(_validateEmail(val)) {
@@ -63,84 +62,79 @@ const SignInScreen = ({navigation}) => {
 		}
 	}
 
+	const handleNameChange = (val) => {
+		if( val.length >= 4 ) {
+			setData({
+				...data,
+				name: val,
+				check_nameChange: true
+			});
+			setNameValidated(true)
+		} else {
+			setData({
+				...data,
+				name: val,
+				check_nameChange: false
+			});
+			setNameValidated(false)
+		}
+	}
+
+	const handleContactChange = (val) => {
+		if(_validateContact(val)) {
+			setData({
+				...data,
+				contact: val,
+				check_contactChange: true
+			});
+			setContactValidated(true)
+		} else {
+			setData({
+				...data,
+				contact: val,
+				check_contactChange: false
+			});
+			setContactValidated(false)
+		}
+	}
+
 	const _validateEmail = (email) => {
 		return email.match(
 			/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 		);
 	};
 
-	const handleUsernameChange = (val) => {
-		if( val.length >= 4 ) {
-			setData({
-				...data,
-				username: val,
-				check_usernameChange: true
-			});
-			setUsernameValidated(true)
-		} else {
-			setData({
-				...data,
-				username: val,
-				check_usernameChange: false
-			});
-			setUsernameValidated(false)
-		}
-	}
+	const _validateContact = (contact) => {
+		return contact.match(
+			/^(6|8|9)[0-9]{7}$/
+		);
+	};
 
-	const handlePasswordChange = (val) => {
-		setData({
-			...data,
-			password: val
-		});
-	}
-
-	const handleConfirmPasswordChange = (val) => {
-		setData({
-			...data,
-			confirm_password: val
-		});
-	}
-
-	const checkPasswordSame = () => {
-		if(data.password.length === 0 || data.confirm_password === 0) {
-			setPasswordValidated(false);
-			return
-		}
-		if(data.password === data.confirm_password) {
-			setPasswordValidated(true);
-			return
-		}
-		setPasswordValidated(false);
-	}
-
-	const updateSecureTextEntry = () => {
-		setData({
-			...data,
-			secureTextEntry: !data.secureTextEntry
-		});
-	}
-
-	const updateConfirmSecureTextEntry = () => {
-		setData({
-			...data,
-			confirm_secureTextEntry: !data.confirm_secureTextEntry
-		});
-	}
-
-	const handleRegistration = () => {
+	const handleRegistration = async () => {
 		let errorType = 'An error has occurred.';
-		if(!passwordValidated) {
-			errorType = 'Passwords does not match!'
-		}
-		if(!emailValidated) {
+
+		const existingUser = await getUserByPhone(data.contact);
+		const existingApplication = await getApplicationByPhone(data.contact);
+		
+		const exists = existingUser.length > 0 || existingApplication.length > 0;
+
+		if(existingUser.length > 0) {
+			errorType = 'An account under your phone number has already been registered. Please log in.';
+		} else if(existingApplication.length > 0) {
+			errorType = 'You have already submitted an application. Please wait for us to revert.';
+		} else if(!emailValidated) {
 			errorType = 'Please enter a valid email.'
+		} else if(!contactValidated) {
+			errorType = 'Please enter your phone number correctly. (without +65)';
+		} else if(!nameValidated) {
+			errorType = 'Please enter a name that is at least 4 characters long';
 		}
-		if(!usernameValidated) {
-			errorType = 'Please enter a username that is at least 4 characters long'
-		}
-		if(emailValidated && usernameValidated && passwordValidated) {
-			registerUser();
-			return;
+
+		if(nameValidated && contactValidated && emailValidated) {
+			if(!exists) {
+				registerUser();
+				return;
+			}
 		}
 		Popup.show({
 			type: 'danger',
@@ -152,7 +146,7 @@ const SignInScreen = ({navigation}) => {
 	}
 
 	const registerUser = async () => {
-		register(data.username, data.email, data.password)
+		register(data.name, data.email, data.contact)
 	}
 
 	return (
@@ -166,6 +160,7 @@ const SignInScreen = ({navigation}) => {
 				style={styles.footer}
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
+					
 					<Text style={styles.text_footer}>Email</Text>
 					<View style={styles.action}>
 						<FontAwesome 
@@ -196,7 +191,7 @@ const SignInScreen = ({navigation}) => {
 						}
 					</View>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Username</Text>
+					<Text style={[styles.text_footer, {marginTop: 35}]}>Full Name</Text>
 					<View style={styles.action}>
 						<FontAwesome 
 							name="user-o"
@@ -204,13 +199,13 @@ const SignInScreen = ({navigation}) => {
 							size={20}
 						/>
 						<TextInput 
-							placeholder="Your Username"
+							placeholder="Your Name"
 							style={styles.textInput}
-							onChangeText={(val) => handleUsernameChange(val.trim())}
-							autoComplete='username'
+							onChangeText={(val) => handleNameChange(val.trim())}
+							autoComplete='name'
 						/>
 						{
-							data.check_usernameChange 
+							data.check_nameChange 
 							&&
 							<Animatable.View
 								animation="bounceIn"
@@ -224,7 +219,7 @@ const SignInScreen = ({navigation}) => {
 						}
 					</View>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Password</Text>
+					<Text style={[styles.text_footer, {marginTop: 35}]}>Phone Number</Text>
 					<View style={styles.action}>
 						<Feather 
 							name="lock"
@@ -232,69 +227,29 @@ const SignInScreen = ({navigation}) => {
 							size={20}
 						/>
 						<TextInput 
-							placeholder="Your Password"
-							secureTextEntry={data.secureTextEntry}
+							placeholder="Your Phone Number"
 							style={styles.textInput}
 							autoCapitalize="none"
-							onChangeText={(val) => handlePasswordChange(val)}
-							onEndEditing={checkPasswordSame}
+							onChangeText={(val) => handleContactChange(val)}
+							keyboardType={'phone-pad'}
+							maxLength={8}
 						/>
-						<TouchableOpacity
-							onPress={updateSecureTextEntry}
-						>
-							{
-								data.secureTextEntry 
-								? 
-									<Feather 
-										name="eye-off"
-										color="grey"
-										size={20}
-									/>
-								:
-									<Feather 
-										name="eye"
-										color="grey"
-										size={20}
-									/>
-							}
-						</TouchableOpacity>
+						{
+							data.check_contactChange
+							&&
+							<Animatable.View
+								animation="bounceIn"
+							>
+								<Feather 
+									name="check-circle"
+									color="green"
+									size={20}
+								/>
+							</Animatable.View>
+						}
 					</View>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Confirm Password</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="lock"
-							color="#05375a"
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Confirm Your Password"
-							secureTextEntry={data.confirm_secureTextEntry}
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handleConfirmPasswordChange(val)}
-							onEndEditing={checkPasswordSame}
-						/>
-						<TouchableOpacity
-							onPress={updateConfirmSecureTextEntry}
-						>
-							{
-								data.secureTextEntry 
-								? 
-									<Feather 
-										name="eye-off"
-										color="grey"
-										size={20}
-									/>
-								:
-									<Feather 
-										name="eye"
-										color="grey"
-										size={20}
-									/>
-							}
-						</TouchableOpacity>
-					</View>
+
 					<View style={styles.textPrivate}>
 						<Text style={styles.color_textPrivate}>
 							By signing up you agree to our {" "}
@@ -316,7 +271,7 @@ const SignInScreen = ({navigation}) => {
 								colors={[colors.secondary, colors.primary]}
 								style={styles.signIn}
 							>
-								<Text style={[styles.textSign, {color:'#fff'}]}>Sign Up</Text>
+								<Text style={[styles.textSign, {color:'#fff'}]}>Register</Text>
 							</LinearGradient>
 						</TouchableOpacity>
 

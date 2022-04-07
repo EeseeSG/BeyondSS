@@ -243,7 +243,7 @@ export default function SignInScreen({navigation}) {
 							onPress={() => navigation.navigate('SignUpScreen')}
 							style={[styles.signIn, { borderColor: colors.primary, borderWidth: 1, marginTop: 15 }]}
 						>
-							<Text style={[styles.textSign, { color: colors.primary }]}>Sign Up</Text>
+							<Text style={[styles.textSign, { color: colors.primary }]}>Register</Text>
 						</TouchableOpacity>
 					</View>
 

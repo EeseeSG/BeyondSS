@@ -8,7 +8,6 @@ import {
     Dimensions, 
     Image, 
     ScrollView, 
-    FlatList,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 
@@ -24,74 +23,9 @@ import PartnerCarousel from '../../components/Store/PartnerCarousel';
 
 // DATA
 import { currentUserData } from '../../database/User';
+import { getPartnerData, getNewsData, getBannerData } from '../../database/Index';
 import moment from 'moment';
 
-const carousel_data = [
-    {
-        title: 'Wok Hey Delights',
-        image: require('../../assets/sample/food_banner_example/chinese-wok.jpg'),
-    },
-    {
-        title: 'Indian Delights',
-        image: require('../../assets/sample/food_banner_example/indian-food.jpg'),
-    },
-    {
-        title: 'Weekend Brunch Special',
-        image: require('../../assets/sample/food_banner_example/western.jpg'),
-    }
-]
-
-const news = [
-    {
-        id: 1,
-        title: 'Another Week Beyond - 2213',
-        date: 1648862568*1000,
-        desc: 'Dear friends, On Sunday evening at 8 pm, a colleague received a text from a mother of 3, I will refer to as Donna. Donna wrote that she was in pain, feeling extremely anxious and frightened. She was texting from the hospital and requested for my colleague to meet her there. A few minutes later, a nurse from the hospital called …',
-        url: 'https://www.beyond.org.sg/another-week-beyond-2213/',
-    },
-    {
-        id: 2,
-        title: 'Another Week Beyond - 2212',
-        date: 1648171368*1000,
-        desc: 'Dear friends, This week’s sharing is co-written with Felice, an intern who was moved to pen down her experience after helping with a recent conversation among mothers on the theme of “Health and Dreams”.  Felice was struck by the genuine care and concern people accorded each other even though they did not really know each other well and importantly, how people …',
-        url: 'https://www.beyond.org.sg/another-week-beyond-2212/',
-    },
-    {
-        id: 3,
-        title: 'Another Week Beyond - 2211',
-        date: 1647566568*1000,
-        desc: 'Dear friends, “We are here to create a safe and brave space. What do you think that is?” This was how we began our very first session for 4 youth to explore if they would like to nurture a small community where members help each other learn strategies for psychological and emotional wellbeing.  A safe space is one where people feel …',
-        url: 'https://www.beyond.org.sg/another-week-beyond-2213/',
-    },
-]
-
-const partners = [
-    {
-        id: 1,
-        img: require('../../assets/partners/FourJs.jpg'),
-        url: 'https://4js.com/',
-    },
-    {
-        id: 2,
-        img: require('../../assets/partners/kuehne-nagel1.jpg'),
-        url: 'https://home.kuehne-nagel.com/',
-    },
-    {
-        id: 3,
-        img: require('../../assets/partners/logoVistalegre_empresa.png'),
-        url: 'https://www.vistalegre.com/',
-    },
-    {
-        id: 4,
-        img: require('../../assets/partners/nuevo_logo_alhambra_color_web-300x85.png'),
-        url: 'https://www.alhambrait.com/',
-    },
-    {
-        id: 5,
-        img: require('../../assets/partners/ucalsa.jpg'),
-        url: 'https://www.ucalsa.com/',
-    },
-]
 
 const in_need_fed = 1000;
 const orders_fulfilled = 100000;
@@ -102,7 +36,7 @@ export default function Home({ navigation }) {
     const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
 
     //=====================================================================================================================
-    //==  GET CURRENT USER ==
+    //==  GET DATA ==
     //=====================================================================================================================
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
@@ -114,6 +48,37 @@ export default function Home({ navigation }) {
         return _getCurrentUser()
     }, [])
 
+    const [news, setNews] = useState([]);
+    useEffect(() => {
+        async function _getNews() {
+            let news_arr = await getNewsData()
+            setNews(news_arr)
+            return;
+        }
+        return _getNews();
+    }, [])
+
+    const [partners, setPartners] = useState([]);
+    useEffect(() => {
+        async function _getPartners() {
+            let partner_arr = await getPartnerData()
+            setPartners(partner_arr)
+            return;
+        }
+        return _getPartners();
+    }, [])
+
+    const [banners, setBanners] = useState([]);
+    useEffect(() => {
+        async function _getBanners() {
+            let banner_arr = await getBannerData()
+            setBanners(banner_arr)
+            return;
+        }
+        return _getBanners();
+    }, [])
+
+
     //=====================================================================================================================
     //==  GET ADV BANNER ==
     //=====================================================================================================================
@@ -122,31 +87,11 @@ export default function Home({ navigation }) {
     const renderBanner = (data) => (
         <View>
             <Image 
-                source={data.image}
+                source={{ uri: data.image }}
                 style={{ height: 150, width: 300, borderRadius: 10 }}
             />
         </View>
     )
-
-
-    //=====================================================================================================================
-    //==  GET PROJECT DETAILS ==
-    //=====================================================================================================================
-
-    // useEffect(() => {
-    //     async function _getProducts() {
-    //         // TEMP
-    //         let products = await ProductData.getAllProductData();
-    //         let popular_item = products.slice(0,4);
-    //         let offer_item = products.slice(4,7);
-    //         let sold_item = products.slice(7, products.length);
-
-    //         setPopularItem(popular_item);
-    //         setOfferItem(offer_item);
-    //         setSoldItem(sold_item);
-    //     }
-    //     return _getProducts()
-    // }, [])
 
     //=====================================================================================================================
     //==  HANDLE EXTERNAL LINKS ==
@@ -187,7 +132,7 @@ export default function Home({ navigation }) {
             <View>
                 <Carousel
                     ref={carousel}
-                    data={carousel_data}
+                    data={banners}
                     renderItem={({ item }) => renderBanner(item)}
                     sliderWidth={Dimensions.get('window').width - 20}
                     itemWidth={300}
