@@ -24,7 +24,7 @@ export const getAllUpcomingProjectData = async () => {
             return snapshot.docs.map(project => {
                 let _id = project.id;
                 let data = project.data();
-                return { _id, ...data }
+                return { ...data, _id }
             })
         })
 }
@@ -39,4 +39,20 @@ export const getProjectByID = async (project_id) => {
             let data = project.data();
             return { _id, ...data }
         })
+}
+
+export const setReservation = async (data) => {
+    try {
+        await firebase.firestore()
+            .collection('reservations')
+            .add(data)
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
 }

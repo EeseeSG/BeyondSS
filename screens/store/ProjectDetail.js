@@ -31,6 +31,9 @@ import StoreTags from '../../components/Store/StoreTags';
 
 // DATA
 import * as UserData from '../../database/User';
+import * as ProjectData from '../../database/Project';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 
 const IMAGE_HEIGHT = 200;
@@ -40,9 +43,7 @@ export default function FoodItem(props) {
     const { navigation, route } = props;
     const { colors } = useTheme();
     const [isLoaded, setIsLoaded] = useState(false);
-
-    const [data, setData] = useState(route.params.data);
-    const image = data.image;
+    const data = route.params.data;
     const [quantity, setQuantity] = useState(1);
 
     //=====================================================================================================================
@@ -63,53 +64,70 @@ export default function FoodItem(props) {
     //=====================================================================================================================
     async function _getCurrentUser() {
         let current_user = await UserData.currentUserData();
-        setCurrentUser(current_user)
+        setCurrentUser(current_user);
+        _getCurrentReservations(current_user);  // get reserved quantity
         return
     } 
-  
+
     //=====================================================================================================================
+    //==  CURRENT RESERVATIONS ==
+    //=====================================================================================================================
+    const [currentReservations, setCurrentReservations] = useState([]);
+    async function _getCurrentReservations(user) {
+        firebase.firestore()
+            .collection('reservations')
+            .where('project_id', '==', data._id)
+            .where('user_id', '==', user._id)
+            .onSnapshot((snapshot) => {
+                let arr = snapshot.docs.map((snap) => {
+                    let _id = snap.id;
+                    let data = snap.data();
+                    return { _id, ...data }
+                })
+
+                // sum them up
+                const reserved_map = arr.map((i) => i.reserved);
+                const count = reserved_map.reduce((a, b) => a + b, 0);
+                setCurrentReservations(count)
+            })
+    } 
+    
+  
+    //============================================c=========================================================================
     //==  MAKE RESERVATION ==
     //=====================================================================================================================
     const _addToCart = async () => {
-        // // check if it is available yet
-        // let avail = checkAvailability();
-        // if(!avail) return
+        // check if it is available yet
+        let avail = checkAvailability();
+        if(!avail) return
 
-        // // post the data
-        // let delivery_date = new Date('2022-02-20'); // temp data
-        // let data_to_store = { 
-        //     user_id: currentUser._id, 
-        //     product_data: data, 
-        //     order_data: {
-        //         selection: {
-        //             index: selection,
-        //             item: data.sizes[selection],
-        //         },
-        //         quantity,
-        //         item_price: data.price,
-        //         total_price: (data.sizes[selection].price * quantity),
-        //     },
-        //     createdAt: new Date(),
-        //     deliveryDate: delivery_date,
-        // };
-        // let result = await StoreData.setShoppingCart(data_to_store);
-        // if(result.success) {
-        //     Popup.show({
-        //         type: 'success',
-        //         title: 'Success!',
-        //         textBody: 'Item has been added into your shopping cart.',
-        //         buttonText: 'Okay',
-        //         callback: () => Popup.hide()
-        //     })
-        // } else {
-        //     Popup.show({
-        //         type: 'danger',
-        //         title: 'Error. Please try again.',
-        //         textBody: result.error,
-        //         buttonText: 'Close',
-        //         callback: () => Popup.hide()
-        //     })
-        // }
+        // post the data
+        let reservation_data = { 
+            user_id: currentUser._id,
+            user: currentUser, 
+            project_id: data._id,
+            project: data, 
+            reserved: quantity,
+            createdAt: new Date(),
+        };
+        let result = await ProjectData.setReservation(reservation_data);
+        if(result.success) {
+            Popup.show({
+                type: 'success',
+                title: 'Success!',
+                textBody: 'Item has been added into your shopping cart.',
+                buttonText: 'Okay',
+                callback: () => Popup.hide()
+            })
+        } else {
+            Popup.show({
+                type: 'danger',
+                title: 'Error. Please try again.',
+                textBody: result.error,
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        }
     }
 
     //=====================================================================================================================
@@ -216,8 +234,13 @@ export default function FoodItem(props) {
                         <Text style={{ fontStyle: 'italic' }}>Brought to you by <Text style={{ fontWeight: 'bold', fontStyle: 'normal' }}>Beyond Social Services</Text></Text>
                     </View>
                     <DisplayTimer />
-                    <View style={{ marginLeft: 30, }}>
+                    <View style={{ marginLeft: 30, marginTop: 10, }}>
                         <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 5, flex: 1, marginRight: 30, }}>{data.title}</Text>
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={{ fontWeight: 'bold' }}>Collect at:</Text>
+                            <Text>{data.location}</Text>
+                            <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
+                        </View>
                         <StoreTags
                             tags={data.tags}
                             style={{ marginTop: 5, }}
@@ -242,8 +265,11 @@ export default function FoodItem(props) {
                     style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
                 >
                     <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={_addToCart}>
-                        <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 30, }]}>Reserve {quantity} portion</Text>
+                        <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Reserve {quantity} portion</Text>
                     </TouchableOpacity>
+                    <View style={{ marginBottom: 10, }}>
+                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 5, paddingVertical: 5, paddingHorizontal: 10, }}>You have reserved {currentReservations.toString()} portions</Text>
+                    </View>
                 </LinearGradient>
             </Animatable.View>
         </ScrollView>
@@ -309,7 +335,8 @@ const styles = StyleSheet.create({
         minWidth: Dimensions.get('window').width / 5,
     },
     cardButton: {
-        margin: 20, 
+        marginHorizontal: 20,
+        marginVertical: 5, 
         height: 50, 
         width: Dimensions.get('screen').width * 0.8, 
         justifyContent: 'center', 
