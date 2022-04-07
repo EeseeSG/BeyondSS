@@ -14,6 +14,21 @@ export const getAllProjectData = async () => {
         })
 }
 
+export const getAllUpcomingProjectData = async () => {
+    return await firebase.firestore()
+        .collection('projects')
+        .where('datetime', '>', new Date())
+        .orderBy('datetime', 'asc')
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(project => {
+                let _id = project.id;
+                let data = project.data();
+                return { _id, ...data }
+            })
+        })
+}
+
 export const getProjectByID = async (project_id) => {
     return await firebase.firestore()
         .collection('projects')

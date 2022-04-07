@@ -1,51 +1,50 @@
 import React, { useEffect, useState, } from 'react';
 import { 
     View, 
-    ScrollView, 
+    FlatList, 
+    Text,
+    StyleSheet,
+    TouchableOpacity
 } from 'react-native';
 import { defaultStyles } from '../../constants/defaultStyles';
-import StoreBlock from '../../components/Store/StoreBlock';
+import * as ProjectData from '../../database/Project';
 import MultiSelect from '../../components/Search/MultiSelect';
-import * as StoreData from '../../database/Store';
+import moment from 'moment';
+import * as Colors from '../../constants/Colors';
 
 
 export default function Explore(props) {
     const { navigation } = props;
-    const [isLoaded, setIsLoaded] = useState(false);
-    const [storeData, setStoreData] = useState([]);
-    const [displayStoreData, setDisplayStoreData] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(true);
+    const [projects, setProjects] = useState([]);
+    const [rawProjects, setRawProjects] = useState([]);
     const [category, setCategory] = useState([]);
     const [selected, setSelected] = useState([]);
 
     useEffect(() => {
-        async function _getStoreData() {
-            let store_data = await StoreData.getAllStoreDataLimit(10);  // max 10 entries for subsequent query
-            let arr_store_id = store_data.map(store => store._id)
-            let store_product_data = await StoreData.getStoreProductDataByGroup(arr_store_id);
-            let mapped_store_data = await StoreData._mapProductToStore({arr_store: store_data, arr_products: store_product_data})
-            setStoreData(mapped_store_data);  // basic data
-            setDisplayStoreData(mapped_store_data);  //  data to display for filtered items
+        async function _getProjectData() {
+            let project_arr = await ProjectData.getAllUpcomingProjectData();
+            setProjects(project_arr);
+            setRawProjects(project_arr);  // to revert back after release filter
 
-            // set categories
-            let flat_categories = await _getCategories(mapped_store_data);
-            let categories_map = await _convertToMap(flat_categories);
-            setCategory(categories_map)
-
-            setIsLoaded(true)
-        }   
-        return _getStoreData()
+            // set the categories
+            let categories_arr = await _getCategories(project_arr);
+            let categories_mapped = await _convertToMap(categories_arr)
+            setCategory(categories_mapped);
+        }
+        return _getProjectData()
     }, [])
 
     const handleSelect = (val) => {
         setSelected(val)
 
         if(val.length === 0) {
-            setDisplayStoreData(storeData);  // revert to all values
+            setProjects(rawProjects);  // revert to all values
             return
         }
 
         // filter data
-        let filtered_data = storeData.filter((d) => {
+        let filtered_data = projects.filter((d) => {
             for(const v of val) {
                 if(d.tags.indexOf(v) !== -1) {
                     return true
@@ -54,7 +53,7 @@ export default function Explore(props) {
             return false
         })
 
-        setDisplayStoreData(filtered_data)
+        setProjects(filtered_data)
     } 
 
     // ===========================================
@@ -93,29 +92,77 @@ export default function Explore(props) {
         return final_text.trim()
     }
 
+    const renderItem = ({ item }) => {
+        return (
+            <TouchableOpacity style={{ margin: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }}>
+                <View style={{ flexDirection: 'row', marginRight: 15, }}>
+                    <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
+                    <Text 
+                        style={[
+                            item.halal ? 
+                            { color: 'green', borderColor: 'green' } : 
+                            { color: Colors.primary, borderColor: Colors.primary }, 
+                            { fontWeight: 'bold', borderWidth: 0.5, justifyContent: 'center', alignContent: 'center', textAlignVertical: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, }
+                        ]}
+                    >
+                        {item.halal ? 'Halal' : 'Non-Halal'}
+                    </Text>
+                </View>
+                <View style={{ marginHorizontal: 7, }}>
+                    <View style={{ flexDirection: 'row', flex: 1, marginVertical: 10, }}>
+                        <View style={{ flex: 1, }}>
+                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark }}>{item.location}</Text>
+                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark }}>{moment(item.datetime.seconds * 1000).format('LLL')}</Text>
+                            <Text>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
+                        </View>
+                        <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end' }}>
+                            <Text style={{ fontSize: 22, marginRight: 5, color: Colors.primary, fontWeight: 'bold', marginRight: 10, }}>{item.count.toString()}</Text>
+                            <Text style={{ fontSize: 17, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
+                        </View>
+                    </View>
+                    <View style={{ marginTop: 10, }}>
+                        <Text style={{ color: '#000' }} numberOfLines={5}>{item.message}</Text>
+                    </View>
+                </View>
+            </TouchableOpacity>    
+        )
+    }
+
 
     if(!isLoaded) {
         return (
             <View></View>
         )
     }
+
     return (
-        <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, }}>
+        <View style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, }}>
             <MultiSelect 
                 data={category}
                 selected={selected}
                 setSelected={handleSelect}
             />
-            { 
-                displayStoreData.map((data, i) => (
-                    <StoreBlock 
-                        key={i}
-                        index={i} 
-                        data={data}
-                        navigation={navigation}
-                    />
-                ))
-            }
-        </ScrollView>
+            <View style={{ alignItems: 'flex-end', marginRight: 25, marginBottom: 10, }}>
+                <Text style={{ color: 'black', opacity: 0.7, fontStyle: 'italic' }}>Showing {projects.length} of {rawProjects.length} results</Text>
+            </View>
+            <FlatList
+                horizontal={false}
+                keyExtractor={(_, index) => index.toString()}
+                data={projects}
+                renderItem={renderItem}
+                showsVerticalScrollIndicator={false}
+                ListFooterComponent={() => null}
+                ListFooterComponentStyle={{ paddingBottom: 90, }}
+            />
+        </View>
     )
 }
+
+const styles = StyleSheet.create({
+    sectionHeader: { 
+        fontSize: 16, 
+        fontWeight: 'bold', 
+        marginTop: 7, 
+        marginBottom: 3, 
+    }
+})
