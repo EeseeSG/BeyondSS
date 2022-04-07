@@ -37,8 +37,7 @@ import RootStackScreen from './screens/auth/RootStackScreen';
 import Tabs from './navigation/Tabs';
 import StoreProfile from './screens/store/StoreProfile';
 import Settings from './screens/settings/Settings';
-import FoodItem from './screens/store/FoodItem';
-import Cart from './screens/store/ShoppingCart';
+import ProjectDetail from './screens/store/ProjectDetail';
 import PaymentHistory from './screens/user/PaymentHistory';
 import ProductReviews from './screens/store/ProductReviews';
 import Favourites from './screens/user/Favourites';
@@ -122,8 +121,7 @@ export default function App() {
                       <Stack.Screen name="Tabs"  component={Tabs} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Settings" component={Settings}/>
                       <Stack.Screen name="Expore" component={Explore} options={{ headerShown: false,}}/>
-                      <Stack.Screen name="FoodItem" component={FoodItem} options={{ headerShown: false,}}/>
-                      <Stack.Screen name="Cart" component={Cart} options={{ title: ''}}/>
+                      <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
                       <Stack.Screen name="StoreProfile" component={StoreProfile} options={{ title: '', headerShown: false, }}/>
                       <Stack.Screen name="PaymentHistory" component={PaymentHistory} options={{ title: 'Payment History'}}/>
                       <Stack.Screen name="ProductReviews" component={ProductReviews} options={{ title: 'Reviews'}}/>

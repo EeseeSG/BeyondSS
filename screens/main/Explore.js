@@ -15,7 +15,7 @@ import * as Colors from '../../constants/Colors';
 
 export default function Explore(props) {
     const { navigation } = props;
-    const [isLoaded, setIsLoaded] = useState(true);
+    const [isLoaded, setIsLoaded] = useState(false);
     const [projects, setProjects] = useState([]);
     const [rawProjects, setRawProjects] = useState([]);
     const [category, setCategory] = useState([]);
@@ -31,6 +31,9 @@ export default function Explore(props) {
             let categories_arr = await _getCategories(project_arr);
             let categories_mapped = await _convertToMap(categories_arr)
             setCategory(categories_mapped);
+
+            // load the page
+            setIsLoaded(true);
         }
         return _getProjectData()
     }, [])
@@ -94,18 +97,18 @@ export default function Explore(props) {
 
     const renderItem = ({ item }) => {
         return (
-            <TouchableOpacity style={{ margin: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }}>
+            <TouchableOpacity style={{ margin: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
                 <View style={{ flexDirection: 'row', marginRight: 15, }}>
                     <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
                     <Text 
                         style={[
-                            item.halal ? 
+                            item.tags.indexOf('halal') !== -1 ? 
                             { color: 'green', borderColor: 'green' } : 
                             { color: Colors.primary, borderColor: Colors.primary }, 
                             { fontWeight: 'bold', borderWidth: 0.5, justifyContent: 'center', alignContent: 'center', textAlignVertical: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, }
                         ]}
                     >
-                        {item.halal ? 'Halal' : 'Non-Halal'}
+                        {item.tags.indexOf('halal') !== -1 ? 'Halal' : 'Non-Halal'}
                     </Text>
                 </View>
                 <View style={{ marginHorizontal: 7, }}>
