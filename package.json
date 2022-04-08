@@ -41,7 +41,8 @@
     "react-native-vector-icons": "^9.0.0",
     "react-native-web": "0.17.1",
     "@react-native-community/datetimepicker": "3.5.2",
-    "expo-notifications": "~0.13.3"
+    "expo-notifications": "~0.13.3",
+    "expo-device": "~4.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

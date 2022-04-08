@@ -63,3 +63,51 @@ export const getAllApplications = async () => {
             return result
         })
 }
+
+export const createNewUser = async (data) => {
+    try {
+        await firebase
+        .auth()
+        .createUserWithEmailAndPassword(data.email, data.password)
+        .then((credential) => {
+            credential.user.updateProfile({ displayName: data.name })
+                .then(async () => {
+                let user_id = credential.user.uid;
+                let user_data = {
+                    ...data,
+                    createdAt: new Date(),
+                }
+                await firebase.firestore()
+                    .collection('users')
+                    .doc(user_id)
+                    .set(user_data)
+
+                // set user data
+                setUser(user_data)
+
+                });
+        });
+    } catch (error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
+
+export const rejectApplication = async (application_id) => {
+    try {
+        await firebase.firestore()
+            .collection('applications')
+            .doc(application_id)
+            .delete()
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}

@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useState, useContext, } from 'react';
+import React, { useState, useContext, useEffect, } from 'react';
 import { 
 	View, 
 	Text,  
@@ -27,17 +27,45 @@ import { LinearGradient } from 'expo-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 
+// PUSH NOTIFICATION
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
 const SignInScreen = ({navigation}) => {
 	const { colors } = useTheme();
-
 	const { register } = useContext(AuthContext);
-
 	const [data, setData] = useState({
 		email: '',
 		name: '',
 		contact: '',
 	});
+
+	useEffect(() => {
+		async function registerForPushNotificationsAsync() {
+			let token;
+			if (Device.isDevice) {
+				const { status: existingStatus } = await Notifications.getPermissionsAsync();
+				let finalStatus = existingStatus;
+				if (existingStatus !== 'granted') {
+					const { status } = await Notifications.requestPermissionsAsync();
+					finalStatus = status;
+				}
+				if (finalStatus !== 'granted') {
+					alert('Failed to get push token for push notification!');
+					return;
+				}
+				token = (await Notifications.getExpoPushTokenAsync()).data;
+				console.log(token);
+				setData({
+					...data,
+					expoPushToken: token
+				})
+			} else {
+			  	alert('Must use physical device for Push Notifications');
+			}
+		}
+		return registerForPushNotificationsAsync()
+	}, [])
 
 	// Data validation
 	const [emailValidated, setEmailValidated] = useState(false);
@@ -146,7 +174,7 @@ const SignInScreen = ({navigation}) => {
 	}
 
 	const registerUser = async () => {
-		register(data.name, data.email, data.contact)
+		register(data)
 	}
 
 	return (

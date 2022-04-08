@@ -61,7 +61,7 @@ export const AuthProvider = ({ children }) => {
         },
 
         // REGISTER
-        register: async (name, email, contact) => {
+        register: async ({ email, name, contact, expoPushToken }) => {
           setLoading(true);
 
           try {
@@ -71,12 +71,13 @@ export const AuthProvider = ({ children }) => {
                 email: email,
                 name: name,
                 contact: contact,
-                createdAt: new Date(),
+                expoPushToken: expoPushToken,
                 device: {
                   brand: Platform.constants.Brand,
                   model: Platform.constants.Model,
                   platform: Platform.OS,
                 },
+                createdAt: new Date(),
               })
             Popup.show({
               type: 'success',
@@ -85,48 +86,6 @@ export const AuthProvider = ({ children }) => {
               buttonText: 'Close',
               callback: () => Popup.hide()
             })
-          } catch (error) {
-            Popup.show({
-              type: 'danger',
-              title: 'An error has occurred. Please try again.',
-              textBody: error,
-              buttonText: 'Close',
-              callback: () => Popup.hide()
-            })
-          }
-
-          setLoading(false);
-        },
-
-        // APPROVE
-        approve: async (name, email, password) => {
-          setLoading(true);
-
-          try {
-            await firebase
-            .auth()
-            .createUserWithEmailAndPassword(email, password)
-            .then((credential) => {
-              credential.user.updateProfile({ displayName: name })
-                .then(async () => {
-                  let user_id = credential.user.uid;
-                  let user_data = {
-                    email: email,
-                    name: name,
-                    contact: contact,
-                    createdAt: new Date(),
-                    lastOnline: new Date(),
-                  }
-                  await firebase.firestore()
-                    .collection('users')
-                    .doc(user_id)
-                    .set(user_data)
-
-                  // set user data
-                  setUser(user_data)
-
-                });
-            });
           } catch (error) {
             Popup.show({
               type: 'danger',

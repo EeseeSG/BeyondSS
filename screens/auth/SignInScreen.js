@@ -8,9 +8,7 @@ import {
     Platform,
     StyleSheet ,
     StatusBar,
-    Alert,
 	ScrollView,
-	Image
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
