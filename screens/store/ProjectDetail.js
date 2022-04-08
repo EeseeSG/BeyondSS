@@ -41,22 +41,64 @@ const PHONE_OFFSET = Platform.OS === 'ios' ? 44 : 0;
 
 export default function FoodItem(props) {
     const { navigation, route } = props;
+    const data = route.params.data;
     const { colors } = useTheme();
     const [isLoaded, setIsLoaded] = useState(false);
-    const data = route.params.data;
     const [quantity, setQuantity] = useState(1);
 
     //=====================================================================================================================
     //== INITIATE ==
     //=====================================================================================================================
     const [currentUser, setCurrentUser] = useState([]);
+    const [reservations, setReservations] = useState(null);
+    const [currentReservations, setCurrentReservations] = useState(null);
+    const [quantityReserved, setQuantityReserved] = useState(null);
+
+    // get user data
     useEffect(() => {
-        async function _init() {
-            await _getCurrentUser()
+        async function _getUserData() {
+            let current_user = await _getCurrentUser(); // user data
+            setCurrentUser(current_user);
+        }
+        return _getUserData()
+    } ,[])
+
+    // to load once all data is loaded
+    useEffect(() => {
+        if(currentReservations && quantityReserved) {
             setIsLoaded(true);
         }
-        return _init()
-    } ,[])
+    }, [currentReservations, quantityReserved])
+
+    // get reservation data
+    useEffect(() => {
+        return _getReservationData();
+    }, [])
+
+    // update total reserved amount
+    useEffect(() => {
+        if(reservations) {
+            async function _getReservedTotal() {
+                let total_reserved_count = await _getTotalReservedCount(reservations);  // total count
+                setQuantityReserved(total_reserved_count);
+            }
+            return _getReservedTotal();
+        }
+
+    }, [reservations])
+
+    // update user reserved amount
+    useEffect(() => {
+        if(reservations) {
+            async function _getReservedUser() {
+                let user_count = await _getUserReservedCount(reservations);  // user specific count
+                setCurrentReservations(user_count);
+                setQuantity(user_count);
+            }
+            return _getReservedUser();
+        }
+    }, [reservations])
+
 
 
     //=====================================================================================================================
@@ -64,35 +106,46 @@ export default function FoodItem(props) {
     //=====================================================================================================================
     async function _getCurrentUser() {
         let current_user = await UserData.currentUserData();
-        setCurrentUser(current_user);
-        _getCurrentReservations(current_user);  // get reserved quantity
-        return
+        return current_user
     } 
 
     //=====================================================================================================================
     //==  CURRENT RESERVATIONS ==
     //=====================================================================================================================
-    const [currentReservations, setCurrentReservations] = useState([]);
-    async function _getCurrentReservations(user) {
-        firebase.firestore()
+    async function _getReservationData() {
+        let reservations_all = await _getCurrentReservations();  // get reserved data
+        setReservations(reservations_all)
+    }
+
+    async function _getCurrentReservations() {
+        const reservations_all = await firebase.firestore()
             .collection('reservations')
             .where('project_id', '==', data._id)
-            .where('user_id', '==', user._id)
-            .onSnapshot((snapshot) => {
-                let arr = snapshot.docs.map((snap) => {
+            .get()
+            .then(async (snapshot) => {
+                let arr = await Promise.all(snapshot.docs.map((snap) => {
                     let _id = snap.id;
                     let data = snap.data();
                     return { _id, ...data }
-                })
-
-                // sum them up
-                const reserved_map = arr.map((i) => i.reserved);
-                const count = reserved_map.reduce((a, b) => a + b, 0);
-                setCurrentReservations(count);
-                setQuantity(count)
+                }))
+                return arr
             })
-    } 
-    
+        return reservations_all
+    }
+
+    async function _getTotalReservedCount(reservations_all) {
+        const reserved_map = reservations_all.map((i) => i.reserved);
+        const count = reserved_map.reduce((a, b) => a + b, 0);
+        return count
+    }
+
+    async function _getUserReservedCount(reservations_all) {
+        const user_reserved_data = await Promise.all(reservations_all.filter((i) => i.user_id === currentUser._id));
+        const user_reserved_map = await Promise.all(user_reserved_data.map((i) => i.reserved));
+        const user_count = user_reserved_map.reduce((a, b) => a + b, 0);
+        return user_count
+    }
+
   
     //============================================c=========================================================================
     //==  MAKE RESERVATION ==
@@ -113,6 +166,9 @@ export default function FoodItem(props) {
         };
         let result = await ProjectData.updateReservation(reservation_data);
         if(result.success) {
+            // update by recalling the function
+            await _getReservationData()
+
             Popup.show({
                 type: 'success',
                 title: 'Success!',
@@ -239,7 +295,7 @@ export default function FoodItem(props) {
                         <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 5, flex: 1, marginRight: 30, }}>{data.title}</Text>
                         <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end', margin: 10, }}>
                             <Text style={{ fontSize: 22, color: 'black', opacity: 0.7, }}>= </Text>
-                            <Text style={{ fontSize: 22, color: colors.primary, fontWeight: 'bold', marginRight: 5, }}>{data.count.toString()}</Text>
+                            <Text style={{ fontSize: 22, color: colors.primary, fontWeight: 'bold', marginRight: 5, }}>{(data.count - quantityReserved).toString()}</Text>
                             <Text style={{ fontSize: 20, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
                         </View>
                         <View style={{ marginVertical: 10 }}>
@@ -258,10 +314,10 @@ export default function FoodItem(props) {
                             quantity={quantity}
                             setQuantity={setQuantity}
                         />
-                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(255,255,255,0.9)', borderRadius: 5, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
+                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
-                        <Text style={styles.header}>Message from Chef</Text>
+                        <Text style={styles.header}>Message from Chef:</Text>
                         <Text style={{ textAlign: 'justify' }}>{data.message}</Text>
                     </View>
 

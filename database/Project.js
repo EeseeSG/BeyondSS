@@ -9,7 +9,7 @@ export const getAllProjectData = async () => {
             return snapshot.docs.map(project => {
                 let _id = project.id;
                 let data = project.data();
-                return { _id, ...data }
+                return { ...data, _id }
             })
         })
 }
@@ -21,9 +21,9 @@ export const getAllUpcomingProjectData = async () => {
         .orderBy('datetime', 'asc')
         .get()
         .then((snapshot) => {
-            return snapshot.docs.map(project => {
-                let _id = project.id;
-                let data = project.data();
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
                 return { ...data, _id }
             })
         })
@@ -39,6 +39,49 @@ export const getProjectByID = async (project_id) => {
             let data = project.data();
             return { _id, ...data }
         })
+}
+
+export const getAllUpcomingReservations = async () => {
+    return await firebase.firestore()
+        .collection('reservations')
+        .where('project.datetime', '>', new Date())
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
+export const getOutstandingProjects = async () => {
+    let project_arr = await getAllProjectData();
+
+    // map current availability
+    let reservations_arr = await getAllUpcomingReservations();
+    let new_project_arr = project_arr.map((project) => {
+        let reserved = 0;
+        let beneficiaries = [];
+        let reservation_data = [];
+        for(var i = 0; i < reservations_arr.length; i++) {
+            if(project._id === reservations_arr[i].project_id) {
+                reserved += reservations_arr[i].reserved;
+                beneficiaries.push(reservations_arr[i].user_id);
+                reservation_data.push({
+                    user: reservations_arr[i].user,
+                    reserved: reservations_arr[i].reserved,
+                })
+            }
+        }
+        return {
+            ...project,
+            reserved,
+            beneficiaries,
+            reservation_data
+        }
+    });
+    return new_project_arr;
 }
 
 export const updateReservation = async (data) => {

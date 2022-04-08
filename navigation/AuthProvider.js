@@ -4,7 +4,12 @@ import { firebase } from '../constants/Firebase';
 import { DEFAULT_AVATAR } from '../constants/Default';
 import { Platform } from 'react-native';
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext({
+  user: null,
+  setUser: () => {},
+  loading: false,
+  setLoading: () => {},
+});
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -58,8 +63,6 @@ export const AuthProvider = ({ children }) => {
         // REGISTER
         register: async (name, email, contact) => {
           setLoading(true);
-
-          console.log(Platform)
 
           try {
             await firebase.firestore()
