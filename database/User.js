@@ -83,7 +83,7 @@ export const getAllUsersByDateJoined = async () => {
 
 export const createNewUser = async (data) => {
     try {
-        let intial_password = _generateRandomPassword();  // raw password for user to log in
+        let intial_password = data.contact.slice(-6);  // raw password for user to log in
 
         await firebase
         .auth()

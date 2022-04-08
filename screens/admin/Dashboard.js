@@ -13,8 +13,6 @@ import moment from 'moment';
 import { getAllApplications } from '../../database/User';
 import Feather from 'react-native-vector-icons/Feather';
 import { createNewUser, deleteApplication, getAllUsersByDateJoined } from '../../database/User';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
-
 
 export default function NewProject(props) {
     const [isRefreshing, setIsRefreshing] = useState(false);
