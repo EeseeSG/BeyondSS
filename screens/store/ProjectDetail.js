@@ -65,7 +65,7 @@ export default function FoodItem(props) {
 
     // to load once all data is loaded
     useEffect(() => {
-        if(currentReservations && quantityReserved) {
+        if(currentReservations !== null && quantityReserved  !== null) {
             setIsLoaded(true);
         }
     }, [currentReservations, quantityReserved])
@@ -172,7 +172,7 @@ export default function FoodItem(props) {
             Popup.show({
                 type: 'success',
                 title: 'Success!',
-                textBody: 'Item has been added into your shopping cart.',
+                textBody: 'Reservation was made successfully. Please take note of the location, time and any notes by the chef.',
                 buttonText: 'Okay',
                 callback: () => Popup.hide()
             })
@@ -253,6 +253,30 @@ export default function FoodItem(props) {
         return true
     }
 
+    const handleCancel = () => {
+        Popup.show({
+            type: 'confirm',
+            title: 'WARNING!',
+            textBody: 'Are you sure you would like to cancel this reservation? This action cannot be undone.',
+            buttonText: 'Confirm',
+            confirmText: 'Cancel',
+            callback: async () => {
+                try {
+                    let status = await ProjectData.cancelReservation(data._id+'-'+currentUser._id);
+                    console.log(status)
+                } catch(err) {
+                    console.log(err)
+                } finally {
+                    Popup.hide();
+                    navigation.navigate('Explore');
+                }
+            },
+            cancelCallback: () => {
+                Popup.hide();
+            },
+        })
+    }
+
 
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
@@ -315,6 +339,9 @@ export default function FoodItem(props) {
                             setQuantity={setQuantity}
                         />
                         <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
+                        <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
+                            <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
+                        </TouchableOpacity>
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
                         <Text style={styles.header}>Message from Chef:</Text>

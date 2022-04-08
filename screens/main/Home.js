@@ -7,6 +7,7 @@ import {
     TouchableOpacity, 
     Dimensions, 
     Image, 
+    FlatList,
     ScrollView, 
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
@@ -24,8 +25,15 @@ import PartnerCarousel from '../../components/Store/PartnerCarousel';
 // DATA
 import { currentUserData } from '../../database/User';
 import { getPartnerData, getNewsData, getBannerData } from '../../database/Index';
+import { _parseDetailedProjectData } from '../../database/Project';
 import moment from 'moment';
 
+// DATABASE
+import firebase from 'firebase';
+require('firebase/firestore');
+
+// COMPONENTS
+import ProjectItem from '../../components/Project/ProjectItem';
 
 const in_need_fed = 1000;
 const orders_fulfilled = 100000;
@@ -78,6 +86,26 @@ export default function Home({ navigation }) {
         return _getBanners();
     }, [])
 
+    const [reservations, setReservations] = useState([]);
+    useEffect(() => {
+        if(currentUser) {
+            async function _getReservations() {
+                firebase.firestore()
+                    .collection('reservations')
+                    .where('user_id', '==', currentUser._id)
+                    .onSnapshot(async (snapshot) => {
+                        let arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        let parsedArr = await _parseDetailedProjectData(arr);
+                        setReservations(parsedArr);
+                    })
+            }
+            return _getReservations()
+        }
+    }, [currentUser])
 
     //=====================================================================================================================
     //==  GET ADV BANNER ==
@@ -96,10 +124,25 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     //==  HANDLE EXTERNAL LINKS ==
     //=====================================================================================================================
-
     const _handlePressButtonAsync = async (url) => {
         await WebBrowser.openBrowserAsync(url);
     };
+
+
+    //=====================================================================================================================
+    //==  HANDLE UPCOMING ==
+    //=====================================================================================================================
+    const renderItem = ({ item }) => {
+        return (
+            <ProjectItem 
+                data={item.project} 
+                user_id={currentUser._id}
+                navigation={navigation}
+                style={{ width: windowWidth - 20 }}
+            />
+        )
+    }
+
 
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
@@ -160,6 +203,17 @@ export default function Home({ navigation }) {
                 </View>
             </View>
 
+            {
+                reservations && (
+                    <FlatList
+                        horizontal
+                        keyExtractor={(_, index) => index.toString()}
+                        data={reservations}
+                        renderItem={renderItem}
+                    />
+                )
+                
+            }
 
             <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>
                 <Image
@@ -186,7 +240,7 @@ export default function Home({ navigation }) {
                     <TouchableOpacity key={index} style={{ marginVertical: 10, marginHorizontal: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
                         <View style={{ flexDirection: 'row', marginVertical: 5, }}>
                             <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
-                            <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic'}} selectable>{moment(item.date).format('LL')}</Text>
+                            <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
                         </View>
                         <Text style={{ fontSize: 12, }} selectable>{item.desc}</Text>
                         <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.5)', fontSize: 12, fontWeight: 'bold' }}>Read More...</Text>

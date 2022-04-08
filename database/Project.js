@@ -59,6 +59,11 @@ export const getOutstandingProjects = async () => {
     let project_arr = await getAllProjectData();
 
     // map current availability
+    let new_project_arr = await _parseDetailedProjectData(project_arr)
+    return new_project_arr;
+}
+
+export const _parseDetailedProjectData = async (project_arr) => {
     let reservations_arr = await getAllUpcomingReservations();
     let new_project_arr = project_arr.map((project) => {
         let reserved = 0;
@@ -90,6 +95,23 @@ export const updateReservation = async (data) => {
             .collection('reservations')
             .doc(data.project_id+'-'+data.user_id)
             .set(data)
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
+
+export const cancelReservation = async (reservation_id) => {
+    try {
+        await firebase.firestore()
+            .collection('reservations')
+            .doc(reservation_id)
+            .delete()
         return {
             success: true,
         }

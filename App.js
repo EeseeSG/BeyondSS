@@ -120,7 +120,7 @@ export default function App() {
                     <Stack.Group navigationKey={isLoggedIn ? 'user' : 'guest'}>
                       <Stack.Screen name="Tabs"  component={Tabs} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Settings" component={Settings}/>
-                      <Stack.Screen name="Expore" component={Explore} options={{ headerShown: false,}}/>
+                      <Stack.Screen name="Explore" component={Explore} options={{ headerShown: false,}}/>
                       <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
                       <Stack.Screen name="StoreProfile" component={StoreProfile} options={{ title: '', headerShown: false, }}/>
                       <Stack.Screen name="PaymentHistory" component={PaymentHistory} options={{ title: 'Payment History'}}/>
