@@ -29,7 +29,7 @@ export default function ProjectItem(props) {
 
     return (
         <View style={{ width: windowWidth, ...style }}>
-            <TouchableOpacity style={[hasApplied ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
+            <TouchableOpacity style={[(hasApplied || user_id === item.user._id) ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
                 {
                     hasApplied && (
                         <View style={{ width: 25, height: 25, borderWidth: 1, borderColor: 'green', borderRadius: 30, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 0, top: -10, }}>
@@ -48,24 +48,25 @@ export default function ProjectItem(props) {
                             </TouchableOpacity>
                         )
                     }
+                </View>
+                <Text style={{ fontSize: 14, color: Colors.dark }}>{moment(item.datetime.seconds * 1000).format('LLL')}</Text>
+                <Text>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
 
-                </View>
-                <View style={{ marginHorizontal: 7, }}>
-                    <View style={{ flexDirection: 'row', flex: 1, marginVertical: 10, }}>
-                        <View style={{ flex: 1, }}>
-                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark }}>{item.location}</Text>
-                            <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark }}>{moment(item.datetime.seconds * 1000).format('LLL')}</Text>
-                            <Text>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
-                        </View>
-                        <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end' }}>
-                            <Text style={{ fontSize: 22, marginRight: 5, color: Colors.primary, fontWeight: 'bold', marginRight: 10, }}>{(item.count - item.reserved).toString()}</Text>
-                            <Text style={{ fontSize: 17, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
-                        </View>
+                <View style={{ flexDirection: 'row', flex: 1, marginTop: 10, }}>
+                    <View style={{ flex: 1, }}>
+                        <Text style={{ color: Colors.dark }}>Collect at:</Text>
+                        <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark, marginLeft: 5, }}>{item.location}</Text>
                     </View>
-                    <View style={{ marginTop: 10, }}>
-                        <Text style={{ color: '#000' }} numberOfLines={5}>{item.message}</Text>
+                    <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end' }}>
+                        <Text style={{ fontSize: 22, marginRight: 5, color: Colors.primary, fontWeight: 'bold', marginRight: 10, }}>{(item.count - item.reserved).toString()}</Text>
+                        <Text style={{ fontSize: 17, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
                     </View>
                 </View>
+                <View style={{ marginTop: 10, }}>
+                    <Text style={{ color: Colors.dark }}>Message:</Text>
+                    <Text style={{ color: '#000', marginLeft: 5, }} numberOfLines={3}>{item.message}</Text>
+                </View>
+
             </TouchableOpacity>
         </View>
     )
