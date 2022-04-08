@@ -49,6 +49,15 @@ export default function Explore(props) {
         setIsLoaded(true);
     }
 
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+
+        await _getProjectData();
+
+        setIsRefreshing(false);
+    }
+
     // ===========================================
     //   MULTISELECT
     // ===========================================
@@ -145,6 +154,8 @@ export default function Explore(props) {
                 showsVerticalScrollIndicator={false}
                 ListFooterComponent={() => null}
                 ListFooterComponentStyle={{ paddingBottom: 90, }}
+                onRefresh={handleRefresh}
+                refreshing={isRefreshing}
             />
         </View>
     )

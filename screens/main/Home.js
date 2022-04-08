@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useRef, useState, useEffect, } from 'react';
+import React, { useRef, useState, useEffect, useContext } from 'react';
 import { 
     View, 
     Text, 
@@ -11,10 +11,10 @@ import {
     ScrollView, 
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
+import { Popup } from 'react-native-popup-confirm-toast';
 
 // DESIGN
 import { defaultStyles } from '../../constants/defaultStyles';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTheme } from 'react-native-paper';
 import UserAvatar from 'react-native-user-avatar';
 
@@ -23,8 +23,8 @@ import Carousel from 'react-native-snap-carousel';
 import PartnerCarousel from '../../components/Project/PartnerCarousel';
 
 // DATA
-import { currentUserData } from '../../database/User';
-import { getPartnerData, getNewsData, getBannerData } from '../../database/Index';
+import * as UserData from '../../database/User';
+import * as IndexData from '../../database/Index';
 import moment from 'moment';
 
 // DATABASE
@@ -34,13 +34,16 @@ require('firebase/firestore');
 // COMPONENTS
 import CollectionItem from '../../components/Project/CollectionItem';
 
-const in_need_fed = 1000;
-const orders_fulfilled = 100000;
-
+// AUTH PROVIDER
+import { AuthContext } from '../../navigation/AuthProvider';
 
 export default function Home({ navigation }) {
     const { colors } = useTheme();
+    const { logout } = useContext(AuthContext);
     const { width: windowWidth, height: windowHeight } = Dimensions.get('screen');
+    const [isChef, setIsChef] = useState(false);
+    const [isBeneficiary, setIsBeneficiary] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     //=====================================================================================================================
     //==  GET DATA ==
@@ -48,8 +51,11 @@ export default function Home({ navigation }) {
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
         async function _getCurrentUser() {
-            let currentUser = await currentUserData()
-            setCurrentUser(currentUser)
+            let currentUser = await UserData.currentUserData();
+            setCurrentUser(currentUser);
+            setIsChef(currentUser.type === 'chef');
+            setIsBeneficiary(currentUser.type === 'beneficiary');
+            setIsAdmin(currentUser.isAdmin);
             return
         }
         return _getCurrentUser()
@@ -58,7 +64,7 @@ export default function Home({ navigation }) {
     const [news, setNews] = useState([]);
     useEffect(() => {
         async function _getNews() {
-            let news_arr = await getNewsData()
+            let news_arr = await IndexData.getNewsData()
             setNews(news_arr)
             return;
         }
@@ -68,7 +74,7 @@ export default function Home({ navigation }) {
     const [partners, setPartners] = useState([]);
     useEffect(() => {
         async function _getPartners() {
-            let partner_arr = await getPartnerData()
+            let partner_arr = await IndexData.getPartnerData()
             setPartners(partner_arr)
             return;
         }
@@ -78,7 +84,7 @@ export default function Home({ navigation }) {
     const [banners, setBanners] = useState([]);
     useEffect(() => {
         async function _getBanners() {
-            let banner_arr = await getBannerData()
+            let banner_arr = await IndexData.getBannerData()
             setBanners(banner_arr)
             return;
         }
@@ -103,6 +109,21 @@ export default function Home({ navigation }) {
                     })
             }
             return _getReservations()
+        }
+    }, [currentUser])
+
+    const [chefs, setChefs] = useState(0);
+    const [beneficiary, setBeneficiary] = useState(0);
+    useEffect(() => {
+        if(currentUser) {
+            async function _getAllUserData() {
+                let arr = await IndexData.getAllUserData();
+                let num_chef = arr.filter((i) => i.type === 'chef').length;
+                let num_beneficiary = arr.filter((i) => i.type === 'beneficiary').length;
+                setChefs(num_chef);
+                setBeneficiary(num_beneficiary);
+            }
+            return _getAllUserData()
         }
     }, [currentUser])
 
@@ -143,6 +164,28 @@ export default function Home({ navigation }) {
     }
 
 
+    const handleCTA = () => {
+        if(isChef) {
+            navigation.navigate('Start Giving')
+        } else if(isBeneficiary) {
+            navigation.navigate('Explore')
+        } else if(isAdmin) {
+            navigation.navigate('Dashboard')
+        } else {
+            Popup.show({
+                type: 'danger',
+                title: 'Invalid quantity',
+                textBody: 'The quantity you selected is more than that of what is currently left available. Please lower the quantity and try again.',
+                buttonText: 'Close',
+                callback: () => {
+                    Popup.hide();
+                    logout();
+                }
+            })
+        }
+    }
+
+
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
     //=====================================================================================================================
@@ -152,19 +195,25 @@ export default function Home({ navigation }) {
 
     return (
         <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, paddingHorizontal: 10, paddingTop: 10, }}>
-            <View style={{ marginTop: 5, marginBottom: 5, marginHorizontal: 5, flexDirection: 'row-reverse',}}>
-                <TouchableOpacity style={[styles.cartBtn, styles.shadow]} onPress={() => navigation.navigate('Cart')}>
-                    <MaterialCommunityIcons name="cart-outline" size={24} color={colors.dark}/>
-                </TouchableOpacity>
-            </View>
-            <View style={{ marginHorizontal: 10, }}>
+            <View style={{ marginHorizontal: 10, marginTop: 40, }}>
                 <View style={{ flexDirection: 'row' }}>
                     <UserAvatar name={currentUser.username}/>
                     <Text style={[styles.greetings, { color: colors.primary, marginBottom: 5, }]}>
                         {"  "}Hi {currentUser.username} 
                     </Text>
                 </View>
-                <Text style={[styles.title, { marginBottom: 10, }]}>{currentUser.type === 'chef' ? 'How would you like to help?' : 'How can we help?'}</Text>
+                <Text style={[styles.title, { marginBottom: 10, }]}>{isChef ? 'How would you like to help?' : 'How can we help?'}</Text>
+            </View>
+
+            <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>
+                <Image
+                    source={require('../../assets/home_chef_transparent.png')}
+                    style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
+                    resizeMode='cover'
+                />
+                <TouchableOpacity style={styles.swipeBtn} onPress={handleCTA}>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{isChef ? 'Start Giving!' : 'Explore!'}</Text>
+                </TouchableOpacity>
             </View>
 
             <View>
@@ -174,7 +223,7 @@ export default function Home({ navigation }) {
                     renderItem={({ item }) => renderBanner(item)}
                     sliderWidth={Dimensions.get('window').width - 20}
                     itemWidth={300}
-                    slideStyle={{ marginTop: 20, }}
+                    slideStyle={{ marginTop: 30, }}
                     loop={true}
                     enableSnap={true}
                     autoplay={true}
@@ -184,16 +233,16 @@ export default function Home({ navigation }) {
 
             <View style={{ flex: 1, marginHorizontal: 10, marginTop: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
                 <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                    <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Total</Text>
+                    <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Hosting</Text>
                 </View>
                 <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                        <Text style={{ fontSize: 26, color: 'black', opacity: 0.8, fontWeight: 'bold' }}>{in_need_fed.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                        <Text style={{ color: 'black', opacity: 0.6, }}>in-need fed</Text>
+                        <Text style={{ fontSize: 26, color: 'black', opacity: 0.8, fontWeight: 'bold' }}>{beneficiary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                        <Text style={{ color: 'black', opacity: 0.6, }}>beneficiaries</Text>
                     </View>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{orders_fulfilled.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                        <Text style={{ color: 'black', opacity: 0.6, }}>orders fulfilled</Text>
+                        <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{chefs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                        <Text style={{ color: 'black', opacity: 0.6, }}>chef volunteers</Text>
                     </View>
                 </View>
             </View>
@@ -214,17 +263,6 @@ export default function Home({ navigation }) {
                 )
             }
 
-            <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>
-                <Image
-                    source={require('../../assets/home_chef_transparent.png')}
-                    style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
-                    resizeMode='cover'
-                />
-                <TouchableOpacity style={styles.swipeBtn} onPress={() => navigation.navigate('Explore')}>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{currentUser.type === 'chef' ? 'Start Giving!' : 'Explore!'}</Text>
-                </TouchableOpacity>
-            </View>
-
             <Text style={styles.header}>Partners</Text>
             <View style={{ backgroundColor: '#fff', borderRadius: 5, }}>
                 <PartnerCarousel
@@ -236,7 +274,7 @@ export default function Home({ navigation }) {
             <Text style={styles.header}>Latest News</Text>
             {
                 news.map((item, index) => (
-                    <TouchableOpacity key={index} style={{ marginHorizontal: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
+                    <TouchableOpacity key={index} style={{ margin: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
                         <View style={{ flexDirection: 'row', marginVertical: 5, }}>
                             <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
                             <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
@@ -246,6 +284,9 @@ export default function Home({ navigation }) {
                     </TouchableOpacity>
                 ))
             }
+            <TouchableOpacity style={{ margin: 10, justifyContent: 'center', alignItems: 'flex-end' }} onPress={() => _handlePressButtonAsync('https://www.beyond.org.sg/')}>
+                <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.7)', fontWeight: 'bold' }}>View more...</Text>
+            </TouchableOpacity>
 
 
         </ScrollView>

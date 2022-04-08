@@ -38,6 +38,8 @@ import Tabs from './navigation/Tabs';
 import Settings from './screens/settings/Settings';
 import ProjectDetail from './screens/projects/ProjectDetail';
 import Explore from './screens/main/Explore';
+import NewProject from './screens/projects/NewProject';
+import Dashboard from './screens/admin/Dashboard';
 
 // INIT FIREBASE
 import { firebase } from './constants/Firebase';
@@ -118,6 +120,8 @@ export default function App() {
                       <Stack.Screen name="Settings" component={Settings}/>
                       <Stack.Screen name="Explore" component={Explore} options={{ headerShown: false,}}/>
                       <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
+                      <Stack.Screen name="Start Giving" component={NewProject} />
+                      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false,}}/>
                     </Stack.Group>
                   </Stack.Navigator>
                 </>

@@ -99,7 +99,7 @@ export const AuthProvider = ({ children }) => {
         },
 
         // APPROVE
-        approve: async (displayName, email, password) => {
+        approve: async (name, email, password) => {
           setLoading(true);
 
           try {
@@ -107,16 +107,14 @@ export const AuthProvider = ({ children }) => {
             .auth()
             .createUserWithEmailAndPassword(email, password)
             .then((credential) => {
-              credential.user.updateProfile({ displayName: displayName })
+              credential.user.updateProfile({ displayName: name })
                 .then(async () => {
                   let user_id = credential.user.uid;
                   let user_data = {
                     email: email,
-                    username: displayName,
-                    username_lower: displayName.toLowerCase(),
-                    avatar: default_avatar,
+                    name: name,
+                    contact: contact,
                     createdAt: new Date(),
-                    online: true,
                     lastOnline: new Date(),
                   }
                   await firebase.firestore()
@@ -127,8 +125,6 @@ export const AuthProvider = ({ children }) => {
                   // set user data
                   setUser(user_data)
 
-                  // login to chatkitty
-                  await loginChatKitty(email.trim(), password)
                 });
             });
           } catch (error) {

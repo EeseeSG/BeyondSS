@@ -30,6 +30,20 @@ export const getPartnerData = async () => {
 export const getNewsData = async () => {
     return await firebase.firestore()
         .collection('news')
+        .limit(10)
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(project => {
+                let _id = project.id;
+                let data = project.data();
+                return { _id, ...data }
+            })
+        })
+}
+
+export const getAllUserData = async () => {
+    return await firebase.firestore()
+        .collection('users')
         .get()
         .then((snapshot) => {
             return snapshot.docs.map(project => {

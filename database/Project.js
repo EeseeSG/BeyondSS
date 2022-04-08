@@ -180,3 +180,19 @@ export const cancelReservation = async (reservation_id) => {
         }
     }
 }
+
+export const createProject = async (data) => {
+    try {
+        await firebase.firestore()
+            .collection('projects')
+            .add(data)
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}

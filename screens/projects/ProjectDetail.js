@@ -7,9 +7,6 @@ import {
     TouchableOpacity, 
     ScrollView,
     Dimensions,
-    FlatList,
-    Image,
-    Alert,
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -32,14 +29,12 @@ import StoreTags from '../../components/Project/StoreTags';
 // DATA
 import * as UserData from '../../database/User';
 import * as ProjectData from '../../database/Project';
-import firebase from 'firebase';
-require('firebase/firestore');
 
 
 const IMAGE_HEIGHT = 200;
 const PHONE_OFFSET = Platform.OS === 'ios' ? 44 : 0;
 
-export default function FoodItem(props) {
+export default function ProjectDetail(props) {
     const { navigation, route } = props;
     const data = route.params.data;
     const { colors } = useTheme();
@@ -118,18 +113,7 @@ export default function FoodItem(props) {
     }
 
     async function _getCurrentReservations() {
-        const reservations_all = await firebase.firestore()
-            .collection('reservations')
-            .where('project_id', '==', data._id)
-            .get()
-            .then(async (snapshot) => {
-                let arr = await Promise.all(snapshot.docs.map((snap) => {
-                    let _id = snap.id;
-                    let data = snap.data();
-                    return { _id, ...data }
-                }))
-                return arr
-            })
+        const reservations_all = await ProjectData.getReservationsByID(data._id);
         return reservations_all
     }
 
@@ -334,15 +318,18 @@ export default function FoodItem(props) {
                             <Text style={{ fontSize: 22, color: colors.primary, fontWeight: 'bold', marginRight: 5, }}>{(data.count - quantityReserved).toString()}</Text>
                             <Text style={{ fontSize: 20, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
                         </View>
-                        <View style={{ marginVertical: 10 }}>
-                            <Text style={{ fontWeight: 'bold' }}>Collect at:</Text>
-                            <Text>{data.location}</Text>
-                            <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
-                        </View>
                         <StoreTags
                             tags={data.tags}
                             style={{ marginTop: 5, }}
                         />
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.header}>Chef XXX</Text>
+                        </View>
+                        <View style={{ marginVertical: 10 }}>
+                            <Text style={styles.header}>Collect at:</Text>
+                            <Text>{data.location}</Text>
+                            <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
+                        </View>
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
                         <Text style={styles.header}>Change reservation quantity to:</Text>
