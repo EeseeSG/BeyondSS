@@ -5,11 +5,10 @@ import {
     View, 
     Text, 
     TouchableOpacity, 
-    FlatList,
+    ActivityIndicator,
     ScrollView,
     Dimensions
 } from 'react-native';
-import moment from 'moment';
 
 // DESIGN
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -20,6 +19,7 @@ import UserAvatar from 'react-native-user-avatar';
 
 // CUSTOM
 import CollectionItem from '../../components/Project/CollectionItem';
+import ActivityItem from '../../components/Project/ActivityItem';
 
 // DATA
 import * as ProjectData from '../../database/Project';
@@ -30,6 +30,9 @@ export default function Profile({ navigation }) {
     const { colors } = useTheme();
     const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
     const [selection, setSelection] = useState(0);
+    const [isChef, setIsChef] = useState(false);
+    const [isBeneficiary, setIsBeneficiary] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
 
     //=====================================================================================================================
     //==  GET CURRENT USER ==
@@ -44,13 +47,6 @@ export default function Profile({ navigation }) {
         return _getCurrentUser()
     }, [])
 
-    //=====================================================================================================================
-    //==  STATISTICS ==
-    //=====================================================================================================================
-    const [paymentData, setPaymentData] = useState([]);
-    const [spending, setSpending] = useState(0);
-    const [totalOrders, setTotalOrders] = useState(0);
-
 
     //=====================================================================================================================
     //==  NAVIGATION ==
@@ -60,28 +56,173 @@ export default function Profile({ navigation }) {
     }
 
     //=====================================================================================================================
-    //==  RESERVATIONS ==
+    //==  GET UPCOMING DETAILS ==
     //=====================================================================================================================
     const [reservations, setReservations] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [upcomingIsLoaded, setUpcomingIsLoaded] = useState(false);
     useEffect(() => {
         if(currentUser) {
-            async function _getCollections() {
+            async function _getReservations() {
                 firebase.firestore()
                     .collection('reservations')
                     .where('user_id', '==', currentUser._id)
                     .where('project.datetime', '>', new Date())
-                    .onSnapshot((snapshot) => {
-                        let reservation_data = snapshot.docs.map(snap => {
+                    .onSnapshot(async (snapshot) => {
+                        let reservations_arr = await Promise.all(snapshot.docs.map((snap) => {
                             let _id = snap.id;
                             let data = snap.data();
                             return { ...data, _id }
-                        })
-                        setReservations(reservation_data)
+                        }));
+                        setReservations(reservations_arr);
+                        setUpcomingIsLoaded(true);
                     })
             }
-            return _getCollections()
+            async function _getActivitiesByChef() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('user._id', '==', currentUser._id)
+                    .where('datetime', '>', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        firebase.firestore()
+                            .collection('reservations')
+                            .where('user_id', '==', currentUser._id)
+                            .where('project.datetime', '>', new Date())
+                            .onSnapshot(async (snapshot) => {
+                                let reservations_arr = await Promise.all(snapshot.docs.map(snap => {
+                                    let _id = snap.id;
+                                    let data = snap.data();
+                                    return { ...data, _id }
+                                }));
+                                let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr);
+                                setActivities(activities_arr);
+                                setUpcomingIsLoaded(true);
+                            });
+                    })
+            }
+            async function _getAllUpcomingActivities() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('datetime', '>', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        let reservations_arr = await ProjectData.getAllUpcomingReservations();
+                        let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr)
+                        setActivities(activities_arr);
+                        setUpcomingIsLoaded(true);
+                    })
+            }
+
+            const is_chef = currentUser.type === 'chef';
+            const is_beneficiary = currentUser.type === 'beneficiary';
+            const is_admin = currentUser.type === 'admin';
+            setIsChef(is_chef);
+            setIsBeneficiary(is_beneficiary);
+            setIsAdmin(is_admin);
+
+            if(is_chef) {
+                return _getActivitiesByChef()
+            } else if(is_beneficiary) {
+                return _getReservations()
+            } else if(is_admin) {
+                return _getAllUpcomingActivities()
+            }
         }
     }, [currentUser])
+
+
+    //=====================================================================================================================
+    //==  GET HISTORICAL DATA ==
+    //=====================================================================================================================
+    const [reservationsHistory, setReservationsHistory] = useState([]);
+    const [activitiesHistory, setActivitiesHistory] = useState([]);
+    const [isLoaded, setIsLoaded] = useState(false);
+    useEffect(() => {
+        if(currentUser) {
+            async function _getReservations() {
+                firebase.firestore()
+                    .collection('reservations')
+                    .where('user_id', '==', currentUser._id)
+                    .where('project.datetime', '<=', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let reservations_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        setReservationsHistory(reservations_arr);
+                        setIsLoaded(true);
+                    })
+            }
+            async function _getActivitiesByChef() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('user._id', '==', currentUser._id)
+                    .where('datetime', '<=', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        firebase.firestore()
+                            .collection('reservations')
+                            .where('user_id', '==', currentUser._id)
+                            .where('project.datetime', '>', new Date())
+                            .onSnapshot(async (snapshot) => {
+                                let reservations_arr = await Promise.all(snapshot.docs.map(snap => {
+                                    let _id = snap.id;
+                                    let data = snap.data();
+                                    return { ...data, _id }
+                                }));
+                                let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr);
+                                setActivitiesHistory(activities_arr);
+                                setIsLoaded(true);
+                            });
+                    })
+            }
+            async function _getAllUpcomingActivities() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('datetime', '<=', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        let reservations_arr = await ProjectData.getAllUpcomingReservations();
+                        let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr)
+                        setActivitiesHistory(activities_arr);
+                        setIsLoaded(true);
+                    })
+            }
+
+            const is_chef = currentUser.type === 'chef';
+            const is_beneficiary = currentUser.type === 'beneficiary';
+            const is_admin = currentUser.type === 'admin';
+            setIsChef(is_chef);
+            setIsBeneficiary(is_beneficiary);
+            setIsAdmin(is_admin);
+
+            if(is_chef) {
+                return _getActivitiesByChef()
+            } else if(is_beneficiary) {
+                return _getReservations()
+            } else if(is_admin) {
+                return _getAllUpcomingActivities()
+            }
+        }
+    }, [upcomingIsLoaded])
 
     const RenderCollectionOnEmpty = () => (
         <View style={{ justifyContent: 'center', alignItems: 'center', padding: 20, marginTop: 10, }}>
@@ -94,33 +235,14 @@ export default function Profile({ navigation }) {
 
 
     //=====================================================================================================================
-    //==  GET HISTORY==
-    //=====================================================================================================================
-    const [history, setHistory] = useState([]);
-    useEffect(() => {
-        async function _getHistory() {
-            firebase.firestore()
-                .collection('reservations')
-                .where('user_id', '==', user_id)
-                .where('project.datetime', '<=', new Date())
-                .onSnapshot((snapshot) => {
-                    let historical_data = snapshot.docs.map(snap => {
-                        let _id = snap.id;
-                        let data = snap.data();
-                        return { ...data, _id }
-                    })
-                    setHistory(historical_data)
-                })
-        }
-        return _getHistory()
-    }, [])
-
-
-    //=====================================================================================================================
     //==  RENDER DISPLAY ==
     //=====================================================================================================================
-    if(!currentUser) {
-        return(<></>)
+    if(!isLoaded) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color={"#0000ff"} />
+            </View>
+        )   
     }
 
     return (
@@ -137,19 +259,35 @@ export default function Profile({ navigation }) {
                 <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
                     <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{reservations.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
+                            {
+                                isBeneficiary ? (
+                                    reservations.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                ) : (
+                                    activities.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                )
+                            }
+                            </Text>
                             <Text style={{ color: 'black', opacity: 0.6, }}>pending</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{history.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>received</Text>
+                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
+                            {
+                                isBeneficiary ? (
+                                    reservationsHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                ) : (
+                                    activitiesHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                )
+                            }
+                            </Text>
+                            <Text style={{ color: 'black', opacity: 0.6, }}>{isBeneficiary ? 'received' : 'completed'}</Text>
                         </View>
                     </View>
                 </View>
 
                 <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10, paddingHorizontal: 20, }}>
                     <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
-                        <Text style={{ }}>Upcoming</Text>
+                        <Text>Upcoming</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={[selection === 1 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(1)}>
                         <Text>Past</Text>
@@ -158,28 +296,60 @@ export default function Profile({ navigation }) {
 
                 {
                     selection === 0 ? (
-                        reservations.length !== 0 ? (
-                            reservations.map((reservation) => (
-                                <CollectionItem 
-                                    data={reservation} 
-                                    user_id={currentUser._id}
-                                    navigation={navigation}
-                                />
-                            ))
+                        isBeneficiary ? (
+                            reservations.length !== 0 ? (
+                                reservations.map((reservation, i) => (
+                                    <CollectionItem 
+                                        key={i}
+                                        data={reservation} 
+                                        user_id={currentUser._id}
+                                        navigation={navigation}
+                                    />
+                                ))
+                            ) : (
+                                <RenderCollectionOnEmpty />
+                            )
                         ) : (
-                            <RenderCollectionOnEmpty />
+                            activities.length !== 0 ? (
+                                activities.map((activity, i) => (
+                                    <ActivityItem 
+                                        key={i}
+                                        data={activity} 
+                                        user_id={currentUser._id}
+                                        navigation={navigation}
+                                    />
+                                ))
+                            ) : (
+                                <RenderCollectionOnEmpty />
+                            )
                         )
                     ) : (
-                        history.length !== 0 ? (
-                            history.map((hist) => (
-                                <CollectionItem 
-                                    data={hist} 
-                                    user_id={currentUser._id}
-                                    navigation={navigation}
-                                />
-                            ))
+                        isBeneficiary ? (
+                            reservationsHistory.length !== 0 ? (
+                                reservationsHistory.map((hist, i) => (
+                                    <CollectionItem 
+                                        key={i}
+                                        data={hist} 
+                                        user_id={currentUser._id}
+                                        navigation={navigation}
+                                    />
+                                ))
+                            ) : (
+                                <RenderCollectionOnEmpty />
+                            )
                         ) : (
-                            <RenderCollectionOnEmpty />
+                            activitiesHistory.length !== 0 ? (
+                                activitiesHistory.map((hist, i) => (
+                                    <ActivityItem 
+                                        key={i}
+                                        data={hist} 
+                                        user_id={currentUser._id}
+                                        navigation={navigation}
+                                    />
+                                ))
+                            ) : (
+                                <RenderCollectionOnEmpty />
+                            )
                         )
                     )
                 }

@@ -49,7 +49,7 @@ export default function Home({ navigation }) {
     const [isAdmin, setIsAdmin] = useState(false);
 
     //=====================================================================================================================
-    //==  GET DATA ==
+    //==  GET CURRENT USER ==
     //=====================================================================================================================
     const [currentUser, setCurrentUser] = useState(null);
     useEffect(() => {
@@ -61,6 +61,9 @@ export default function Home({ navigation }) {
         return _getCurrentUser()
     }, [])
 
+    //=====================================================================================================================
+    //==  GET MISC DATA ==
+    //=====================================================================================================================
     const [news, setNews] = useState([]);
     useEffect(() => {
         async function _getNews() {
@@ -91,6 +94,9 @@ export default function Home({ navigation }) {
         return _getBanners();
     }, [])
 
+    //=====================================================================================================================
+    //==  GET EVENT DETAILS ==
+    //=====================================================================================================================
     const [reservations, setReservations] = useState([]);
     const [activities, setActivities] = useState([]);
     const [eventisLoaded, setEventIsLoaded] = useState(false);
@@ -172,6 +178,9 @@ export default function Home({ navigation }) {
         }
     }, [currentUser])
 
+    //=====================================================================================================================
+    //==  GET STATISTICS ==
+    //=====================================================================================================================
     const [chefs, setChefs] = useState(0);
     const [beneficiary, setBeneficiary] = useState(0);
     const [isLoaded, setIsLoaded] = useState(false);
@@ -193,7 +202,6 @@ export default function Home({ navigation }) {
     //==  GET ADV BANNER ==
     //=====================================================================================================================
     const carousel = useRef(null);
-
     const renderBanner = (data) => (
         <View>
             <Image 

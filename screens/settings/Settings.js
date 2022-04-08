@@ -66,11 +66,11 @@ export default function Settings({ navigation }) {
         <ScrollView style={styles.container}>
             <View style={styles.content}>
                 <Text style={styles.header}>General</Text>
-                <SettingsBlock
+                {/* <SettingsBlock
                     icon='person-add-outline'
                     text='My Profile'
                     onPress={() => {}}
-                />
+                /> */}
                 {/* <SettingsBlock
                     icon='md-chatbox-outline'
                     text='Feedback'
@@ -91,17 +91,17 @@ export default function Settings({ navigation }) {
                 <SettingsBlock
                     icon='ios-information-circle-outline'
                     text='About Us'
-                    onPress={() => {}}
+                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
                 />
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Terms and Conditions'
-                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
+                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}
                 />
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Privacy Policy'
-                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
+                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}
                 />
                 <SettingStatic
                     icon='ios-folder-outline'
