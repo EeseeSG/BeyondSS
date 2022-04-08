@@ -352,9 +352,13 @@ export default function FoodItem(props) {
                             setQuantity={setQuantity}
                         />
                         <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
-                        <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
-                            <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
-                        </TouchableOpacity>
+                        {
+                            currentReservations !== 0 && (
+                                <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
+                                    <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
+                                </TouchableOpacity>
+                            )
+                        }
                     </View>
                     <View style={{ marginHorizontal: 30, }}>
                         <Text style={styles.header}>Message from Chef:</Text>
@@ -436,7 +440,7 @@ const styles = StyleSheet.create({
     },
     cardButton: {
         marginHorizontal: 20,
-        marginVertical: 5, 
+        marginVertical: 20, 
         height: 50, 
         width: Dimensions.get('screen').width * 0.8, 
         justifyContent: 'center', 

@@ -100,6 +100,21 @@ export const getUserUpcomingReservations = async (user_id) => {
         })
 }
 
+export const getUserPastReservations = async (user_id) => {
+    return await firebase.firestore()
+        .collection('reservations')
+        .where('user_id', '==', user_id)
+        .where('project.datetime', '<=', new Date())
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
 export const getOutstandingProjects = async () => {
     let project_arr = await getAllUpcomingProjectData();
     let reservations_arr = await getAllUpcomingReservations(); // map current availability

@@ -199,10 +199,13 @@ export default function Home({ navigation }) {
                 </View>
             </View>
 
+            <Text style={styles.header}>Your collections</Text>
             {
                 reservations && (
                     <>
-                    <Text style={styles.header}>Your collections</Text>
+                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                            <Text>You have not made any reservation. Make one now!</Text>
+                        </View>
                         <FlatList
                             horizontal
                             keyExtractor={(_, index) => index.toString()}
@@ -235,7 +238,7 @@ export default function Home({ navigation }) {
             <Text style={styles.header}>Latest News</Text>
             {
                 news.map((item, index) => (
-                    <TouchableOpacity key={index} style={{ marginVertical: 10, marginHorizontal: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
+                    <TouchableOpacity key={index} style={{ marginHorizontal: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
                         <View style={{ flexDirection: 'row', marginVertical: 5, }}>
                             <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
                             <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
@@ -262,6 +265,7 @@ const styles = StyleSheet.create({
     },
     header: {
         marginTop: 30,
+        marginBottom: 20,
         fontSize: 18,
         textTransform: 'capitalize',
         fontWeight: 'bold',

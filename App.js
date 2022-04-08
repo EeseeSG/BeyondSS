@@ -35,12 +35,8 @@ import * as Colors from './constants/Colors';
 // SCREENS
 import RootStackScreen from './screens/auth/RootStackScreen';
 import Tabs from './navigation/Tabs';
-import StoreProfile from './screens/store/StoreProfile';
 import Settings from './screens/settings/Settings';
-import ProjectDetail from './screens/store/ProjectDetail';
-import PaymentHistory from './screens/user/PaymentHistory';
-import ProductReviews from './screens/store/ProductReviews';
-import Favourites from './screens/user/Favourites';
+import ProjectDetail from './screens/projects/ProjectDetail';
 import Explore from './screens/main/Explore';
 
 // INIT FIREBASE
@@ -122,10 +118,6 @@ export default function App() {
                       <Stack.Screen name="Settings" component={Settings}/>
                       <Stack.Screen name="Explore" component={Explore} options={{ headerShown: false,}}/>
                       <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
-                      <Stack.Screen name="StoreProfile" component={StoreProfile} options={{ title: '', headerShown: false, }}/>
-                      <Stack.Screen name="PaymentHistory" component={PaymentHistory} options={{ title: 'Payment History'}}/>
-                      <Stack.Screen name="ProductReviews" component={ProductReviews} options={{ title: 'Reviews'}}/>
-                      <Stack.Screen name="Favourites" component={Favourites} options={{ title: 'Favourites'}}/>
                     </Stack.Group>
                   </Stack.Navigator>
                 </>
