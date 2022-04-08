@@ -53,6 +53,9 @@ export default function Explore(props) {
     const handleRefresh = async () => {
         setIsRefreshing(true);
 
+        // reset all values
+        setSelected([])
+
         await _getProjectData();
 
         setIsRefreshing(false);
@@ -62,6 +65,7 @@ export default function Explore(props) {
     //   MULTISELECT
     // ===========================================
     const handleSelect = (val) => {
+        console.log(val)
         setSelected(val)
 
         if(val.length === 0) {
@@ -70,7 +74,7 @@ export default function Explore(props) {
         }
 
         // filter data
-        let filtered_data = projects.filter((d) => {
+        let filtered_data = rawProjects.filter((d) => {
             for(const v of val) {
                 if(d.tags.indexOf(v) !== -1) {
                     return true
