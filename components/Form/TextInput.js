@@ -47,6 +47,7 @@ export default function CustomTextInput(props) {
                     autoCapitalize={autoCap}
                     onChangeText={(val) => onChangeText(val)}
                     numberOfLines={numberOfLines}
+                    multiline={numberOfLines > 1}
                     value={value}
                 />
                 {

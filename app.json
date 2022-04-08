@@ -36,6 +36,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-notifications",
+        {
+          "icon": "./asset/icon-transparent.png",
+          "color": "#ffffff"
+        }
+      ]
+    ]
   }
 }

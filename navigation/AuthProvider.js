@@ -66,7 +66,6 @@ export const AuthProvider = ({ children }) => {
 
 								let current_token = await registerForPushNotificationsAsync()
 								if(current_user.expoPushToken !== current_token) {
-									console.log('update token')
 									// update
 									let new_current_user = {
 										...current_user,
@@ -78,7 +77,6 @@ export const AuthProvider = ({ children }) => {
 										.update(new_current_user)
 									setUser(new_current_user)
 								} else {
-									console.log('same token')
 									setUser(current_user)
 								}
 							})

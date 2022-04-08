@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useState, useEffect, } from 'react';
+import React, { useState, useEffect, useRef, } from 'react';
 import { 
   View, 
   StatusBar, 
@@ -46,6 +46,24 @@ import Dashboard from './screens/admin/Dashboard';
 // INIT FIREBASE
 import { firebase } from './constants/Firebase';
 
+// NOTIFICATIONS
+import * as Notifications from 'expo-notifications';
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+if (Platform.OS === 'android') {
+  Notifications.setNotificationChannelAsync('default', {
+    name: 'default',
+    importance: Notifications.AndroidImportance.MAX,
+    vibrationPattern: [0, 250, 250, 250],
+    lightColor: '#FF231F7C',
+  });
+}
 
 export default function App() {
   //=====================================================================================================================

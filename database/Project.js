@@ -41,6 +41,20 @@ export const getProjectByID = async (project_id) => {
         })
 }
 
+export const getProjectByRef = async (project_ref) => {
+    return await firebase.firestore()
+        .collection('projects')
+        .where('ref', '==', project_ref)
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
 export const getAllUpcomingReservations = async () => {
     return await firebase.firestore()
         .collection('reservations')

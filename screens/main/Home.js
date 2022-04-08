@@ -40,6 +40,9 @@ import ActivityItem from '../../components/Project/ActivityItem';
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
 
+// NOTIFICATIONS
+import * as Notifications from 'expo-notifications';
+
 export default function Home({ navigation }) {
     const { colors } = useTheme();
     const { logout } = useContext(AuthContext);
@@ -47,6 +50,39 @@ export default function Home({ navigation }) {
     const [isChef, setIsChef] = useState(false);
     const [isBeneficiary, setIsBeneficiary] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+
+    //=====================================================================================================================
+    //==  PUSH NOTIFICATION ==
+    //=====================================================================================================================
+    const [notification, setNotification] = useState(false);
+    const notificationListener = useRef();
+    const responseListener = useRef();
+    useEffect(() => {
+        // This listener is fired whenever a notification is received while the app is foregrounded
+        notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+            setNotification(notification);
+        });
+
+        // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+        responseListener.current = Notifications.addNotificationResponseReceivedListener(async (response) => {
+            let data = response.notification.request.content.data;
+            let ref = data.ref;
+
+            // grab project data by ref
+            let project_arr = await ProjectData.getProjectByRef(ref);
+            let reservations_arr = await ProjectData.getReservationsByID(project_arr[0]._id);
+            let project_data = await ProjectData._parseDetailedProjectData(project_arr, reservations_arr);
+            console.log(project_data[0])
+            console.log('navigating...')
+            navigation.navigate('ProjectDetail', { data: project_data[0] })
+        });
+
+        return () => {
+            Notifications.removeNotificationSubscription(notificationListener.current);
+            Notifications.removeNotificationSubscription(responseListener.current);
+        };
+    }, []);
+
 
     //=====================================================================================================================
     //==  GET CURRENT USER ==

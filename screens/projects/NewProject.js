@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useEffect, useState, useContext, } from 'react';
+import React, { useEffect, useState, } from 'react';
 import { 
     View, 
     Text, 
@@ -7,18 +7,13 @@ import {
     Platform,
     StyleSheet ,
 	ScrollView,
-	Switch,
 	FlatList
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
 
-// ANIMATION
-import * as Animatable from 'react-native-animatable';
-
 // DESIGN
 import { LinearGradient } from 'expo-linear-gradient';
-import Feather from 'react-native-vector-icons/Feather';
 
 // DATA
 import * as ProjectData from '../../database/Project';
@@ -28,6 +23,8 @@ import * as UserData from '../../database/User';
 import CustomTextInput from '../../components/Form/TextInput';
 import CustomDateTimeInput from '../../components/Form/DateInput';
 import CustomSwitchInput from '../../components/Form/Switch';
+import { sendPushNotification } from '../../components/Helper/PushNotifications';
+import { uuidv4 } from '../../components/Helper/UUID';
 
 
 export default function SignInScreen({navigation}) {
@@ -67,6 +64,7 @@ export default function SignInScreen({navigation}) {
 		isValidCount: null,
 		isValidLocation: null,
 		isValidDate: null,
+		ref: uuidv4(),
 	});
     
 
@@ -330,6 +328,23 @@ export default function SignInScreen({navigation}) {
                 buttonText: 'Close',
                 callback: () => Popup.hide()
             })
+
+			// get all user data
+			let all_users = await UserData.getAllUsersByDateJoined();
+			let all_push_tokens = all_users.map((user) => user.expoPushToken);
+
+			// set message
+			let message = {
+				title: 'New Food Distribution!',
+				body: `New ${data.count} of ${data.title} up for reservation. Reserve yours now!`,
+				data: {
+					ref: data.ref,
+				},
+			}
+
+			// send push notifications to all
+			await sendPushNotification(all_push_tokens, message)
+
         } else {
             Popup.show({
                 type: 'danger',
@@ -452,7 +467,8 @@ export default function SignInScreen({navigation}) {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1, 
-        margin: 15,
+        padding: 15,
+		backgroundColor: 'white',
 	},
 	header: {
 		flex: 1,

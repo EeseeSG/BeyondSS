@@ -41,6 +41,7 @@ const PHONE_OFFSET = Platform.OS === 'ios' ? 44 : 0;
 export default function ProjectDetail(props) {
     const { navigation, route } = props;
     const data = route.params.data;
+    console.log(data)
     const { colors } = useTheme();
     const [isLoaded, setIsLoaded] = useState(false);
     const [quantity, setQuantity] = useState(1);
