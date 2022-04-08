@@ -37,7 +37,7 @@ export const getProjectByID = async (project_id) => {
         .then((project) => {
             let _id = project.id;
             let data = project.data();
-            return { _id, ...data }
+            return { ...data, _id }
         })
 }
 

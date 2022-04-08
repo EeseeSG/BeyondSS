@@ -33,7 +33,7 @@ import firebase from 'firebase';
 require('firebase/firestore');
 
 // COMPONENTS
-import ProjectItem from '../../components/Project/ProjectItem';
+import CollectionItem from '../../components/Project/CollectionItem';
 
 const in_need_fed = 1000;
 const orders_fulfilled = 100000;
@@ -95,15 +95,12 @@ export default function Home({ navigation }) {
                     .where('user_id', '==', currentUser._id)
                     .where('project.datetime', '>', new Date())
                     .onSnapshot(async (snapshot) => {
-                        let project_arr = await Promise.all(snapshot.docs.map((snap) => {
+                        let reservations_arr = await Promise.all(snapshot.docs.map((snap) => {
                             let _id = snap.id;
                             let data = snap.data();
                             return { ...data, _id }
                         }));
-
-                        let reservations_arr = await ProjectData.getUserUpcomingReservations(currentUser._id);
-                        let parsedArr = await ProjectData._parseDetailedProjectData(project_arr, reservations_arr)
-                        setReservations(parsedArr);
+                        setReservations(reservations_arr);
                     })
             }
             return _getReservations()
@@ -137,8 +134,8 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     const renderItem = ({ item }) => {
         return (
-            <ProjectItem 
-                data={item.project} 
+            <CollectionItem 
+                data={item} 
                 user_id={currentUser._id}
                 navigation={navigation}
                 style={{ width: windowWidth - 20 }}
@@ -186,7 +183,7 @@ export default function Home({ navigation }) {
                 />
             </View>
 
-            <View style={{ flex: 1, marginHorizontal: 20, marginTop: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
+            <View style={{ flex: 1, marginHorizontal: 10, marginTop: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
                 <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
                     <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>This Month</Text>
                 </View>
@@ -204,14 +201,16 @@ export default function Home({ navigation }) {
 
             {
                 reservations && (
-                    <FlatList
-                        horizontal
-                        keyExtractor={(_, index) => index.toString()}
-                        data={reservations}
-                        renderItem={renderItem}
-                    />
+                    <>
+                    <Text style={styles.header}>Your collections</Text>
+                        <FlatList
+                            horizontal
+                            keyExtractor={(_, index) => index.toString()}
+                            data={reservations}
+                            renderItem={renderItem}
+                        />
+                    </>
                 )
-                
             }
 
             <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>
