@@ -17,6 +17,7 @@ import { defaultStyles } from '../../constants/defaultStyles';
 import { useTheme } from 'react-native-paper';
 import { LinearGradient } from 'expo-linear-gradient';
 import CountDown from 'react-native-countdown-component';
+import Feather from 'react-native-vector-icons/Feather';
 
 // ANIMATION
 import * as Animatable from 'react-native-animatable';
@@ -283,6 +284,76 @@ export default function ProjectDetail(props) {
         })
     }
 
+    const handleComplete = (reservation_id) => {
+        Popup.show({
+            type: 'confirm',
+            title: 'Complete Order?',
+            textBody: 'Are you ready to complete this order?',
+            buttonText: 'Confirm',
+            confirmText: 'Cancel',
+            callback: async () => {
+                try {
+                    let status = await ProjectData.completeDelivery(reservation_id);
+                    if(status.success) {
+                        // update the list
+                        let new_reservations = reservations.map((reservation) => {
+                            if(reservation._id === reservation_id) {
+                                return {
+                                    ...reservation,
+                                    delivered: true,
+                                }
+                            }
+                            return reservation
+                        })
+                        setReservations(new_reservations);
+                    }
+                } catch(err) {
+                    console.log(err)
+                } finally {
+                    Popup.hide();
+                }
+            },
+            cancelCallback: () => {
+                Popup.hide();
+            },
+        })
+    }
+
+    const handleAcknowledge = (reservation_id) => {
+        Popup.show({
+            type: 'confirm',
+            title: 'Complete Order?',
+            textBody: 'Are you ready to complete this order?',
+            buttonText: 'Confirm',
+            confirmText: 'Cancel',
+            callback: async () => {
+                try {
+                    let status = await ProjectData.acknowledgeDelivery(reservation_id);
+                    if(status.success) {
+                        // update the list
+                        let new_reservations = reservations.map((reservation) => {
+                            if(reservation._id === reservation_id) {
+                                return {
+                                    ...reservation,
+                                    acknowledged: true,
+                                }
+                            }
+                            return reservation
+                        })
+                        setReservations(new_reservations);
+                    }
+                } catch(err) {
+                    console.log(err)
+                } finally {
+                    Popup.hide();
+                }
+            },
+            cancelCallback: () => {
+                Popup.hide();
+            },
+        })
+    }
+
 
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
@@ -370,8 +441,66 @@ export default function ProjectDetail(props) {
                     {
                         (isAdmin || isChef) && (
                             reservations.map((reservation) => (
-                                <View>
-                                    <Text>User</Text>
+                                <View style={{ marginHorizontal: 20, marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
+                                    <View style={{ flex: 1, }}>
+                                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 5, }}>{reservation.user.name}</Text>
+                                        <Text style={{ fontSize: 16, }}>+65 {reservation.user.contact}</Text>
+                                        <Text style={{ fontSize: 16, fontWeight: 'bold', }}>Reserved:  <Text style={{ color: 'blue', fontSize: 18, }}>{reservation.reserved.toString()}</Text></Text>
+                                    </View>
+                                    {
+                                        !reservation.delivered ? (
+                                            isChef ? (
+                                                <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
+                                                    <Feather 
+                                                        name="check-square"
+                                                        color={'green'}
+                                                        size={30}
+                                                    />
+                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Mark as delivered</Text>
+                                                </TouchableOpacity>
+                                            ) : (
+                                                <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
+                                                    <Feather 
+                                                        name="loader"
+                                                        color={'grey'}
+                                                        size={30}
+                                                    />
+                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending</Text>
+                                                </View>    
+                                            )
+                                        ) : (
+                                            !reservation.acknowledged ? (
+                                                isChef ? (
+                                                    <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                                        <Feather 
+                                                            name="loader"
+                                                            color={'grey'}
+                                                            size={30}
+                                                        />
+                                                        <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending {'\n'}Acknowledgement</Text>
+                                                    </View>
+                                                ) : (
+                                                    <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleAcknowledge(reservation._id)}>
+                                                        <Feather 
+                                                            name="check-square"
+                                                            color={'green'}
+                                                            size={30}
+                                                        />
+                                                        <Text style={{ textAlign: 'center', fontSize: 12, }}>Received</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                            ) : (
+                                                <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Feather 
+                                                        name="archive"
+                                                        color={'blue'}
+                                                        size={30}
+                                                    />
+                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Completed</Text>
+                                                </View>
+                                            )
+                                        )
+                                    }
                                 </View>
                             ))
                         )

@@ -161,6 +161,8 @@ export default function Home({ navigation }) {
                     })
             }
 
+            console.log(currentUser)
+
             const is_chef = currentUser.type === 'chef';
             const is_beneficiary = currentUser.type === 'beneficiary';
             const is_admin = currentUser.type === 'admin';
@@ -282,9 +284,9 @@ export default function Home({ navigation }) {
         <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, paddingHorizontal: 10, paddingTop: 10, }}>
             <View style={{ marginHorizontal: 10, marginTop: 40, }}>
                 <View style={{ flexDirection: 'row' }}>
-                    <UserAvatar name={currentUser.username}/>
+                    <UserAvatar name={currentUser.name}/>
                     <Text style={[styles.greetings, { color: colors.primary, marginBottom: 5, }]}>
-                        {"  "}Hi {currentUser.username} 
+                        {"  "}Hi {currentUser.name} 
                     </Text>
                 </View>
                 <Text style={[styles.title, { marginBottom: 10, }]}>{isChef ? 'How would you like to help?' : 'How can we help?'}</Text>
@@ -340,7 +342,7 @@ export default function Home({ navigation }) {
                 </View>
             </View>
                             
-            <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'}</Text>
+            <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
             {
                 (isChef || isAdmin) ? (
                     activities.length ? (

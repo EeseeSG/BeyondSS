@@ -355,7 +355,7 @@ export default function SignInScreen({navigation}) {
                     placeholder={"Enter name of food"}
                     onChangeText={nameHandler}
                     isValidInput={data.isValidName}
-                    validationText={"Username must be 4 characters long"}
+                    validationText={"Username must be at least 4 characters long"}
 					value={data.name}
                 />
 

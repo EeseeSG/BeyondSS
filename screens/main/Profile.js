@@ -251,8 +251,8 @@ export default function Profile({ navigation }) {
                 <TouchableOpacity style={styles.flushRightContainer} onPress={goToSettings}>
                     <Icon color='#A9A9A9' name='settings-outline' size={30}/>
                 </TouchableOpacity>
-                <UserAvatar size={80} name={currentUser.username}/>
-                <Text style={styles.profileName}>{currentUser.username}</Text>
+                <UserAvatar size={80} name={currentUser.name}/>
+                <Text style={styles.profileName}>{currentUser.name}</Text>
             </View>
             <ScrollView contentContainerStyle={{ paddingBottom: 100, }}>
                 {/** STATISTICS */}

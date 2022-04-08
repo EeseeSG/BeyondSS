@@ -211,3 +211,41 @@ export const createProject = async (data) => {
         }
     }
 }
+
+export const completeDelivery = async (reservation_id) => {
+    try {
+        await firebase.firestore()
+            .collection('reservations')
+            .doc(reservation_id)
+            .update({
+                delivered: true,
+            })
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
+
+export const acknowledgeDelivery = async (reservation_id) => {
+    try {
+        await firebase.firestore()
+            .collection('reservations')
+            .doc(reservation_id)
+            .update({
+                acknowledged: true,
+            })
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}

@@ -173,7 +173,7 @@ export default function SignInScreen({navigation}) {
 					{ 
 						!data.isValidUser &&
 						<Animatable.View animation="fadeInLeft" duration={500}>
-							<Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+							<Text style={styles.errorMsg}>Name must be at least 4 characters long.</Text>
 						</Animatable.View>
 					}
 					
@@ -217,7 +217,7 @@ export default function SignInScreen({navigation}) {
 					{ 
 						!data.isValidPassword && 
 						<Animatable.View animation="fadeInLeft" duration={500}>
-							<Text style={styles.errorMsg}>Password must be 8 characters long.</Text>
+							<Text style={styles.errorMsg}>Password must be 6 characters long.</Text>
 						</Animatable.View>
 					}
 
