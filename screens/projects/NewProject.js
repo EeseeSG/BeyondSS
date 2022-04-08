@@ -22,6 +22,7 @@ import Feather from 'react-native-vector-icons/Feather';
 
 // DATA
 import * as ProjectData from '../../database/Project';
+import * as UserData from '../../database/User';
 
 // COMPONENT
 import CustomTextInput from '../../components/Form/TextInput';
@@ -31,6 +32,18 @@ import CustomSwitchInput from '../../components/Form/Switch';
 
 export default function SignInScreen({navigation}) {
 	const { colors } = useTheme();
+
+	//=====================================================================================================================
+    //==  DATA SUMMARY ==
+    //=====================================================================================================================
+	const [currentUser, setCurrentUser] = useState([]);
+	useEffect(() => {
+		async function _getCurrentUser() {
+			let current_user = await UserData.currentUserData()
+			setCurrentUser(current_user);
+		}
+		return _getCurrentUser
+	}, [])
 
     //=====================================================================================================================
     //==  DATA SUMMARY ==
@@ -303,7 +316,9 @@ export default function SignInScreen({navigation}) {
 
 		const new_data = {
 			...data,
-			tags: parsedTags
+			user: currentUser,
+			tags: parsedTags,
+			createdAt: new Date(),
 		}
 
 		let result = await ProjectData.createProject(new_data);

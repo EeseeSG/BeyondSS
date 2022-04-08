@@ -8,7 +8,8 @@ import {
     Dimensions, 
     Image, 
     FlatList,
-    ScrollView, 
+    ScrollView,
+    ActivityIndicator,
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -25,6 +26,7 @@ import PartnerCarousel from '../../components/Project/PartnerCarousel';
 // DATA
 import * as UserData from '../../database/User';
 import * as IndexData from '../../database/Index';
+import * as ProjectData from '../../database/Project';
 import moment from 'moment';
 
 // DATABASE
@@ -33,6 +35,7 @@ require('firebase/firestore');
 
 // COMPONENTS
 import CollectionItem from '../../components/Project/CollectionItem';
+import ActivityItem from '../../components/Project/ActivityItem';
 
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
@@ -53,9 +56,6 @@ export default function Home({ navigation }) {
         async function _getCurrentUser() {
             let currentUser = await UserData.currentUserData();
             setCurrentUser(currentUser);
-            setIsChef(currentUser.type === 'chef');
-            setIsBeneficiary(currentUser.type === 'beneficiary');
-            setIsAdmin(currentUser.type === 'admin');
             return
         }
         return _getCurrentUser()
@@ -92,6 +92,8 @@ export default function Home({ navigation }) {
     }, [])
 
     const [reservations, setReservations] = useState([]);
+    const [activities, setActivities] = useState([]);
+    const [eventisLoaded, setEventIsLoaded] = useState(false);
     useEffect(() => {
         if(currentUser) {
             async function _getReservations() {
@@ -106,26 +108,86 @@ export default function Home({ navigation }) {
                             return { ...data, _id }
                         }));
                         setReservations(reservations_arr);
+                        setEventIsLoaded(true);
                     })
             }
-            return _getReservations()
+            async function _getActivitiesByChef() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('user._id', '==', currentUser._id)
+                    .where('datetime', '>', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        firebase.firestore()
+                            .collection('reservations')
+                            .where('user_id', '==', currentUser._id)
+                            .where('project.datetime', '>', new Date())
+                            .onSnapshot(async (snapshot) => {
+                                let reservations_arr = await Promise.all(snapshot.docs.map(snap => {
+                                    let _id = snap.id;
+                                    let data = snap.data();
+                                    return { ...data, _id }
+                                }));
+                                let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr);
+                                setActivities(activities_arr);
+                                setEventIsLoaded(true);
+                            });
+                    })
+            }
+            async function _getAllUpcomingActivities() {
+                firebase.firestore()
+                    .collection('projects')
+                    .where('datetime', '>', new Date())
+                    .onSnapshot(async (snapshot) => {
+                        let projects_arr = await Promise.all(snapshot.docs.map((snap) => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        }));
+                        let reservations_arr = await ProjectData.getAllUpcomingReservations();
+                        let activities_arr = await ProjectData._parseDetailedProjectData(projects_arr, reservations_arr)
+                        setActivities(activities_arr);
+                        setEventIsLoaded(true);
+                    })
+            }
+
+            const is_chef = currentUser.type === 'chef';
+            const is_beneficiary = currentUser.type === 'beneficiary';
+            const is_admin = currentUser.type === 'admin';
+            setIsChef(is_chef);
+            setIsBeneficiary(is_beneficiary);
+            setIsAdmin(is_admin);
+
+            if(is_chef) {
+                return _getActivitiesByChef()
+            } else if(is_beneficiary) {
+                return _getReservations()
+            } else if(is_admin) {
+                return _getAllUpcomingActivities()
+            }
         }
     }, [currentUser])
 
     const [chefs, setChefs] = useState(0);
     const [beneficiary, setBeneficiary] = useState(0);
+    const [isLoaded, setIsLoaded] = useState(false);
     useEffect(() => {
-        if(currentUser) {
+        if(eventisLoaded) {
             async function _getAllUserData() {
                 let arr = await IndexData.getAllUserData();
                 let num_chef = arr.filter((i) => i.type === 'chef').length;
                 let num_beneficiary = arr.filter((i) => i.type === 'beneficiary').length;
                 setChefs(num_chef);
                 setBeneficiary(num_beneficiary);
+                setIsLoaded(true);
             }
             return _getAllUserData()
         }
-    }, [currentUser])
+    }, [eventisLoaded])
 
     //=====================================================================================================================
     //==  GET ADV BANNER ==
@@ -152,7 +214,18 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     //==  HANDLE UPCOMING ==
     //=====================================================================================================================
-    const renderItem = ({ item }) => {
+    const renderActivityItem = ({ item }) => {
+        return (
+            <ActivityItem 
+                data={item} 
+                user_id={currentUser._id}
+                navigation={navigation}
+                style={{ width: windowWidth - 20 }}
+            />
+        )
+    }
+
+    const renderReservedItem = ({ item }) => {
         return (
             <CollectionItem 
                 data={item} 
@@ -189,8 +262,12 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
     //=====================================================================================================================
-    if(!currentUser) {
-        return(<></>)
+    if(!isLoaded) {
+        return (
+            <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color={"#0000ff"} />
+            </View>
+        )
     }
 
     return (
@@ -254,20 +331,35 @@ export default function Home({ navigation }) {
                     </View>
                 </View>
             </View>
-
-            <Text style={styles.header}>Your collections</Text>
+                            
+            <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'}</Text>
             {
-                reservations.length ? (
-                    <FlatList
-                        horizontal
-                        keyExtractor={(_, index) => index.toString()}
-                        data={reservations}
-                        renderItem={renderItem}
-                    />
+                (isChef || isAdmin) ? (
+                    activities.length ? (
+                        <FlatList
+                            horizontal
+                            keyExtractor={(_, index) => index.toString()}
+                            data={activities}
+                            renderItem={renderActivityItem}
+                        />
+                    ) : (
+                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                            <Text>{isChef ? 'You have not made any activities. Start one now!' : 'There are no activities.'}</Text>
+                        </View>
+                    )
                 ) : (
-                    <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
-                        <Text>You have not made any reservation. Make one now!</Text>
-                    </View>
+                    reservations.length ? (
+                        <FlatList
+                            horizontal
+                            keyExtractor={(_, index) => index.toString()}
+                            data={reservations}
+                            renderItem={renderReservedItem}
+                        />
+                    ) : (
+                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                            <Text>You have not made any reservation. Make one now!</Text>
+                        </View>
+                    )
                 )
             }
 

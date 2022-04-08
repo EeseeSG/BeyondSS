@@ -4,7 +4,9 @@ import {
   View, 
   StatusBar, 
   Platform, 
+  LogBox,
 } from 'react-native';
+LogBox.ignoreLogs(['Setting a timer']);
 import { Root, } from 'react-native-popup-confirm-toast';
 import AnimatedSplash from "react-native-animated-splash-screen";
 

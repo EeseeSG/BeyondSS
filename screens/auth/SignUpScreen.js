@@ -55,7 +55,6 @@ const SignInScreen = ({navigation}) => {
 					return;
 				}
 				token = (await Notifications.getExpoPushTokenAsync()).data;
-				console.log(token);
 				setData({
 					...data,
 					expoPushToken: token

@@ -65,7 +65,6 @@ export default function Explore(props) {
     //   MULTISELECT
     // ===========================================
     const handleSelect = (val) => {
-        console.log(val)
         setSelected(val)
 
         if(val.length === 0) {

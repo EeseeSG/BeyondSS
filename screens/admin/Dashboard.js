@@ -63,7 +63,6 @@ export default function NewProject(props) {
                 try {
                     let status = await createNewUser(data);
                     _removeApplicationFromList(data._id);
-                    console.log(status)
                 } catch(err) {
                     console.log(err)
                 } finally {
@@ -92,7 +91,6 @@ export default function NewProject(props) {
                 try {
                     let status = await deleteApplication(data._id);
                     _removeApplicationFromList(data._id);
-                    console.log(status)
                 } catch(err) {
                     console.log(err)
                 } finally {
@@ -116,7 +114,6 @@ export default function NewProject(props) {
                 try {
                     let status = await deleteApplication(data._id);
                     _removeApplicationFromList(data._id);
-                    console.log(status)
                 } catch(err) {
                     console.log(err)
                 } finally {

@@ -100,6 +100,21 @@ export const getUserUpcomingReservations = async (user_id) => {
         })
 }
 
+export const getChefUpcomingReservations = async (chef_id) => {
+    return await firebase.firestore()
+        .collection('reservations')
+        .where('user_id', '==', chef_id)
+        .where('project.datetime', '>', new Date())
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
 export const getUserPastReservations = async (user_id) => {
     return await firebase.firestore()
         .collection('reservations')
@@ -123,7 +138,7 @@ export const getOutstandingProjects = async () => {
 }
 
 export const _parseDetailedProjectData = async (project_arr, reservations_arr) => {
-    let new_project_arr = project_arr.map((project) => {
+    let new_project_arr = await Promise.all(project_arr.map((project) => {
         let reserved = 0;
         let beneficiaries = [];
         let reservation_data = [];
@@ -143,7 +158,7 @@ export const _parseDetailedProjectData = async (project_arr, reservations_arr) =
             beneficiaries,
             reservation_data
         }
-    }).sort((a, b) => a.datetime.seconds > b.datetime.seconds);
+    }).sort((a, b) => a.datetime.seconds > b.datetime.seconds));
     return new_project_arr;
 }
 

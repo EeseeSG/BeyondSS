@@ -260,7 +260,6 @@ export default function ProjectDetail(props) {
             callback: async () => {
                 try {
                     let status = await ProjectData.cancelReservation(data._id+'-'+currentUser._id);
-                    console.log(status)
                 } catch(err) {
                     console.log(err)
                 } finally {
@@ -322,10 +321,10 @@ export default function ProjectDetail(props) {
                             tags={data.tags}
                             style={{ marginTop: 5, }}
                         />
-                        <View style={{ marginVertical: 10 }}>
-                            <Text style={styles.header}>Chef XXX</Text>
+                        <View style={{ marginTop: 10, }}>
+                            <Text style={{ fontStyle: 'italic', }}>Chef  <Text style={[styles.header, { fontStyle: 'normal', fontSize: 18, }]}>{data.user.name}</Text></Text>
                         </View>
-                        <View style={{ marginVertical: 10 }}>
+                        <View style={{ marginBottom: 10 }}>
                             <Text style={styles.header}>Collect at:</Text>
                             <Text>{data.location}</Text>
                             <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>

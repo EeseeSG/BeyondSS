@@ -8,6 +8,12 @@ import {
     TouchableOpacity 
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
+import { Popup } from 'react-native-popup-confirm-toast';
+import firebase from 'firebase';
+require('firebase/firestore');
+
+// VERSION
+import * as APP_SETTINGS from '../../app.json';
 
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
@@ -40,7 +46,7 @@ export default function Settings({ navigation }) {
                 Popup.show({
                     type: 'success',
                     title: 'Verification Email Sent',
-                    textBody: `A verification email has been sent to ${email}. \n\nPlease check your email to reset your password.`,
+                    textBody: `A verification email has been sent to ${current_user.email}. \n\nPlease check your email to reset your password.`,
                     buttonText: 'Okay',
                     callback: () => Popup.hide()
                 })
@@ -65,16 +71,16 @@ export default function Settings({ navigation }) {
                     text='My Profile'
                     onPress={() => {}}
                 />
-                <SettingsBlock
+                {/* <SettingsBlock
                     icon='md-chatbox-outline'
                     text='Feedback'
                     onPress={() => {}}
-                />
-                <SettingsBlock
+                /> */}
+                {/* <SettingsBlock
                     icon='ios-notifications-outline'
                     text='Notification'
                     onPress={() => {}}
-                />
+                /> */}
                 <SettingsBlock
                     icon='md-key-outline'
                     text='Change Password'
@@ -90,17 +96,17 @@ export default function Settings({ navigation }) {
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Terms and Conditions'
-                    onPress={() => _openWebBrowser()}
+                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
                 />
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Privacy Policy'
-                    onPress={() => _openWebBrowser()}
+                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
                 />
                 <SettingStatic
                     icon='ios-folder-outline'
                     text='Version'
-                    subtext='Version 1.0.0'
+                    subtext={`Version ${APP_SETTINGS.expo.version}`}
                 />
             </View>
 

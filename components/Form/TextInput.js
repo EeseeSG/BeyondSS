@@ -45,7 +45,7 @@ export default function CustomTextInput(props) {
                     keyboardType={keyboardType}
                     style={[styles.textInput, { color: textColor }, numberOfLines !== 1 && styles.longTextInput]}
                     autoCapitalize={autoCap}
-                    onChangeText={(val) => onChangeText(val.trim())}
+                    onChangeText={(val) => onChangeText(val)}
                     numberOfLines={numberOfLines}
                     value={value}
                 />
