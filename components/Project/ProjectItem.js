@@ -8,12 +8,26 @@ import {
 } from 'react-native';
 import moment from 'moment';
 import * as Colors from '../../constants/Colors';
+import { Popup } from 'react-native-popup-confirm-toast';
 
 
 export default function ProjectItem(props) {
     const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
     const { data: item, user_id, style={}, navigation } = props;
     const hasApplied = item.beneficiaries.indexOf(user_id) !== -1;
+
+
+    const onPressNote = () => {
+        const parseTags = item.tags.join(',\n')
+        Popup.show({
+            type: 'info',
+            title: parseTags,
+            textBody: '',
+            buttonText: 'Close',
+            callback: () => Popup.hide()
+        })
+    }
+
     return (
         <View style={{ width: windowWidth, ...style }}>
             <TouchableOpacity style={[hasApplied ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
@@ -26,16 +40,16 @@ export default function ProjectItem(props) {
                 }
                 <View style={{ flexDirection: 'row', marginRight: 15, }}>
                     <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
-                    <Text 
-                        style={[
-                            item.tags.indexOf('halal') !== -1 ? 
-                            { color: 'green', borderColor: 'green' } : 
-                            { color: Colors.primary, borderColor: Colors.primary }, 
-                            { fontWeight: 'bold', borderWidth: 0.5, justifyContent: 'center', alignContent: 'center', textAlignVertical: 'center', paddingHorizontal: 8, paddingVertical: 3, borderRadius: 5, }
-                        ]}
-                    >
-                        {item.tags.indexOf('halal') !== -1 ? 'Halal' : 'Non-Halal'}
-                    </Text>
+                    {
+                        item.tags.length > 0 && (
+                            <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green' }} onPress={onPressNote}>
+                                <Text style={{ color: 'green', fontWeight: 'bold', }}>
+                                    + {item.tags.length} preference
+                                </Text>
+                            </TouchableOpacity>
+                        )
+                    }
+
                 </View>
                 <View style={{ marginHorizontal: 7, }}>
                     <View style={{ flexDirection: 'row', flex: 1, marginVertical: 10, }}>
