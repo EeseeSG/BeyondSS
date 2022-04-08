@@ -4,13 +4,11 @@ import {
     View, 
     Text, 
     TouchableOpacity, 
-    TextInput,
     Platform,
     StyleSheet ,
-    StatusBar,
-    Alert,
 	ScrollView,
-	Image
+	Switch,
+	FlatList
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -27,6 +25,9 @@ import * as ProjectData from '../../database/Project';
 
 // COMPONENT
 import CustomTextInput from '../../components/Form/TextInput';
+import CustomDateTimeInput from '../../components/Form/DateInput';
+import CustomSwitchInput from '../../components/Form/Switch';
+
 
 export default function SignInScreen({navigation}) {
 	const { colors } = useTheme();
@@ -38,8 +39,19 @@ export default function SignInScreen({navigation}) {
 		title: '',
 		location: '',
         message: '',
+		tags: {
+			isHalal: false,
+			isVegetarian: false,
+			isVegan: false,
+			isKosher: false,
+			isGlutenFree: false,
+			hasPeanut: false,
+			hasDiary: false,
+		},
+		datetime: new Date(),
 		isValidName: null,
 		isValidLocation: null,
+		isValidDate: null,
 	});
     
 
@@ -92,15 +104,154 @@ export default function SignInScreen({navigation}) {
 		}
 	}
 
+	const dateHandler = (val) => {
+		if(val <= new Date()) {
+			setData({
+				...data,
+				datetime: new Date(),
+				isValidDate: false,
+			});
+			return
+		}
+		setData({
+			...data,
+			datetime: val,
+			isValidDate: true,
+		});
+	}
+
+    //=====================================================================================================================
+    //==  TAG HANDLER ==
+    //=====================================================================================================================
+	const preference_tags = [
+		{
+			value: 'isHalal',
+			onChange: (val) => halalHandler(val),
+			yes: 'Is Halal',
+			no: 'Not Halal',
+		},
+		{
+			value: 'isVegetarian',
+			onChange: (val) => vegetarianHandler(val),
+			yes: 'Is Vegetarian',
+			no: 'Not Vegetarian',
+		},
+		{
+			value: 'isVegan',
+			onChange: (val) => veganHandler(val),
+			yes: 'Is Vegan',
+			no: 'Not Vegan',
+		},
+		{
+			value: 'isKosher',
+			onChange: (val) => kosherHandler(val),
+			yes: 'Is Kosher',
+			no: 'Not Kosher',
+		},
+	]
+
+	const allergen_tags = [
+		{
+			value: 'hasPeanut',
+			onChange: (val) => peanutHandler(val),
+			yes: 'Has Peanut',
+			no: 'No Peanut',
+		},
+		{
+			value: 'hasDiary',
+			onChange: (val) => diaryHandler(val),
+			yes: 'Has Diary',
+			no: 'No Diary',
+		},
+		{
+			value: 'isGlutenFree',
+			onChange: (val) => glutenHandler(val),
+			yes: 'Is Gluten Free',
+			no: 'Not Gluten Free',
+		},
+	]
+
+
+	const halalHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				isHalal: val,
+			}
+		});
+	}
+
+	const vegetarianHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				isVegetarian: val,
+			}
+		});
+	}
+
+	const veganHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				isVegan: val,
+			}
+		});
+	}
+
+	const kosherHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				isKosher: val,
+			}
+		});
+	}
+
+	const glutenHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				isGlutenFree: val,
+			}
+		});
+	}
+
+	const peanutHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				hasPeanut: val,
+			}
+		});
+	}
+
+	const diaryHandler = (val) => {
+		setData({
+			...data,
+			tags: {
+				...data.tags,
+				hasDiary: val,
+			}
+		});
+	}
+
+
 
     //=====================================================================================================================
     //==  SUBMIT ==
     //=====================================================================================================================
     const checkValidation = () => {
-		if(data.email.length == 0 || data.password.length == 0) {
-			return false;
+		if(data.isValidName && data.isValidLocation && data.isValidDate) {
+			return true;
 		}
-        return true
+        return false;
     }
 
 	const submitHandler = async () => {
@@ -109,13 +260,16 @@ export default function SignInScreen({navigation}) {
         if(!validated) {
             Popup.show({
                 type: 'danger',
-                title: 'Wrong Input!',
-                textBody: 'Username or password field cannot be empty.',
+                title: 'Incorrect Input!',
+                textBody: 'Please fill in all the necessary inputs in the required format.',
                 buttonText: 'Okay',
                 callback: () => Popup.hide()
             })
             return;
         }
+
+		console.log(data)
+		return
 
 		let result = await ProjectData.createProject(data);
         if(result.success) {
@@ -163,8 +317,17 @@ export default function SignInScreen({navigation}) {
                     validationText={"Please enter a valid location"}
                 />
 
+				<CustomDateTimeInput 
+					header={"Date and Time"}
+					fontIcon={"user-o"}
+					date={data.datetime}
+					setDate={dateHandler}
+					isValidInput={data.isValidDate}
+                    validationText={"Please enter a valid date and time"}
+				/>
+
                 <CustomTextInput
-                    header={"Message"}
+                    header={"Message (optional)"}
                     fontIcon={"user-o"}
                     placeholder={"Enter any message you would like to convey"}
                     onChangeText={messageHandler}
@@ -172,7 +335,34 @@ export default function SignInScreen({navigation}) {
                     numberOfLines={5}
                 />
 
+				<Text style={[styles.text_footer, { color: 'black', marginTop: 30, }]}>Dietary Restrictions</Text>
+				<FlatList
+					numColumns={2}
+					data={preference_tags}
+					keyExtractor={(_, index) => index.toString()}
+					contentContainerStyle={{ marginHorizontal: 20, }}
+					renderItem={({item}) => (
+						<CustomSwitchInput
+							data={data}
+							item={item}
+						/>
+					)}
+				/>
 
+				
+				<Text style={[styles.text_footer, { color: 'black', marginTop: 30, }]}>Allergens</Text>
+				<FlatList
+					numColumns={2}
+					data={allergen_tags}
+					keyExtractor={(_, index) => index.toString()}
+					contentContainerStyle={{ marginHorizontal: 20, }}
+					renderItem={({item}) => (
+						<CustomSwitchInput
+							data={data}
+							item={item}
+						/>
+					)}
+				/>
 
                 <View style={styles.button}>
                     <TouchableOpacity

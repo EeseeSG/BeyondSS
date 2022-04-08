@@ -27,7 +27,7 @@ export default function CustomTextInput(props) {
     } = props;
     return (
         <View>
-            <Text style={[styles.text_footer, { color: textColor, marginTop: 20, }]}>{header}</Text>
+            <Text style={[styles.text_footer, { color: textColor, marginTop: 30, }]}>{header}</Text>
             <View style={styles.action}>
                 {
                     numberOfLines === 1 && (
@@ -48,7 +48,7 @@ export default function CustomTextInput(props) {
                     numberOfLines={numberOfLines}
                 />
                 {
-                    (isValidInput && isValidInput !== null) && (
+                    numberOfLines === 1 && (isValidInput && isValidInput !== null) && (
                         <Animatable.View animation="bounceIn">
                             <Feather name="check-circle" color="green" size={20}/>
                         </Animatable.View>
