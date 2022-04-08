@@ -15,18 +15,16 @@ import moment from 'moment';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { defaultStyles } from '../../constants/defaultStyles';
 import { useTheme } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
 import { currentUserData } from '../../database/User';
 import UserAvatar from 'react-native-user-avatar';
 
 // CUSTOM
-import ItemHorizontalSlider from '../../components/Store/ItemHorizontalSlider';
 import CollectionItem from '../../components/Project/CollectionItem';
 
 // DATA
-import * as UserData from '../../database/User';
 import * as ProjectData from '../../database/Project';
-
+import firebase from 'firebase';
+require('firebase/firestore');
 
 export default function Profile({ navigation }) {
     const { colors } = useTheme();
@@ -68,15 +66,25 @@ export default function Profile({ navigation }) {
     useEffect(() => {
         if(currentUser) {
             async function _getCollections() {
-                let reservation_data = await ProjectData.getUserUpcomingReservations(currentUser._id);
-                setReservations(reservation_data)
+                firebase.firestore()
+                    .collection('reservations')
+                    .where('user_id', '==', currentUser._id)
+                    .where('project.datetime', '>', new Date())
+                    .onSnapshot((snapshot) => {
+                        let reservation_data = snapshot.docs.map(snap => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        })
+                        setReservations(reservation_data)
+                    })
             }
             return _getCollections()
         }
     }, [currentUser])
 
-    const renderCollectionOnEmpty = () => (
-        <View style={{ justifyContent: 'center', alignItems: 'center', padding: 20,}}>
+    const RenderCollectionOnEmpty = () => (
+        <View style={{ justifyContent: 'center', alignItems: 'center', padding: 20, marginTop: 10, }}>
             <Text>You have not made any reservation. Make one now!</Text>
             <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: colors.primary, marginTop: 10, paddingHorizontal: 20, }]} onPress={() => navigation.navigate('Explore')}>
                 <Text style={{ color: '#fff' }}>Explore</Text>
@@ -91,8 +99,18 @@ export default function Profile({ navigation }) {
     const [history, setHistory] = useState([]);
     useEffect(() => {
         async function _getHistory() {
-            let historical_data = await ProjectData.getUserPastReservations(currentUser._id);
-            setHistory(historical_data)
+            firebase.firestore()
+                .collection('reservations')
+                .where('user_id', '==', user_id)
+                .where('project.datetime', '<=', new Date())
+                .onSnapshot((snapshot) => {
+                    let historical_data = snapshot.docs.map(snap => {
+                        let _id = snap.id;
+                        let data = snap.data();
+                        return { ...data, _id }
+                    })
+                    setHistory(historical_data)
+                })
         }
         return _getHistory()
     }, [])
@@ -119,15 +137,12 @@ export default function Profile({ navigation }) {
                 <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
                     <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={{ fontSize: 22, color: 'black', opacity: 0.8, marginRight: 5, }}>$</Text>
-                                <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{spending.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                            </View>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>received</Text>
+                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{reservations.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={{ color: 'black', opacity: 0.6, }}>pending</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{totalOrders.toString()}</Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>orders fulfilled</Text>
+                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{history.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={{ color: 'black', opacity: 0.6, }}>received</Text>
                         </View>
                     </View>
                 </View>
@@ -143,21 +158,29 @@ export default function Profile({ navigation }) {
 
                 {
                     selection === 0 ? (
-                        reservations.map((reservation) => (
-                            <CollectionItem 
-                                data={reservation} 
-                                user_id={currentUser._id}
-                                navigation={navigation}
-                            />
-                        ))
+                        reservations.length !== 0 ? (
+                            reservations.map((reservation) => (
+                                <CollectionItem 
+                                    data={reservation} 
+                                    user_id={currentUser._id}
+                                    navigation={navigation}
+                                />
+                            ))
+                        ) : (
+                            <RenderCollectionOnEmpty />
+                        )
                     ) : (
-                        history.map((hist) => (
-                            <CollectionItem 
-                                data={hist} 
-                                user_id={currentUser._id}
-                                navigation={navigation}
-                            />
-                        ))
+                        history.length !== 0 ? (
+                            history.map((hist) => (
+                                <CollectionItem 
+                                    data={hist} 
+                                    user_id={currentUser._id}
+                                    navigation={navigation}
+                                />
+                            ))
+                        ) : (
+                            <RenderCollectionOnEmpty />
+                        )
                     )
                 }
 

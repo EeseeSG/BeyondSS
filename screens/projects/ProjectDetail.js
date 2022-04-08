@@ -281,7 +281,6 @@ export default function FoodItem(props) {
                     console.log(err)
                 } finally {
                     Popup.hide();
-                    navigation.navigate('Explore');
                 }
             },
             cancelCallback: () => {
