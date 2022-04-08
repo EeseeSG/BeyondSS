@@ -72,11 +72,7 @@ export const AuthProvider = ({ children }) => {
                 name: name,
                 contact: contact,
                 expoPushToken: expoPushToken,
-                device: {
-                  brand: Platform.constants.Brand,
-                  model: Platform.constants.Model,
-                  platform: Platform.OS,
-                },
+                device: Platform.OS,
                 createdAt: new Date(),
               })
             Popup.show({

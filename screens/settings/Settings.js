@@ -11,6 +11,7 @@ import { useTheme } from 'react-native-paper';
 
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
+import { currentUserData } from '../../database/User';
 
 // SETTIGNS COMPONENETS
 import SettingsBlock from '../../components/Settings/SettingBlocks';
@@ -29,8 +30,31 @@ export default function Settings({ navigation }) {
     };
 
     const _openWebBrowser = async (link) => {
-        await WebBrowser.openBrowserAsync('https://expo.dev')
+        await WebBrowser.openBrowserAsync(link)
     }
+
+    const _resetPassword = async () => {
+        let current_user = await currentUserData();
+        await firebase.auth().sendPasswordResetEmail(current_user.email)
+            .then(function () {
+                Popup.show({
+                    type: 'success',
+                    title: 'Verification Email Sent',
+                    textBody: `A verification email has been sent to ${email}. \n\nPlease check your email to reset your password.`,
+                    buttonText: 'Okay',
+                    callback: () => Popup.hide()
+                })
+            }).catch(function (error) {                
+                Popup.show({
+                    type: 'danger',
+                    title: 'An error has occurred',
+                    textBody: error.toString(),
+                    buttonText: 'Okay',
+                    callback: () => Popup.hide()
+                })
+            })
+    }
+
 
     return (
         <ScrollView style={styles.container}>
@@ -54,7 +78,7 @@ export default function Settings({ navigation }) {
                 <SettingsBlock
                     icon='md-key-outline'
                     text='Change Password'
-                    onPress={() => {}}
+                    onPress={_resetPassword}
                 />
 
                 <Text style={styles.header}>About</Text>

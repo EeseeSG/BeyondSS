@@ -19,8 +19,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 // CONFIG
-const { height } = Dimensions.get("screen");
-const height_logo = height * 0.55;
+const { width } = Dimensions.get("screen");
+const height_logo = width * 0.55;
 
 export default function SplashScreen({navigation}) {
 	const { colors } = useTheme();

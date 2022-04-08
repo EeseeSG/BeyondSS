@@ -158,9 +158,7 @@ export default function NewProject(props) {
                     </View>
                 </View>
                 <Text style={{ fontWeight: 'bold', marginVertical: 5, }}>Date Applied: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
-                <Text>Device Brand: {item.device.brand}</Text>
-                <Text>Device Model: {item.device.model}</Text>
-                <Text>Device OS: {item.device.platform}</Text>
+                <Text>Device OS: {item.device}</Text>
             </View>
         )
     }
@@ -191,10 +189,7 @@ export default function NewProject(props) {
                     <Text style={{ fontWeight: 'bold', }}>Date Accepted: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
                     <Text style={{ fontWeight: 'bold', }}>Date Applied: {moment(item.appliedAt.seconds * 1000).format('LLL')}</Text>
                 </View>
-
-                <Text>Device Brand: {item.device.brand}</Text>
-                <Text>Device Model: {item.device.model}</Text>
-                <Text>Device OS: {item.device.platform}</Text>
+                <Text>Device OS: {item.device}</Text>
             </View>
         )
     }
