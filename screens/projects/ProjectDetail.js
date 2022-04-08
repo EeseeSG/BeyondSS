@@ -41,6 +41,10 @@ export default function ProjectDetail(props) {
     const [isLoaded, setIsLoaded] = useState(false);
     const [quantity, setQuantity] = useState(1);
 
+    const [isChef, setIsChef] = useState(false);
+    const [isBeneficiary, setIsBeneficiary] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+
     //=====================================================================================================================
     //== INITIATE ==
     //=====================================================================================================================
@@ -53,6 +57,13 @@ export default function ProjectDetail(props) {
     useEffect(() => {
         async function _getUserData() {
             let current_user = await _getCurrentUser(); // user data
+            const is_chef = current_user.type === 'chef';
+            const is_beneficiary = current_user.type === 'beneficiary';
+            const is_admin = current_user.type === 'admin';
+            setIsChef(is_chef);
+            setIsBeneficiary(is_beneficiary);
+            setIsAdmin(is_admin);
+
             setCurrentUser(current_user);
         }
         return _getUserData()
@@ -330,25 +341,41 @@ export default function ProjectDetail(props) {
                             <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
                         </View>
                     </View>
-                    <View style={{ marginHorizontal: 30, }}>
-                        <Text style={styles.header}>Change reservation quantity to:</Text>
-                        <QuantityPicker
-                            quantity={quantity}
-                            setQuantity={setQuantity}
-                        />
-                        <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
-                        {
-                            currentReservations !== 0 && (
-                                <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
-                                    <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
-                                </TouchableOpacity>
-                            )
-                        }
-                    </View>
+
+                    {
+                        (isBeneficiary || isAdmin) && (
+                            <View style={{ marginHorizontal: 30, }}>
+                                <Text style={styles.header}>Change reservation quantity to:</Text>
+                                <QuantityPicker
+                                    quantity={quantity}
+                                    setQuantity={setQuantity}
+                                />
+                                <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
+                                {
+                                    currentReservations !== 0 && (
+                                        <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
+                                            <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
+                                        </TouchableOpacity>
+                                    )
+                                }
+                            </View>
+                        )
+                    }
+
                     <View style={{ marginHorizontal: 30, }}>
                         <Text style={styles.header}>Message from Chef:</Text>
                         <Text style={{ textAlign: 'justify' }}>{data.message}</Text>
                     </View>
+
+                    {
+                        (isAdmin || isChef) && (
+                            reservations.map((reservation) => (
+                                <View>
+                                    <Text>User</Text>
+                                </View>
+                            ))
+                        )
+                    }
 
                 </ScrollView>
                 

@@ -10,7 +10,7 @@ export const currentUserData = async () => {
         .then((user) => {
             let _id = user.id;
             let data = user.data();
-            return { _id, ...data }
+            return { ...data, _id }
         })
 }
 
@@ -24,7 +24,7 @@ export const getUserByPhone = async (phone) => {
                 if(snap.exists) {
                     let _id = snap.id;
                     let data = snap.data();
-                    return { _id, ...data }
+                    return { ...data, _id }
                 }
             })
             return result
@@ -41,7 +41,7 @@ export const getApplicationByPhone = async (phone) => {
                 if(snap.exists) {
                     let _id = snap.id;
                     let data = snap.data();
-                    return { _id, ...data }
+                    return { ...data, _id }
                 }
             })
             return result
@@ -57,7 +57,7 @@ export const getAllApplications = async () => {
                 if(snap.exists) {
                     let _id = snap.id;
                     let data = snap.data();
-                    return { _id, ...data }
+                    return { ...data, _id }
                 }
             })
             return result
@@ -74,7 +74,7 @@ export const getAllUsersByDateJoined = async () => {
                 if(snap.exists) {
                     let _id = snap.id;
                     let data = snap.data();
-                    return { _id, ...data }
+                    return { ...data, _id }
                 }
             })
             return result
@@ -83,11 +83,11 @@ export const getAllUsersByDateJoined = async () => {
 
 export const createNewUser = async (data) => {
     try {
-        let intial_password = data.contact.slice(-6);  // raw password for user to log in
+        let initial_password = data.contact.slice(-6);  // raw password for user to log in
 
         await firebase
         .auth()
-        .createUserWithEmailAndPassword(data.email, intial_password)
+        .createUserWithEmailAndPassword(data.email, initial_password)
         .then((credential) => {
             credential.user.updateProfile({ displayName: data.name })
                 .then(async () => {

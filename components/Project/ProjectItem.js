@@ -14,8 +14,11 @@ import { Popup } from 'react-native-popup-confirm-toast';
 export default function ProjectItem(props) {
     const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
     const { data: item, user_id, style={}, navigation } = props;
-    const hasApplied = item.beneficiaries.indexOf(user_id) !== -1;
 
+    console.log(item.beneficiaries)
+    console.log(user_id)
+
+    const hasApplied = item.beneficiaries.indexOf(user_id) !== -1;
 
     const onPressNote = () => {
         const parseTags = item.tags.join(',\n')
