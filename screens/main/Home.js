@@ -67,13 +67,18 @@ export default function Home({ navigation }) {
         responseListener.current = Notifications.addNotificationResponseReceivedListener(async (response) => {
             let data = response.notification.request.content.data;
             let ref = data.ref;
+            let type = data.type;
 
-            // grab project data by ref
-            let project_arr = await ProjectData.getProjectByRef(ref);
+            if(type === 'project') {
+                // grab project data by ref
+                var project = await ProjectData.getProjectByID(ref);
+                var project_arr = [project];
+            } else if(type === 'new') {
+                // grab project data by ref
+                var project_arr = await ProjectData.getProjectByRef(ref);
+            }
             let reservations_arr = await ProjectData.getReservationsByID(project_arr[0]._id);
             let project_data = await ProjectData._parseDetailedProjectData(project_arr, reservations_arr);
-            console.log(project_data[0])
-            console.log('navigating...')
             navigation.navigate('ProjectDetail', { data: project_data[0] })
         });
 

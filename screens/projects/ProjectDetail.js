@@ -34,6 +34,9 @@ import * as ProjectData from '../../database/Project';
 import firebase from 'firebase';
 require('firebase/firestore');
 
+// PUSH NOTIFICATIONS
+import { sendPushNotification } from '../../components/Helper/PushNotifications';
+
 
 const IMAGE_HEIGHT = 200;
 const PHONE_OFFSET = Platform.OS === 'ios' ? 44 : 0;
@@ -41,7 +44,6 @@ const PHONE_OFFSET = Platform.OS === 'ios' ? 44 : 0;
 export default function ProjectDetail(props) {
     const { navigation, route } = props;
     const data = route.params.data;
-    console.log(data)
     const { colors } = useTheme();
     const [isLoaded, setIsLoaded] = useState(false);
     const [quantity, setQuantity] = useState(1);
@@ -306,7 +308,7 @@ export default function ProjectDetail(props) {
         })
     }
 
-    const handleComplete = (reservation_id) => {
+    const handleComplete = (reservation_data) => {
         Popup.show({
             type: 'confirm',
             title: 'Complete Order?',
@@ -315,11 +317,11 @@ export default function ProjectDetail(props) {
             confirmText: 'Cancel',
             callback: async () => {
                 try {
-                    let status = await ProjectData.completeDelivery(reservation_id);
+                    let status = await ProjectData.completeDelivery(reservation_data._id);
                     if(status.success) {
                         // update the list
                         let new_reservations = reservations.map((reservation) => {
-                            if(reservation._id === reservation_id) {
+                            if(reservation._id === reservation_data._id) {
                                 return {
                                     ...reservation,
                                     delivered: true,
@@ -328,6 +330,25 @@ export default function ProjectDetail(props) {
                             return reservation
                         })
                         setReservations(new_reservations);
+
+                        // send push notification
+                        let message = {
+                            title: 'Confirmation',
+                            body: `Please confirm that you have received ${reservation_data.reserved} of ${reservation_data.project.title}. Enjoy your meal!`,
+                            data: {
+                                ref: reservation_data.project_id,
+                                type: 'project',
+                            },
+                        }
+                        sendPushNotification([reservation_data.project.user.expoPushToken], message)  // communicate to chef
+                    } else {
+                        Popup.show({
+                            type: 'danger',
+                            title: 'Error. Please try again.',
+                            textBody: result.error,
+                            buttonText: 'Close',
+                            callback: () => Popup.hide()
+                        })
                     }
                 } catch(err) {
                     console.log(err)
@@ -341,7 +362,7 @@ export default function ProjectDetail(props) {
         })
     }
 
-    const handleAcknowledge = (reservation_id) => {
+    const handleAcknowledge = (reservation_data) => {
         Popup.show({
             type: 'confirm',
             title: 'Acknowledgement',
@@ -350,11 +371,11 @@ export default function ProjectDetail(props) {
             confirmText: 'Cancel',
             callback: async () => {
                 try {
-                    let status = await ProjectData.acknowledgeDelivery(reservation_id);
+                    let status = await ProjectData.acknowledgeDelivery(reservation_data._id);
                     if(status.success) {
                         // update the list
                         let new_reservations = reservations.map((reservation) => {
-                            if(reservation._id === reservation_id) {
+                            if(reservation._id === reservation_data._id) {
                                 return {
                                     ...reservation,
                                     acknowledged: true,
@@ -363,6 +384,25 @@ export default function ProjectDetail(props) {
                             return reservation
                         })
                         setReservations(new_reservations);
+
+                        // send push notification
+                        let message = {
+                            title: 'Acknowledged!',
+                            body: 'Your delivery has been acknowledged. Thank you for your service!',
+                            data: {
+                                ref: reservation_data.project_id,
+                                type: 'project',
+                            },
+                        }
+                        sendPushNotification([reservation_data.project.user.expoPushToken], message)  // communicate to chef
+                    } else {
+                        Popup.show({
+                            type: 'danger',
+                            title: 'Error. Please try again.',
+                            textBody: result.error,
+                            buttonText: 'Close',
+                            callback: () => Popup.hide()
+                        })
                     }
                 } catch(err) {
                     console.log(err)
@@ -448,7 +488,7 @@ export default function ProjectDetail(props) {
                                 {
                                     (isBeneficiary && currentReservationData !== []) && (
                                         (currentReservationData.delivered && !currentReservationData.acknowledged) ? (
-                                            <TouchableOpacity style={{ borderWidth: 1, borderColor: 'green', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={() => handleAcknowledge(currentReservationData._id)}>
+                                            <TouchableOpacity style={{ borderWidth: 1, borderColor: 'green', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={() => handleAcknowledge(currentReservationData)}>
                                                 <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'green' }}>Acknowledge this delivery</Text>
                                             </TouchableOpacity>
                                         ) : (
@@ -490,7 +530,7 @@ export default function ProjectDetail(props) {
                                             {
                                                 !reservation.delivered ? (
                                                     currentUser._id === data.user._id ? (
-                                                        <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
+                                                        <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation)}>
                                                             <Feather 
                                                                 name="check-square"
                                                                 color={'green'}

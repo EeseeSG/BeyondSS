@@ -149,8 +149,8 @@ export default function SignInScreen({navigation}) {
 				<ScrollView showsVerticalScrollIndicator={false}>
 					<Text style={[styles.text_footer, { color: colors.text, marginTop: 20, }]}>Email</Text>
 					<View style={styles.action}>
-						<FontAwesome 
-							name="user-o"
+						<Feather 
+							name="user"
 							color={colors.text}
 							size={20}
 						/>

@@ -339,6 +339,7 @@ export default function SignInScreen({navigation}) {
 				body: `New ${data.count} of ${data.title} up for reservation. Reserve yours now!`,
 				data: {
 					ref: data.ref,
+					type: 'new',
 				},
 			}
 
