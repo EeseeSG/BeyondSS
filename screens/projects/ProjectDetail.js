@@ -26,8 +26,8 @@ import * as Animatable from 'react-native-animatable';
 import LottieView from 'lottie-react-native';
 
 // DISPLAY
-import QuantityPicker from '../../components/Store/QuantityPicker';
-import StoreTags from '../../components/Store/StoreTags';
+import QuantityPicker from '../../components/Project/QuantityPicker';
+import StoreTags from '../../components/Project/StoreTags';
 
 // DATA
 import * as UserData from '../../database/User';

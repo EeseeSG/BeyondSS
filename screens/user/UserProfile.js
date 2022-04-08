@@ -20,7 +20,7 @@ import { currentUserData } from '../../database/User';
 import UserAvatar from 'react-native-user-avatar';
 
 // CUSTOM
-import ItemHorizontalSlider from '../../components/Store/ItemHorizontalSlider';
+import ItemHorizontalSlider from '../../components/Project/ItemHorizontalSlider';
 
 const DATA = [
     {

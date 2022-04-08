@@ -20,12 +20,11 @@ import UserAvatar from 'react-native-user-avatar';
 
 // DISPLAY
 import Carousel from 'react-native-snap-carousel';
-import PartnerCarousel from '../../components/Store/PartnerCarousel';
+import PartnerCarousel from '../../components/Project/PartnerCarousel';
 
 // DATA
 import { currentUserData } from '../../database/User';
 import { getPartnerData, getNewsData, getBannerData } from '../../database/Index';
-import * as ProjectData from '../../database/Project';
 import moment from 'moment';
 
 // DATABASE
@@ -185,7 +184,7 @@ export default function Home({ navigation }) {
 
             <View style={{ flex: 1, marginHorizontal: 10, marginTop: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
                 <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                    <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>This Month</Text>
+                    <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Total</Text>
                 </View>
                 <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
                     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
@@ -201,18 +200,17 @@ export default function Home({ navigation }) {
 
             <Text style={styles.header}>Your collections</Text>
             {
-                reservations && (
-                    <>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
-                            <Text>You have not made any reservation. Make one now!</Text>
-                        </View>
-                        <FlatList
-                            horizontal
-                            keyExtractor={(_, index) => index.toString()}
-                            data={reservations}
-                            renderItem={renderItem}
-                        />
-                    </>
+                reservations.length ? (
+                    <FlatList
+                        horizontal
+                        keyExtractor={(_, index) => index.toString()}
+                        data={reservations}
+                        renderItem={renderItem}
+                    />
+                ) : (
+                    <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                        <Text>You have not made any reservation. Make one now!</Text>
+                    </View>
                 )
             }
 
