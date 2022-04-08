@@ -121,7 +121,7 @@ export default function App() {
                       <Stack.Screen name="Explore" component={Explore} options={{ headerShown: false,}}/>
                       <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Start Giving" component={NewProject} />
-                      <Stack.Screen name="Dashboard" component={Dashboard} options={{ headerShown: false,}}/>
+                      <Stack.Screen name="Dashboard" component={Dashboard} />
                     </Stack.Group>
                   </Stack.Navigator>
                 </>

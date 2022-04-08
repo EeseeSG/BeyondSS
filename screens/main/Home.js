@@ -55,7 +55,7 @@ export default function Home({ navigation }) {
             setCurrentUser(currentUser);
             setIsChef(currentUser.type === 'chef');
             setIsBeneficiary(currentUser.type === 'beneficiary');
-            setIsAdmin(currentUser.isAdmin);
+            setIsAdmin(currentUser.type === 'admin');
             return
         }
         return _getCurrentUser()
@@ -165,12 +165,12 @@ export default function Home({ navigation }) {
 
 
     const handleCTA = () => {
-        if(isChef) {
+        if(isAdmin) {
+            navigation.navigate('Dashboard')
+        } else if(isChef) {
             navigation.navigate('Start Giving')
         } else if(isBeneficiary) {
             navigation.navigate('Explore')
-        } else if(isAdmin) {
-            navigation.navigate('Dashboard')
         } else {
             Popup.show({
                 type: 'danger',
@@ -212,7 +212,15 @@ export default function Home({ navigation }) {
                     resizeMode='cover'
                 />
                 <TouchableOpacity style={styles.swipeBtn} onPress={handleCTA}>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{isChef ? 'Start Giving!' : 'Explore!'}</Text>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>
+                        {isChef ? 
+                        'Start Giving!' : 
+                        isAdmin ? 
+                        'Dashboard' :
+                        isBeneficiary ?
+                        'Explore!' :
+                        'ERROR'}
+                    </Text>
                 </TouchableOpacity>
             </View>
 

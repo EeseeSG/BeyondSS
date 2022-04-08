@@ -47,3 +47,19 @@ export const getApplicationByPhone = async (phone) => {
             return result
         })
 }
+
+export const getAllApplications = async () => {
+    return await firebase.firestore()
+        .collection('applications')
+        .get()
+        .then((snapshot) => {
+            let result = snapshot.docs.map((snap) => {
+                if(snap.exists) {
+                    let _id = snap.id;
+                    let data = snap.data();
+                    return { _id, ...data }
+                }
+            })
+            return result
+        })
+}
