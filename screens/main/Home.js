@@ -25,7 +25,7 @@ import PartnerCarousel from '../../components/Store/PartnerCarousel';
 // DATA
 import { currentUserData } from '../../database/User';
 import { getPartnerData, getNewsData, getBannerData } from '../../database/Index';
-import { _parseDetailedProjectData } from '../../database/Project';
+import * as ProjectData from '../../database/Project';
 import moment from 'moment';
 
 // DATABASE
@@ -93,13 +93,16 @@ export default function Home({ navigation }) {
                 firebase.firestore()
                     .collection('reservations')
                     .where('user_id', '==', currentUser._id)
+                    .where('project.datetime', '>', new Date())
                     .onSnapshot(async (snapshot) => {
-                        let arr = await Promise.all(snapshot.docs.map((snap) => {
+                        let project_arr = await Promise.all(snapshot.docs.map((snap) => {
                             let _id = snap.id;
                             let data = snap.data();
                             return { ...data, _id }
                         }));
-                        let parsedArr = await _parseDetailedProjectData(arr);
+
+                        let reservations_arr = await ProjectData.getUserUpcomingReservations(currentUser._id);
+                        let parsedArr = await ProjectData._parseDetailedProjectData(project_arr, reservations_arr)
                         setReservations(parsedArr);
                     })
             }
@@ -161,15 +164,11 @@ export default function Home({ navigation }) {
             <View style={{ marginHorizontal: 10, }}>
                 <View style={{ flexDirection: 'row' }}>
                     <UserAvatar name={currentUser.username}/>
-                    {/* <Image 
-                        style={{ width: 40, height: 40, borderRadius: 40, borderWidth: 0.5, borderColor: '#ccc', }}
-                        source={{ uri: currentUser.avatar }}
-                    /> */}
                     <Text style={[styles.greetings, { color: colors.primary, marginBottom: 5, }]}>
                         {"  "}Hi {currentUser.username} 
                     </Text>
                 </View>
-                <Text style={[styles.title, { marginBottom: 10, }]}>What are your cravings?</Text>
+                <Text style={[styles.title, { marginBottom: 10, }]}>{currentUser.type === 'chef' ? 'How would you like to help?' : 'How can we help?'}</Text>
             </View>
 
             <View>
@@ -222,7 +221,7 @@ export default function Home({ navigation }) {
                     resizeMode='cover'
                 />
                 <TouchableOpacity style={styles.swipeBtn} onPress={() => navigation.navigate('Explore')}>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>Start Giving!</Text>
+                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>{currentUser.type === 'chef' ? 'Start Giving!' : 'Explore!'}</Text>
                 </TouchableOpacity>
             </View>
 

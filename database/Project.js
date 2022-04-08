@@ -55,16 +55,59 @@ export const getAllUpcomingReservations = async () => {
         })
 }
 
-export const getOutstandingProjects = async () => {
-    let project_arr = await getAllProjectData();
+export const getReservationsByID = async (project_id) => {
+    return await firebase.firestore()
+        .collection('reservations')
+        .where('project_id', '==', project_id)
+        .get()
+        .then((snapshot) => {
+            let arr = snapshot.docs.map((snap) => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+            return arr
+        })
+}
 
-    // map current availability
-    let new_project_arr = await _parseDetailedProjectData(project_arr)
+export const checkReservationAvailability = async (project_id, user_id, addition) => {
+    let project_details = await getProjectByID(project_id);
+    let total_available = project_details.count;
+    let reservations_arr = await getReservationsByID(project_id);
+    let filtered_reservation_arr = reservations_arr.filter((reservation) => reservation.user_id !== user_id);
+    let total_count = filtered_reservation_arr.map((reservation) => reservation.reserved).reduce((a, b) => a + b, 0);
+    let new_count = total_count + addition;
+
+    if(total_available >= new_count) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export const getUserUpcomingReservations = async (user_id) => {
+    return await firebase.firestore()
+        .collection('reservations')
+        .where('user_id', '==', user_id)
+        .where('project.datetime', '>', new Date())
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
+export const getOutstandingProjects = async () => {
+    let project_arr = await getAllUpcomingProjectData();
+    let reservations_arr = await getAllUpcomingReservations(); // map current availability
+    let new_project_arr = await _parseDetailedProjectData(project_arr, reservations_arr)
     return new_project_arr;
 }
 
-export const _parseDetailedProjectData = async (project_arr) => {
-    let reservations_arr = await getAllUpcomingReservations();
+export const _parseDetailedProjectData = async (project_arr, reservations_arr) => {
     let new_project_arr = project_arr.map((project) => {
         let reserved = 0;
         let beneficiaries = [];
@@ -85,7 +128,7 @@ export const _parseDetailedProjectData = async (project_arr) => {
             beneficiaries,
             reservation_data
         }
-    });
+    }).sort((a, b) => a.datetime.seconds > b.datetime.seconds);
     return new_project_arr;
 }
 

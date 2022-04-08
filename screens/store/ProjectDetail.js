@@ -153,7 +153,20 @@ export default function FoodItem(props) {
     const _addToCart = async () => {
         // check if it is available yet
         let avail = checkAvailability();
-        if(!avail) return
+        if(!avail) return;
+
+        // check if there is oversubscription
+        let isSufficient = await ProjectData.checkReservationAvailability(data._id, currentUser._id, quantity);
+        if(!isSufficient) {
+            Popup.show({
+                type: 'danger',
+                title: 'Invalid quantity',
+                textBody: 'The quantity you selected is more than that of what is currently left available. Please lower the quantity and try again.',
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+            return
+        };
 
         // post the data
         let reservation_data = { 
