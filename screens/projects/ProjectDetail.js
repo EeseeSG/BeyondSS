@@ -433,76 +433,81 @@ export default function ProjectDetail(props) {
                         )
                     }
 
-                    <View style={{ marginHorizontal: 30, }}>
+                    <View style={{ marginHorizontal: 30, marginBottom: 10, }}>
                         <Text style={styles.header}>Message from Chef:</Text>
-                        <Text style={{ textAlign: 'justify' }}>{data.message}</Text>
+                        <Text style={{ textAlign: 'justify', }}>{data.message.trim().length === 0 ? 'No message.' : data.message}</Text>
                     </View>
 
                     {
                         (isAdmin || isChef) && (
-                            reservations.map((reservation) => (
-                                <View style={{ marginHorizontal: 20, marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                                    <View style={{ flex: 1, }}>
-                                        <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 5, }}>{reservation.user.name}</Text>
-                                        <Text style={{ fontSize: 16, }}>+65 {reservation.user.contact}</Text>
-                                        <Text style={{ fontSize: 16, fontWeight: 'bold', }}>Reserved:  <Text style={{ color: 'blue', fontSize: 18, }}>{reservation.reserved.toString()}</Text></Text>
-                                    </View>
-                                    {
-                                        !reservation.delivered ? (
-                                            isChef ? (
-                                                <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
-                                                    <Feather 
-                                                        name="check-square"
-                                                        color={'green'}
-                                                        size={30}
-                                                    />
-                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Mark as delivered</Text>
-                                                </TouchableOpacity>
-                                            ) : (
-                                                <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
-                                                    <Feather 
-                                                        name="loader"
-                                                        color={'grey'}
-                                                        size={30}
-                                                    />
-                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending</Text>
-                                                </View>    
-                                            )
-                                        ) : (
-                                            !reservation.acknowledged ? (
-                                                isChef ? (
-                                                    <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
-                                                        <Feather 
-                                                            name="loader"
-                                                            color={'grey'}
-                                                            size={30}
-                                                        />
-                                                        <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending {'\n'}Acknowledgement</Text>
-                                                    </View>
+                            <View style={{ marginHorizontal: 30, }}>
+                                <Text style={[styles.header, { marginBottom: 15, }]}>Reservation Details:</Text>
+                                {
+                                    reservations.map((reservation) => (
+                                        <View style={{ marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
+                                            <View style={{ flex: 1, }}>
+                                                <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 5, }}>{reservation.user.name}</Text>
+                                                <Text style={{ fontSize: 16, }}>+65 {reservation.user.contact}</Text>
+                                                <Text style={{ fontSize: 16, fontWeight: 'bold', }}>Reserved:  <Text style={{ color: 'blue', fontSize: 18, }}>{reservation.reserved.toString()}</Text></Text>
+                                            </View>
+                                            {
+                                                !reservation.delivered ? (
+                                                    isChef ? (
+                                                        <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
+                                                            <Feather 
+                                                                name="check-square"
+                                                                color={'green'}
+                                                                size={30}
+                                                            />
+                                                            <Text style={{ textAlign: 'center', fontSize: 12, }}>Mark as delivered</Text>
+                                                        </TouchableOpacity>
+                                                    ) : (
+                                                        <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
+                                                            <Feather 
+                                                                name="loader"
+                                                                color={'grey'}
+                                                                size={30}
+                                                            />
+                                                            <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending</Text>
+                                                        </View>    
+                                                    )
                                                 ) : (
-                                                    <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleAcknowledge(reservation._id)}>
-                                                        <Feather 
-                                                            name="check-square"
-                                                            color={'green'}
-                                                            size={30}
-                                                        />
-                                                        <Text style={{ textAlign: 'center', fontSize: 12, }}>Received</Text>
-                                                    </TouchableOpacity>
+                                                    !reservation.acknowledged ? (
+                                                        isChef ? (
+                                                            <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                                                <Feather 
+                                                                    name="loader"
+                                                                    color={'grey'}
+                                                                    size={30}
+                                                                />
+                                                                <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending {'\n'}Acknowledgement</Text>
+                                                            </View>
+                                                        ) : (
+                                                            <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleAcknowledge(reservation._id)}>
+                                                                <Feather 
+                                                                    name="check-square"
+                                                                    color={'green'}
+                                                                    size={30}
+                                                                />
+                                                                <Text style={{ textAlign: 'center', fontSize: 12, }}>Received</Text>
+                                                            </TouchableOpacity>
+                                                        )
+                                                    ) : (
+                                                        <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                                            <Feather 
+                                                                name="archive"
+                                                                color={'blue'}
+                                                                size={30}
+                                                            />
+                                                            <Text style={{ textAlign: 'center', fontSize: 12, }}>Completed</Text>
+                                                        </View>
+                                                    )
                                                 )
-                                            ) : (
-                                                <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
-                                                    <Feather 
-                                                        name="archive"
-                                                        color={'blue'}
-                                                        size={30}
-                                                    />
-                                                    <Text style={{ textAlign: 'center', fontSize: 12, }}>Completed</Text>
-                                                </View>
-                                            )
-                                        )
-                                    }
-                                </View>
-                            ))
+                                            }
+                                        </View>
+                                    ))
+                                }
+                            </View>
                         )
                     }
 
