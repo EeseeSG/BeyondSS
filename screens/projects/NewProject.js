@@ -375,6 +375,7 @@ export default function SignInScreen({navigation}) {
                     placeholder={"Please enter location of collection"}
                     onChangeText={locationHandler}
                     isValidInput={data.isValidLocation}
+					numberOfLines={3}
                     validationText={"Please enter a valid location"}
 					value={data.location}
                 />

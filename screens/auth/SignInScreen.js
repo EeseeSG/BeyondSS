@@ -46,14 +46,14 @@ export default function SignInScreen({navigation}) {
 		if( val.trim().length >= 4 ) {
 			setData({
 				...data,
-				email: val,
+				email: val.trim().toLowerCase(),
 				check_textInputChange: true,
 				isValidUser: true
 			});
 		} else {
 			setData({
 				...data,
-				email: val,
+				email: val.trim().toLowerCase(),
 				check_textInputChange: false,
 				isValidUser: false
 			});
@@ -61,7 +61,7 @@ export default function SignInScreen({navigation}) {
 	}
 
 	const handlePasswordChange = (val) => {
-		if( val.trim().length >= 8 ) {
+		if( val.trim().length >= 6 ) {
 			setData({
 				...data,
 				password: val,

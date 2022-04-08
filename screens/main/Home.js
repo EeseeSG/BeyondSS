@@ -161,8 +161,6 @@ export default function Home({ navigation }) {
                     })
             }
 
-            console.log(currentUser)
-
             const is_chef = currentUser.type === 'chef';
             const is_beneficiary = currentUser.type === 'beneficiary';
             const is_admin = currentUser.type === 'admin';

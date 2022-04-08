@@ -219,6 +219,7 @@ export const completeDelivery = async (reservation_id) => {
             .doc(reservation_id)
             .update({
                 delivered: true,
+                deliveredDate: new Date(),
             })
         return {
             success: true,
@@ -238,6 +239,7 @@ export const acknowledgeDelivery = async (reservation_id) => {
             .doc(reservation_id)
             .update({
                 acknowledged: true,
+                acknowledgedDate: new Date(),
             })
         return {
             success: true,

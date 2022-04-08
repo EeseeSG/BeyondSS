@@ -7,6 +7,7 @@ import {
     TouchableOpacity, 
     ScrollView,
     Dimensions,
+    ActivityIndicator
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -30,6 +31,8 @@ import StoreTags from '../../components/Project/StoreTags';
 // DATA
 import * as UserData from '../../database/User';
 import * as ProjectData from '../../database/Project';
+import firebase from 'firebase';
+require('firebase/firestore');
 
 
 const IMAGE_HEIGHT = 200;
@@ -68,18 +71,18 @@ export default function ProjectDetail(props) {
             setCurrentUser(current_user);
         }
         return _getUserData()
-    } ,[])
+    }, [])
 
     // to load once all data is loaded
     useEffect(() => {
-        if(currentReservations !== null && quantityReserved  !== null) {
+        if(currentReservations !== null && quantityReserved !== null && currentReservationData !== null && currentReservationData !== undefined) {
             setIsLoaded(true);
         }
-    }, [currentReservations, quantityReserved])
+    }, [currentReservations, quantityReserved, currentReservationData])
 
     // get reservation data
     useEffect(() => {
-        return _getReservationData();
+        return _getCurrentReservations();
     }, [])
 
     // update total reserved amount
@@ -96,7 +99,7 @@ export default function ProjectDetail(props) {
 
     // update user reserved amount
     useEffect(() => {
-        if(reservations) {
+        if(reservations !== null & currentUser !== null) {
             async function _getReservedUser() {
                 let user_count = await _getUserReservedCount(reservations);  // user specific count
                 setCurrentReservations(user_count);
@@ -104,8 +107,23 @@ export default function ProjectDetail(props) {
             }
             return _getReservedUser();
         }
-    }, [reservations])
+    }, [reservations, currentUser])
 
+    // set if user is beneficiary to highlight only instance
+    useEffect(() => {
+        if(currentUser !== null && reservations !== null) {
+            if(currentUser.type === 'beneficiary') {
+                const user_reserved_data = reservations.filter((i) => i.user_id === currentUser._id);
+                if(user_reserved_data.length === 0) {
+                    setCurrentReservationData([]);
+                } else {
+                    setCurrentReservationData(user_reserved_data[0]);
+                }
+            } else {
+                setCurrentReservationData([]);
+            }
+        }
+    }, [currentUser, reservations])
 
 
     //=====================================================================================================================
@@ -119,14 +137,19 @@ export default function ProjectDetail(props) {
     //=====================================================================================================================
     //==  CURRENT RESERVATIONS ==
     //=====================================================================================================================
-    async function _getReservationData() {
-        let reservations_all = await _getCurrentReservations();  // get reserved data
-        setReservations(reservations_all)
-    }
-
+    const [currentReservationData, setCurrentReservationData] = useState(null);
     async function _getCurrentReservations() {
-        const reservations_all = await ProjectData.getReservationsByID(data._id);
-        return reservations_all
+        await firebase.firestore()
+            .collection('reservations')
+            .where('project_id', '==', data._id)
+            .onSnapshot((snapshot) => {
+                let reservations_all = snapshot.docs.map((snap) => {
+                    let _id = snap.id;
+                    let data = snap.data();
+                    return { ...data, _id }
+                })
+                setReservations(reservations_all)
+            })
     }
 
     async function _getTotalReservedCount(reservations_all) {
@@ -146,7 +169,7 @@ export default function ProjectDetail(props) {
     //============================================c=========================================================================
     //==  MAKE RESERVATION ==
     //=====================================================================================================================
-    const _addToCart = async () => {
+    const _saveReservation = async () => {
         // check if it is available yet
         let avail = checkAvailability();
         if(!avail) return;
@@ -176,8 +199,6 @@ export default function ProjectDetail(props) {
         let result = await ProjectData.updateReservation(reservation_data);
         if(result.success) {
             // update by recalling the function
-            await _getReservationData()
-
             Popup.show({
                 type: 'success',
                 title: 'Success!',
@@ -322,8 +343,8 @@ export default function ProjectDetail(props) {
     const handleAcknowledge = (reservation_id) => {
         Popup.show({
             type: 'confirm',
-            title: 'Complete Order?',
-            textBody: 'Are you ready to complete this order?',
+            title: 'Acknowledgement',
+            textBody: 'Are you ready to acknowledge that you have received this delivery?',
             buttonText: 'Confirm',
             confirmText: 'Cancel',
             callback: async () => {
@@ -354,13 +375,14 @@ export default function ProjectDetail(props) {
         })
     }
 
-
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
     //=====================================================================================================================
     if(!isLoaded) {
         return (
-            <View></View>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+                <ActivityIndicator size="large" color={"#0000ff"} />
+            </View>
         )
     }
 
@@ -423,10 +445,24 @@ export default function ProjectDetail(props) {
                                 />
                                 <Text style={{ fontWeight: 'bold', backgroundColor: 'rgba(0,255,0,0.2)', borderRadius: 5, marginHorizontal: 20, marginTop: 10, paddingVertical: 5, flex: 1, textAlign: 'center' }}>You have reserved {currentReservations.toString()} portions</Text>
                                 {
-                                    currentReservations !== 0 && (
-                                        <TouchableOpacity style={{ borderWidth: 1, borderColor: 'rgb(255,0,0)', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
-                                            <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'rgb(255,0,0)' }}>Cancel Reservation</Text>
-                                        </TouchableOpacity>
+                                    (isBeneficiary && currentReservationData !== []) && (
+                                        (currentReservationData.delivered && !currentReservationData.acknowledged) ? (
+                                            <TouchableOpacity style={{ borderWidth: 1, borderColor: 'green', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={() => handleAcknowledge(currentReservationData._id)}>
+                                                <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'green' }}>Acknowledge this delivery</Text>
+                                            </TouchableOpacity>
+                                        ) : (
+                                            (currentReservationData.delivered && currentReservationData.acknowledged) ? (
+                                                <View style={{ borderWidth: 1, borderColor: 'blue', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }}>
+                                                    <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'blue' }}>You have acknowledged this delivery</Text>
+                                                </View>
+                                            ) : (
+                                                currentReservations !== 0 && (
+                                                    <TouchableOpacity style={{ borderWidth: 1, borderColor: 'red', borderRadius: 30, marginHorizontal: 20, marginTop: 20, }} onPress={handleCancel}>
+                                                        <Text style={{ fontWeight: 'bold', paddingVertical: 15, flex: 1, textAlign: 'center', color: 'red' }}>Cancel Reservation</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                            )
+                                        )
                                     )
                                 }
                             </View>
@@ -452,7 +488,7 @@ export default function ProjectDetail(props) {
                                             </View>
                                             {
                                                 !reservation.delivered ? (
-                                                    isChef ? (
+                                                    currentUser._id === data.user._id ? (
                                                         <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
                                                             <Feather 
                                                                 name="check-square"
@@ -462,6 +498,7 @@ export default function ProjectDetail(props) {
                                                             <Text style={{ textAlign: 'center', fontSize: 12, }}>Mark as delivered</Text>
                                                         </TouchableOpacity>
                                                     ) : (
+                                                        /** THIS IS ADMIN OR OTHER CHEF VIEW */
                                                         <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleComplete(reservation._id)}>
                                                             <Feather 
                                                                 name="loader"
@@ -473,25 +510,14 @@ export default function ProjectDetail(props) {
                                                     )
                                                 ) : (
                                                     !reservation.acknowledged ? (
-                                                        isChef ? (
-                                                            <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
-                                                                <Feather 
-                                                                    name="loader"
-                                                                    color={'grey'}
-                                                                    size={30}
-                                                                />
-                                                                <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending {'\n'}Acknowledgement</Text>
-                                                            </View>
-                                                        ) : (
-                                                            <TouchableOpacity style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }} onPress={() => handleAcknowledge(reservation._id)}>
-                                                                <Feather 
-                                                                    name="check-square"
-                                                                    color={'green'}
-                                                                    size={30}
-                                                                />
-                                                                <Text style={{ textAlign: 'center', fontSize: 12, }}>Received</Text>
-                                                            </TouchableOpacity>
-                                                        )
+                                                        <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
+                                                            <Feather 
+                                                                name="loader"
+                                                                color={'grey'}
+                                                                size={30}
+                                                            />
+                                                            <Text style={{ textAlign: 'center', fontSize: 12, }}>Pending {'\n'}Acknowledgement</Text>
+                                                        </View>
                                                     ) : (
                                                         <View style={{ marginRight: 10, justifyContent: 'center', alignItems: 'center' }}>
                                                             <Feather 
@@ -513,14 +539,36 @@ export default function ProjectDetail(props) {
 
                 </ScrollView>
                 
-                <LinearGradient
-                    colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)']}
-                    style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
-                >
-                    <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={_addToCart}>
-                        <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Save reservation</Text>
-                    </TouchableOpacity>
-                </LinearGradient>
+                {
+                    isBeneficiary && (
+                        // Only available if it is not delivered or not out of time
+                        !currentReservationData.delivered && new Date() < new Date(data.datetime.seconds * 1000)) && (
+                            <LinearGradient
+                                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)']}
+                                style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
+                            >
+                                <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={_saveReservation}>
+                                    <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Save reservation</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
+                    )
+                }
+
+                {
+                    // FOR ADMIN
+                    isAdmin && (
+                        // Only available if it is not out of time
+                        new Date() < new Date(data.datetime.seconds * 1000)) && (
+                            <LinearGradient
+                                colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)']}
+                                style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
+                            >
+                                <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={_saveReservation}>
+                                    <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Save reservation</Text>
+                                </TouchableOpacity>
+                            </LinearGradient>
+                    )
+                }
             </Animatable.View>
         </ScrollView>
     )
