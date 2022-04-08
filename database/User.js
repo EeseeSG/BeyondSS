@@ -64,6 +64,23 @@ export const getAllApplications = async () => {
         })
 }
 
+export const getAllUsersByDateJoined = async () => {
+    return await firebase.firestore()
+        .collection('users')
+        .orderBy('createdAt', 'desc')
+        .get()
+        .then((snapshot) => {
+            let result = snapshot.docs.map((snap) => {
+                if(snap.exists) {
+                    let _id = snap.id;
+                    let data = snap.data();
+                    return { _id, ...data }
+                }
+            })
+            return result
+        })
+}
+
 export const createNewUser = async (data) => {
     try {
         let intial_password = _generateRandomPassword();  // raw password for user to log in
@@ -77,6 +94,7 @@ export const createNewUser = async (data) => {
                 let user_id = credential.user.uid;
                 let user_data = {
                     ...data,
+                    appliedAt: data.createdAt,
                     createdAt: new Date(),
                     intial_password: intial_password,
                 }
