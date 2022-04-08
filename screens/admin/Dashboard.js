@@ -9,7 +9,7 @@ import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
 import { getAllApplications } from '../../database/User';
 import Feather from 'react-native-vector-icons/Feather';
-import { createNewUser, rejectApplication } from '../../database/User';
+import { createNewUser, deleteApplication } from '../../database/User';
 
 
 export default function NewProject(props) {
@@ -67,7 +67,7 @@ export default function NewProject(props) {
             confirmText: 'Cancel',
             callback: async () => {
                 try {
-                    let status = await rejectApplication(data._id);
+                    let status = await deleteApplication(data._id);
                     _removeApplicationFromList(data._id);
                     console.log(status)
                 } catch(err) {

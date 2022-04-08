@@ -66,9 +66,11 @@ export const getAllApplications = async () => {
 
 export const createNewUser = async (data) => {
     try {
+        let intial_password = _generateRandomPassword();  // raw password for user to log in
+
         await firebase
         .auth()
-        .createUserWithEmailAndPassword(data.email, data.password)
+        .createUserWithEmailAndPassword(data.email, intial_password)
         .then((credential) => {
             credential.user.updateProfile({ displayName: data.name })
                 .then(async () => {
@@ -76,16 +78,16 @@ export const createNewUser = async (data) => {
                 let user_data = {
                     ...data,
                     createdAt: new Date(),
+                    intial_password: intial_password,
                 }
                 await firebase.firestore()
                     .collection('users')
                     .doc(user_id)
                     .set(user_data)
-
-                // set user data
-                setUser(user_data)
-
                 });
+
+                // delete from application database
+                deleteApplication(data._id)
         });
     } catch (error) {
         return {
@@ -95,7 +97,14 @@ export const createNewUser = async (data) => {
     }
 }
 
-export const rejectApplication = async (application_id) => {
+export const _generateRandomPassword = () => {
+    const min = 1;
+    const max = 10000;
+    const rand = '000000' + (min + Math.random() * (max - min)).toString();
+    return rand.slice(-6);
+}
+
+export const deleteApplication = async (application_id) => {
     try {
         await firebase.firestore()
             .collection('applications')
