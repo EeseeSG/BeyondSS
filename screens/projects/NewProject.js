@@ -37,6 +37,7 @@ export default function SignInScreen({navigation}) {
     //=====================================================================================================================
 	const [data, setData] = useState({
 		title: '',
+		count: '',
 		location: '',
         message: '',
 		tags: {
@@ -50,6 +51,7 @@ export default function SignInScreen({navigation}) {
 		},
 		datetime: new Date(),
 		isValidName: null,
+		isValidCount: null,
 		isValidLocation: null,
 		isValidDate: null,
 	});
@@ -70,6 +72,22 @@ export default function SignInScreen({navigation}) {
 				...data,
 				title: val,
 				isValidName: false
+			});
+		}
+	}
+
+	const numberHandler = (val) => {
+		if( val.trim().length >= 1 ) {
+			setData({
+				...data,
+				count: val.replace(/[^0-9]/g, ''),
+				isValidCount: true
+			});
+		} else {
+			setData({
+				...data,
+				count: val.replace(/[^0-9]/g, ''),
+				isValidCount: false
 			});
 		}
 	}
@@ -248,7 +266,7 @@ export default function SignInScreen({navigation}) {
     //==  SUBMIT ==
     //=====================================================================================================================
     const checkValidation = () => {
-		if(data.isValidName && data.isValidLocation && data.isValidDate) {
+		if(data.isValidName && data.isValidCount && data.isValidLocation && data.isValidDate) {
 			return true;
 		}
         return false;
@@ -268,10 +286,27 @@ export default function SignInScreen({navigation}) {
             return;
         }
 
-		console.log(data)
-		return
+		// convert tags into readable format
+		const all_tags_mapped = [...preference_tags, ...allergen_tags];
+		const presentTags = Object.keys(data.tags).reduce(function(r, e) {
+			if (data.tags[e] === true) r[e] = data.tags[e]
+			return r;
+		}, {});
+		const listTags = Object.keys(presentTags).map((key) => key);
+		const parsedTags = listTags.map((tag) => {
+			let target = all_tags_mapped.filter((t) => t.value === tag);
+			if(target.length > 0) {
+				return target[0].yes
+			}
+			return null
+		}).filter((i) => i !== null);
 
-		let result = await ProjectData.createProject(data);
+		const new_data = {
+			...data,
+			tags: parsedTags
+		}
+
+		let result = await ProjectData.createProject(new_data);
         if(result.success) {
             Popup.show({
                 type: 'success',
@@ -306,6 +341,17 @@ export default function SignInScreen({navigation}) {
                     onChangeText={nameHandler}
                     isValidInput={data.isValidName}
                     validationText={"Username must be 4 characters long"}
+					value={data.name}
+                />
+
+				<CustomTextInput
+                    header={"How many would you like to distribute?"}
+                    fontIcon={"user-o"}
+                    placeholder={"Enter the amount to be distributed"}
+                    onChangeText={numberHandler}
+                    isValidInput={data.isValidCount}
+					keyboardType={'number-pad'}
+					value={data.count}
                 />
 
                 <CustomTextInput
@@ -315,6 +361,7 @@ export default function SignInScreen({navigation}) {
                     onChangeText={locationHandler}
                     isValidInput={data.isValidLocation}
                     validationText={"Please enter a valid location"}
+					value={data.location}
                 />
 
 				<CustomDateTimeInput 
@@ -324,6 +371,7 @@ export default function SignInScreen({navigation}) {
 					setDate={dateHandler}
 					isValidInput={data.isValidDate}
                     validationText={"Please enter a valid date and time"}
+					value={data.datetime}
 				/>
 
                 <CustomTextInput
@@ -333,6 +381,7 @@ export default function SignInScreen({navigation}) {
                     onChangeText={messageHandler}
                     isValidInput={true}
                     numberOfLines={5}
+					value={data.message}
                 />
 
 				<Text style={[styles.text_footer, { color: 'black', marginTop: 30, }]}>Dietary Restrictions</Text>

@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { 
     View, 
     Text, 
-    Button,
     StyleSheet,
     TouchableOpacity,
 } from 'react-native';
@@ -34,10 +33,8 @@ export default function CustomTextInput(props) {
 
         if(mode === 'date') {
             showTimepicker()
-            return
         } else {
             setShow(false);
-            return
         }
     };
     

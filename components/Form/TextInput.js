@@ -14,6 +14,7 @@ export default function CustomTextInput(props) {
     const {
         header,
         fontIcon,
+        value,
         placeholder=header,
         placeholderTextColor="#666666",
         keyboardType="default",
@@ -46,6 +47,7 @@ export default function CustomTextInput(props) {
                     autoCapitalize={autoCap}
                     onChangeText={(val) => onChangeText(val.trim())}
                     numberOfLines={numberOfLines}
+                    value={value}
                 />
                 {
                     numberOfLines === 1 && (isValidInput && isValidInput !== null) && (
