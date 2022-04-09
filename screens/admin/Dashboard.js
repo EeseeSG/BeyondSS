@@ -4,17 +4,13 @@ import {
     Text, 
     TouchableOpacity, 
     FlatList,
-    Platform,
-    StyleSheet,
-    TextInput
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
-import { getAllApplications } from '../../database/User';
 import Feather from 'react-native-vector-icons/Feather';
-import { createNewUser, deleteApplication, getAllUsersByDateJoined } from '../../database/User';
+import { getAllApplicationsActive, createNewUser, deleteApplication, getAllUsersByDateJoined } from '../../database/User';
 
-export default function NewProject(props) {
+export default function NewProject() {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [applications, setApplications] = useState([]);
     const [selection, setSelection] = useState(0);
@@ -36,7 +32,7 @@ export default function NewProject(props) {
     }
 
     const _getApplications = async () => {
-        let applications_arr = await getAllApplications();
+        let applications_arr = await getAllApplicationsActive();
         setApplications(applications_arr);
     }
 
@@ -62,11 +58,33 @@ export default function NewProject(props) {
             callback: async () => {
                 try {
                     let status = await createNewUser(data);
-                    _removeApplicationFromList(data._id);
+                    console.log(status)
+                    if(status.success) {
+                        Popup.show({
+                            type: 'success',
+                            title: 'User successfully created',
+                            textBody: 'The user has been created and password is set to the LAST SIX (6) digitals of thier registered phone number. They may change password once they login, under "Settings"',
+                            buttonText: 'Close',
+                            callback: () => Popup.hide()
+                        })
+                        _removeApplicationFromList(data._id);
+                    } else {
+                        Popup.show({
+                            type: 'danger',
+                            title: 'Error. Please try again.',
+                            textBody: status.error,
+                            buttonText: 'Close',
+                            callback: () => Popup.hide()
+                        })
+                    }
                 } catch(err) {
-                    console.log(err)
-                } finally {
-                    Popup.hide();
+                    Popup.show({
+                        type: 'danger',
+                        title: 'Error. Please try again.',
+                        textBody: err,
+                        buttonText: 'Close',
+                        callback: () => Popup.hide()
+                    })
                 }
             },
             cancelCallback: () => {
@@ -201,80 +219,29 @@ export default function NewProject(props) {
         setUsers(filtered_results);
     }
 
+    const renderHeader = () => (
+        <View style={{ flexDirection: 'row', marginBottom: 10, paddingHorizontal: 20, }}>
+            <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
+                <Text style={{ color: 'black' }}>Pending</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={[selection === 1 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(1)}>
+                <Text style={{ color: 'black' }}>Search Approved</Text>
+            </TouchableOpacity>
+        </View>
+    )
+
 
     return (
-        <View style={{ paddingTop: 50, }}>
-            <View style={{ flexDirection: 'row', marginBottom: 10, paddingHorizontal: 20, }}>
-                <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
-                    <Text style={{ color: 'black' }}>Pending</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={[selection === 1 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(1)}>
-                    <Text style={{ color: 'black' }}>Search Approved</Text>
-                </TouchableOpacity>
-            </View>
-            {
-                selection === 0 ? (
-                    <FlatList
-                        horizontal={false}
-                        keyExtractor={(_, index) => index.toString()}
-                        data={applications}
-                        renderItem={renderItem}
-                        showsVerticalScrollIndicator={false}
-                        onRefresh={handleApplicationsRefresh}
-                        refreshing={isRefreshing}
-                    />
-                ) : (
-                    <View>
-                        <View style={styles.action}>
-                            <TextInput 
-                                placeholder="Search by Phone Number"
-                                style={styles.textInput}
-                                autoCapitalize="none"
-                                onChangeText={(val) => handleSearch(val)}
-                                keyboardType={'phone-pad'}
-                                maxLength={8}
-                            />
-                        </View>
-                        <FlatList
-                            horizontal={false}
-                            keyExtractor={(_, index) => index.toString()}
-                            data={users}
-                            renderItem={renderUser}
-                            showsVerticalScrollIndicator={false}
-                            onRefresh={handleUsersRefresh}
-                            refreshing={isRefreshing}
-                        />
-                    </View>
-                )
-            }
-        </View>
-
+        <FlatList
+            horizontal={false}
+            keyExtractor={(_, index) => index.toString()}
+            data={selection === 0 ? applications : users}
+            ListHeaderComponent={renderHeader}
+            ListHeaderComponentStyle={{ marginTop: 10, }}
+            renderItem={selection === 0 ? renderItem : renderUser}
+            showsVerticalScrollIndicator={false}
+            onRefresh={selection === 0 ? handleApplicationsRefresh : handleUsersRefresh}
+            refreshing={isRefreshing}
+        />
     )
 }
-
-
-const styles = StyleSheet.create({
-    action: {
-		flexDirection: 'row',
-		marginTop: 10,
-		borderBottomWidth: 1,
-		borderBottomColor: '#c2c2c2', // #f2f2f2
-		paddingBottom: 5,
-		alignItems: 'center',
-        marginHorizontal: 20,
-        backgroundColor: 'white',
-        paddingVertical: 20,
-        justifyContent: 'center',
-        borderRadius: 5,
-	},
-    text_footer: {
-		color: '#05375a',
-		fontSize: 18
-	},
-    textInput: {
-		flex: 1,
-		marginTop: Platform.OS === 'ios' ? 0 : -12,
-		paddingLeft: 10,
-		color: '#05375a'
-	},
-})

@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useEffect, useState, useContext, } from 'react';
+import React, { useState, useContext, } from 'react';
 import { 
     View, 
     Text, 
@@ -21,7 +21,6 @@ import * as Animatable from 'react-native-animatable';
 
 // DESIGN
 import { LinearGradient } from 'expo-linear-gradient';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 
 // FIREBASE

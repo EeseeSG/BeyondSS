@@ -113,6 +113,7 @@ export const AuthProvider = ({ children }) => {
 								contact: contact,
 								type: type,
 								expoPushToken: expoPushToken,
+								isClosed: false,
 								device: Platform.OS,
 								createdAt: new Date(),
 							})

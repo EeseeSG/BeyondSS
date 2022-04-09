@@ -367,7 +367,7 @@ export default function SignInScreen({navigation}) {
 
                 <CustomTextInput
                     header={"Food Name"}
-                    fontIcon={"user-o"}
+                    fontIcon={"terminal"}
                     placeholder={"Enter name of food"}
                     onChangeText={nameHandler}
                     isValidInput={data.isValidName}
@@ -377,7 +377,7 @@ export default function SignInScreen({navigation}) {
 
 				<CustomTextInput
                     header={"How many would you like to distribute?"}
-                    fontIcon={"user-o"}
+                    fontIcon={"calculator"}
                     placeholder={"Enter the amount to be distributed"}
                     onChangeText={numberHandler}
                     isValidInput={data.isValidCount}
@@ -398,7 +398,7 @@ export default function SignInScreen({navigation}) {
 
 				<CustomDateTimeInput 
 					header={"Date and Time"}
-					fontIcon={"user-o"}
+					fontIcon={"calendar"}
 					date={data.datetime}
 					setDate={dateHandler}
 					isValidInput={data.isValidDate}
