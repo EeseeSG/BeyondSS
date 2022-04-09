@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "BeyondSS",
-    "slug": "beyondss",
-    "version": "1.0.0",
+    "name": "GoingBeyond",
+    "slug": "goingbeyond",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
