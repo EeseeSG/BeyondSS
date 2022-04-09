@@ -1,5 +1,5 @@
 // ESSENTIALS
-import React, { useState, useEffect, useRef, } from 'react';
+import React, { useState, useEffect, } from 'react';
 import { 
   View, 
   StatusBar, 

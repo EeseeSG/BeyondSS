@@ -328,7 +328,14 @@ export default function Home({ navigation }) {
                         {"  "}Hi {currentUser.name} 
                     </Text>
                 </View>
-                <Text style={[styles.title, { marginBottom: 10, }]}>{isChef ? 'How would you like to help?' : 'How can we help?'}</Text>
+                <Text style={[styles.title, { marginBottom: 10, }]}>
+                    {isChef ? 
+                    'How would you like to help?' : 
+                    isAdmin ? 
+                    'Manage users':
+                    'How can we help?'
+                    }
+                    </Text>
             </View>
 
             <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>

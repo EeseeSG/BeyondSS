@@ -13,6 +13,9 @@ import {
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
 
+// WEB
+import * as WebBrowser from 'expo-web-browser';
+
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
 
@@ -175,6 +178,10 @@ const SignInScreen = ({navigation}) => {
 		register(data)
 	}
 
+	const _openWebBrowser = async (link) => {
+        await WebBrowser.openBrowserAsync(link)
+    }
+
 	return (
 		<View style={[styles.container, { backgroundColor: colors.secondary, }]}>
 			<StatusBar backgroundColor={colors.secondary} barStyle="light-content"/>
@@ -280,11 +287,11 @@ const SignInScreen = ({navigation}) => {
 						<Text style={styles.color_textPrivate}>
 							By signing up you agree to our {" "}
 						</Text>
-						<TouchableOpacity style={[styles.color_textPrivate, {fontWeight: 'bold'}]} onPress={() => null}>
+						<TouchableOpacity style={[styles.color_textPrivate, {fontWeight: 'bold'}]} onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}>
 							<Text>Terms of service</Text>
 						</TouchableOpacity>
 						<Text style={styles.color_textPrivate}>{" "}and{" "}</Text>
-						<TouchableOpacity style={[styles.color_textPrivate, {fontWeight: 'bold'}]} onPress={() => null}>
+						<TouchableOpacity style={[styles.color_textPrivate, {fontWeight: 'bold'}]} onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}>
 							<Text>Privacy policy</Text>
 						</TouchableOpacity>
 					</View>
