@@ -22,7 +22,7 @@ export default function ActivityItem(props) {
                         item.tags.length > 0 && (
                             <View style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green' }}>
                                 <Text style={{ color: 'green', fontWeight: 'bold', }}>
-                                    + {item.tags.length} preference
+                                    + {item.tags.length}
                                 </Text>
                             </View>
                         )

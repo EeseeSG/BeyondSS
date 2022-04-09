@@ -22,7 +22,7 @@ export default function ProjectItem(props) {
                         item.project.tags.length > 0 && (
                             <View style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green' }}>
                                 <Text style={{ color: 'green', fontWeight: 'bold', }}>
-                                    + {item.project.tags.length} preference
+                                    + {item.project.tags.length}
                                 </Text>
                             </View>
                         )

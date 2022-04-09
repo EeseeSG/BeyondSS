@@ -41,9 +41,9 @@ export default function ProjectItem(props) {
                     <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
                     {
                         item.tags.length > 0 && (
-                            <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green' }} onPress={onPressNote}>
+                            <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green', }} onPress={onPressNote}>
                                 <Text style={{ color: 'green', fontWeight: 'bold', }}>
-                                    + {item.tags.length} preference
+                                    + {item.tags.length}
                                 </Text>
                             </TouchableOpacity>
                         )

@@ -29,7 +29,6 @@ export const AuthProvider = ({ children }) => {
 
 				// LOGIN
 				login: async (email, password) => {
-					console.log('reached')
 					try {
 						firebase.auth().signInWithEmailAndPassword(email.trim(), password)
 							.then(async () => {
@@ -43,8 +42,6 @@ export const AuthProvider = ({ children }) => {
 										let data = user.data();
 										return { ...data, _id }
 									})
-
-								console.log('retrieved user data')
 
 								// check push notification in case change of device
 								async function registerForPushNotificationsAsync() {
@@ -67,11 +64,8 @@ export const AuthProvider = ({ children }) => {
 									}
 								}
 
-								console.log('checking push notification')
 								let current_token = await registerForPushNotificationsAsync()
 								if(current_user.expoPushToken !== current_token) {
-
-									console.log('updating user token')
 									// update
 									let new_current_user = {
 										...current_user,
@@ -83,12 +77,10 @@ export const AuthProvider = ({ children }) => {
 										.update(new_current_user)
 									setUser(new_current_user)
 								} else {
-									console.log('no change in token')
 									setUser(current_user)
 								}
 							})
 							.catch((error) => {
-								console.log(error)
 								Popup.show({
 									type: 'danger',
 									title: 'Access Error',
@@ -98,7 +90,6 @@ export const AuthProvider = ({ children }) => {
 								})
 							})
 					} catch(error) {
-						console.log(error)
 						Popup.show({
 							type: 'danger',
 							title: 'Access Error',
