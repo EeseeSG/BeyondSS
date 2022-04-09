@@ -1,5 +1,6 @@
 import firebase from 'firebase';
 require('firebase/firestore');
+import { firebaseConfig } from '../constants/Firebase';
 
 // GENERAL
 export const currentUserData = async () => {
@@ -83,30 +84,43 @@ export const getAllUsersByDateJoined = async () => {
 
 export const createNewUser = async (data) => {
     try {
-        let initial_password = data.contact.slice(-6);  // raw password for user to log in
+        // set up secondary app so that does not interfer with current app / admin login
+        var secondaryApp = firebase.initializeApp(firebaseConfig, "Secondary");
 
-        await firebase
-        .auth()
-        .createUserWithEmailAndPassword(data.email, initial_password)
-        .then((credential) => {
-            credential.user.updateProfile({ displayName: data.name })
-                .then(async () => {
-                let user_id = credential.user.uid;
-                let user_data = {
-                    ...data,
-                    appliedAt: data.createdAt,
-                    createdAt: new Date(),
-                    intial_password: intial_password,
+        // let initial_password = data.contact.slice(-6);  // raw password for user to log in
+        let initial_password = 'beneficiaryaccount'
+        await secondaryApp.auth()
+            .createUserWithEmailAndPassword(data.email, initial_password)
+            .then((credential) => {
+                credential.user.updateProfile({ displayName: data.name })
+                    .then(async () => {
+                        let user_id = credential.user.uid;
+                        let user_data = {
+                            ...data,
+                            appliedAt: data.createdAt,
+                            createdAt: new Date(),
+                            initial_password: initial_password,
+                        }
+                        await firebase.firestore()
+                            .collection('users')
+                            .doc(user_id)
+                            .set(user_data)
+                    });
+
+                    // delete from application database
+                    deleteApplication(data._id)
+            }).then(() => {
+                // logout
+                secondaryApp.auth().signOut();
+                return {
+                    success: true,
                 }
-                await firebase.firestore()
-                    .collection('users')
-                    .doc(user_id)
-                    .set(user_data)
-                });
-
-                // delete from application database
-                deleteApplication(data._id)
-        });
+            }).catch((error) => {
+                return {
+                    success: false,
+                    error,
+                }
+            });
     } catch (error) {
         return {
             success: false,
