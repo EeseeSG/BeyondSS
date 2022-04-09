@@ -27,24 +27,18 @@
       }
     },
     "android": {
+      "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       },
       "package": "com.beyondss.beyondss",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "versionCode": 1,
+      "permissions": ["CAMERA", "RECORD_AUDIO", "READ_CONTACTS", "READ_PHONE_STATE"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    },
-    "plugins": [
-      [
-        "expo-notifications",
-        {
-          "icon": "./asset/icon-transparent.png",
-          "color": "#ffffff"
-        }
-      ]
-    ]
+    }
   }
 }
