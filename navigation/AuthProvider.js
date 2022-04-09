@@ -101,7 +101,7 @@ export const AuthProvider = ({ children }) => {
 				},
 
 				// REGISTER
-				register: async ({ email, name, contact, expoPushToken }) => {
+				register: async ({ email, name, contact, type, expoPushToken }) => {
 					setLoading(true);
 
 					try {
@@ -111,6 +111,7 @@ export const AuthProvider = ({ children }) => {
 								email: email,
 								name: name,
 								contact: contact,
+								type: type,
 								expoPushToken: expoPushToken,
 								device: Platform.OS,
 								createdAt: new Date(),

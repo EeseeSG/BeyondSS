@@ -9,6 +9,7 @@ import {
 	StyleSheet,
 	ScrollView,
 	StatusBar,
+	Picker,
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -40,6 +41,7 @@ const SignInScreen = ({navigation}) => {
 		email: '',
 		name: '',
 		contact: '',
+		type: '',
 	});
 
 	useEffect(() => {
@@ -72,6 +74,7 @@ const SignInScreen = ({navigation}) => {
 	const [emailValidated, setEmailValidated] = useState(false);
 	const [nameValidated, setNameValidated] = useState(false);
 	const [contactValidated, setContactValidated] = useState(false);
+	const [typeValidated, setTypeValidated] = useState(false);
 
 	const handleEmailChange = (val) => {
 		if(_validateEmail(val)) {
@@ -127,6 +130,24 @@ const SignInScreen = ({navigation}) => {
 		}
 	}
 
+	const handleTypeChange = (val) => {
+		if(val !== '') {
+			setData({
+				...data,
+				type: val,
+				check_typeChange: true
+			});
+			setTypeValidated(true)
+		} else {
+			setData({
+				...data,
+				type: val,
+				check_typeChange: false
+			});
+			setTypeValidated(false)
+		}
+	}
+
 	const _validateEmail = (email) => {
 		return email.match(
 			/^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -157,9 +178,11 @@ const SignInScreen = ({navigation}) => {
 			errorType = 'Please enter your phone number correctly. (without +65)';
 		} else if(!nameValidated) {
 			errorType = 'Please enter a name that is at least 4 characters long';
+		} else if(!typeValidated) {
+			errorType = 'Please select your role.';
 		}
 
-		if(nameValidated && contactValidated && emailValidated) {
+		if(nameValidated && contactValidated && emailValidated && typeValidated) {
 			if(!exists) {
 				registerUser();
 				return;
@@ -282,6 +305,31 @@ const SignInScreen = ({navigation}) => {
 						}
 					</View>
 
+					<Text style={[styles.text_footer, {marginTop: 35}]}>Phone Number</Text>
+					<View style={styles.action}>
+						<Picker
+							selectedValue={data.type}
+							style={styles.textInput}
+							onValueChange={(itemValue, itemIndex) => handleTypeChange(itemValue)}
+						>
+							<Picker.Item label='Select your role...' value='' />
+							<Picker.Item label="Chef (providing food)" value="chef" />
+							<Picker.Item label="Beneficiary (receiving food)" value="beneficiary" />
+						</Picker>
+						{
+							data.check_typeChange
+							&&
+							<Animatable.View
+								animation="bounceIn"
+							>
+								<Feather 
+									name="check-circle"
+									color="green"
+									size={20}
+								/>
+							</Animatable.View>
+						}
+					</View>
 
 					<View style={styles.textPrivate}>
 						<Text style={styles.color_textPrivate}>
