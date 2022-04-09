@@ -138,7 +138,8 @@ export const createNewUser = async (data) => {
                     });
 
                 // delete from application database
-                closeApplication(data._id)
+                let isRejected = false;
+                closeApplication(data._id, isRejected)
 
                 // logout of secondary app
                 secondaryApp.auth().signOut();
@@ -183,13 +184,14 @@ export const deleteApplication = async (application_id) => {
     }
 }
 
-export const closeApplication = async (application_id) => {
+export const closeApplication = async (application_id, isRejected) => {
     try {
         await firebase.firestore()
             .collection('applications')
             .doc(application_id)
             .update({
-                isClosed: true
+                isClosed: true,
+                isRejected: isRejected,
             })
         return {
             success: true,

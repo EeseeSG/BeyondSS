@@ -8,7 +8,7 @@ import {
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
 import Feather from 'react-native-vector-icons/Feather';
-import { getAllApplicationsActive, createNewUser, deleteApplication, getAllUsersByDateJoined } from '../../database/User';
+import { getAllApplicationsActive, createNewUser, closeApplication, getAllUsersByDateJoined } from '../../database/User';
 
 export default function NewProject() {
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -58,7 +58,6 @@ export default function NewProject() {
             callback: async () => {
                 try {
                     let status = await createNewUser(data);
-                    console.log(status)
                     if(status.success) {
                         Popup.show({
                             type: 'success',
@@ -107,7 +106,8 @@ export default function NewProject() {
             confirmText: 'Cancel',
             callback: async () => {
                 try {
-                    let status = await deleteApplication(data._id);
+                    let isRejected = true
+                    let status = await closeApplication(data._id, isRejected);
                     _removeApplicationFromList(data._id);
                 } catch(err) {
                     console.log(err)
@@ -164,7 +164,7 @@ export default function NewProject() {
                                 size={30}
                             />
                         </TouchableOpacity>
-                        <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _deleteUser(item)}>
+                        <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _declineApplication(item)}>
                             <Feather 
                                 name="x-square"
                                 color={'red'}
@@ -191,15 +191,15 @@ export default function NewProject() {
                             Initial Password: <Text style={{ color: 'red' }}>{item.initial_password}</Text>
                         </Text>
                     </View>
-                    <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _declineApplication(item)}>
+                    {/* <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                        <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _deleteUser(item)}>
                             <Feather 
                                 name="x-square"
                                 color={'red'}
                                 size={30}
                             />
                         </TouchableOpacity>
-                    </View>
+                    </View> */}
                 </View>
                 <View style={{ marginVertical: 5, }}>
                     <Text style={{ fontWeight: 'bold', }}>Date Accepted: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
