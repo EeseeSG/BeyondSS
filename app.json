@@ -18,7 +18,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.beyondss.beyondss",
+      "bundleIdentifier": "com.beyondss.goingbeyond",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "Enable Camera Access so that you can capture and upload profile photos",
@@ -32,7 +32,7 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.beyondss.beyondss",
+      "package": "com.beyondss.goingbeyond",
       "googleServicesFile": "./google-services.json",
       "versionCode": 1,
       "permissions": ["CAMERA", "RECORD_AUDIO", "READ_CONTACTS", "READ_PHONE_STATE"]
