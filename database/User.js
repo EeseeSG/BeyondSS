@@ -107,9 +107,7 @@ export const createNewUser = async (data) => {
         let new_app_name = uuidv4();  // create random app for secondary initiation
         var secondaryApp = firebase.initializeApp(firebaseConfig, new_app_name);
 
-        // let initial_password = data.contact.slice(-6);  // raw password for user to log in
-        let initial_password = 'adminaccount'
-
+        let initial_password = data.contact.slice(-6);  // raw password for user to log in
         await secondaryApp.auth()
             .createUserWithEmailAndPassword(data.email, initial_password)
             .then((credential) => {
