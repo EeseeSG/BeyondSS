@@ -4,6 +4,9 @@ import {
     Text, 
     TouchableOpacity, 
     FlatList,
+    Platform,
+    StyleSheet,
+    TextInput
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -16,6 +19,7 @@ export default function NewProject() {
     const [selection, setSelection] = useState(0);
     const [users, setUsers] = useState([]);
     const [rawUsers, setRawUsers] = useState([]);
+    const [searchText, setSearchText] = useState('');
 
     useEffect(() => {
         return _getApplications()
@@ -121,28 +125,11 @@ export default function NewProject() {
         })
     }
 
-    const _deleteUser = async (data) => {
-        Popup.show({
-            type: 'confirm',
-            title: 'WARNING!',
-            textBody: 'Are you sure you like to delete this application? This action cannot be undone.',
-            buttonText: 'Confirm',
-            confirmText: 'Cancel',
-            callback: async () => {
-                try {
-                    let status = await deleteApplication(data._id);
-                    _removeApplicationFromList(data._id);
-                } catch(err) {
-                    console.log(err)
-                } finally {
-                    Popup.hide();
-                }
-            },
-            cancelCallback: () => {
-                Popup.hide();
-            },
-        })
-    }
+    const renderEmpty = () => (
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 20, }}>
+            <Text style={{ fontWeight: 'bold' }}>{selection === 0 ? 'There are no pending applications' : 'There are no users'}</Text>
+        </View>
+    )
 
     const renderItem = ({item}) => {
         return (
@@ -191,15 +178,6 @@ export default function NewProject() {
                             Initial Password: <Text style={{ color: 'red' }}>{item.initial_password}</Text>
                         </Text>
                     </View>
-                    {/* <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
-                        <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _deleteUser(item)}>
-                            <Feather 
-                                name="x-square"
-                                color={'red'}
-                                size={30}
-                            />
-                        </TouchableOpacity>
-                    </View> */}
                 </View>
                 <View style={{ marginVertical: 5, }}>
                     <Text style={{ fontWeight: 'bold', }}>Date Accepted: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
@@ -211,7 +189,7 @@ export default function NewProject() {
     }
 
     const handleSearch = (text) => {
-        if(text.trim().length === 0) {
+        if(text.length === 0) {
             setUsers(rawUsers);
             return
         }
@@ -232,16 +210,59 @@ export default function NewProject() {
 
 
     return (
-        <FlatList
-            horizontal={false}
-            keyExtractor={(_, index) => index.toString()}
-            data={selection === 0 ? applications : users}
-            ListHeaderComponent={renderHeader}
-            ListHeaderComponentStyle={{ marginTop: 10, }}
-            renderItem={selection === 0 ? renderItem : renderUser}
-            showsVerticalScrollIndicator={false}
-            onRefresh={selection === 0 ? handleApplicationsRefresh : handleUsersRefresh}
-            refreshing={isRefreshing}
-        />
+        <>
+            <View style={styles.action}>
+                <Feather 
+                    name="search"
+                    color={'black'}
+                    size={20}
+                />
+                <TextInput 
+                    placeholder="Search by Phone Number"
+                    style={styles.textInput}
+                    onChangeText={(val) => handleSearch(val)}
+                    keyboardType={'phone-pad'}
+                    maxLength={8}
+                />
+            </View>
+            <FlatList
+                horizontal={false}
+                keyExtractor={(_, index) => index.toString()}
+                data={selection === 0 ? applications : users}
+                ListHeaderComponent={renderHeader}
+                ListHeaderComponentStyle={{ marginTop: 10, }}
+                renderItem={selection === 0 ? renderItem : renderUser}
+                ListEmptyComponent={renderEmpty}
+                showsVerticalScrollIndicator={false}
+                onRefresh={selection === 0 ? handleApplicationsRefresh : handleUsersRefresh}
+                refreshing={isRefreshing}
+            />
+        </>
+       
     )
 }
+
+const styles = StyleSheet.create({
+    action: {
+		flexDirection: 'row',
+		marginTop: 10,
+        paddingVertical: 7,
+        paddingHorizontal: 10,
+		borderBottomWidth: 1,
+		borderBottomColor: '#c2c2c2', // #f2f2f2
+		alignItems: 'center',
+        marginHorizontal: 20,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        borderRadius: 5,
+	},
+    text_footer: {
+		color: '#05375a',
+		fontSize: 18
+	},
+    textInput: {
+		flex: 1,
+		paddingLeft: 10,
+		color: '#05375a'
+	},
+})
