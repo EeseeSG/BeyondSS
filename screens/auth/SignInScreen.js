@@ -220,7 +220,7 @@ export default function SignInScreen({navigation}) {
 						</Animatable.View>
 					}
 
-					<TouchableOpacity onPress={() => {}}>
+					<TouchableOpacity onPress={() => navigation.navigate('ForgetPasswordScreen')}>
 						<Text style={{color: '#333333', marginTop:15}}>Forgot password?</Text>
 					</TouchableOpacity>
 					<View style={styles.button}>

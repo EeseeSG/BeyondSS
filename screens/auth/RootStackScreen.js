@@ -6,7 +6,7 @@ const RootStack = createStackNavigator();
 import SplashScreen from './SplashScreen';
 import SignInScreen from './SignInScreen';
 import SignUpScreen from './SignUpScreen';
-
+import ForgetPasswordScreen from './ForgetPassword';
 
 
 export default function RootStackScreen({navigation}) {
@@ -19,6 +19,7 @@ export default function RootStackScreen({navigation}) {
 			<RootStack.Screen name="SplashScreen" component={SplashScreen}/>
 			<RootStack.Screen name="SignInScreen" component={SignInScreen}/>
 			<RootStack.Screen name="SignUpScreen" component={SignUpScreen}/>
+			<RootStack.Screen name="ForgetPasswordScreen" component={ForgetPasswordScreen}/>
 		</RootStack.Navigator>
 	);	
 }
