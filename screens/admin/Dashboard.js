@@ -132,8 +132,11 @@ export default function NewProject(props) {
                 <View style={{ flex: 1, flexDirection: 'row', }}>
                     <View style={{ flex: 1, }}>
                         <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, }}>{item.name}</Text>
-                        <Text style={{ fontStyle: 'italic', marginVertical: 5, }}>{item.email}</Text>
-                        <Text style={{ fontWeight: 'bold', marginVertical: 5, }}>+65 {item.contact}</Text>
+                        <Text style={{ fontWeight: 'bold', fontSize: 15, marginVertical: 5, color: 'blue' }}>Applying as: {item.type.toUpperCase()}</Text>
+                        <View style={{ marginVertical: 5, borderWidth: 0.5, borderColor: '#ccc', padding: 5, borderRadius: 5, }}>
+                            <Text style={{ fontStyle: 'italic', }}>{item.email}</Text>
+                            <Text style={{ fontStyle: 'italic', }}>+65 {item.contact}</Text>
+                        </View>
                     </View>
                     <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
                         <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _approveApplication(item)}>
@@ -152,7 +155,7 @@ export default function NewProject(props) {
                         </TouchableOpacity>
                     </View>
                 </View>
-                <Text style={{ fontWeight: 'bold', marginVertical: 5, }}>Date Applied: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
+                <Text style={{ fontWeight: 'bold', }}>Date Applied: {moment(item.createdAt.seconds * 1000).format('LLL')}</Text>
                 <Text>Device OS: {item.device}</Text>
             </View>
         )
