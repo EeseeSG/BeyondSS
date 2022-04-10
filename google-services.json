@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "736791086604-g5mqhtjgnsh28a7mijkog24j2jef1na7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aaronkoh.gobeyond",
+            "certificate_hash": "c6fbed45e01968cf31aebf208da05ac3caee0c2a"
+          }
+        },
+        {
           "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
           "client_type": 3
         }
