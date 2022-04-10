@@ -7,12 +7,56 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:736791086604:android:32d4256dac082ebec31029",
+        "android_client_info": {
+          "package_name": "com.aaronkoh.gobeyond"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAZ_r_lmsKEHRU-QS-Q4-uXt6JtmseczEs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "736791086604-a5tipln6c97i1diaq0vju6aa3ff8i9kq.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.beyondss.beyondss"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:736791086604:android:cfa69d3b32d65556c31029",
         "android_client_info": {
           "package_name": "com.beyondss.beyondss"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "736791086604-mlhge48i72d42m13e3g6vi5bdri1p3vg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.beyondss.beyondss",
+            "certificate_hash": "c6fbed45e01968cf31aebf208da05ac3caee0c2a"
+          }
+        },
         {
           "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
           "client_type": 3
