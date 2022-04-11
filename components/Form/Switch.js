@@ -4,6 +4,7 @@ import {
     View, 
     Text, 
 	Switch,
+    Platform,
 } from 'react-native';
 import * as Colors from '../../constants/Colors';
 
@@ -11,7 +12,7 @@ import * as Colors from '../../constants/Colors';
 export default function SwitchInput(props) {
     const { data, item } = props;
     return (
-        <View style={{ flexDirection: 'row', flexWrap: 'wrap' , flex: 1, justifyContent: 'flex-start', alignItems: 'center' }}>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap' , flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 15, }}>
             <Switch
                 trackColor={{ false: '#767577', true: Colors.dark }}
                 thumbColor={data.tags[item.value] ? Colors.primary : Colors.base}
@@ -19,7 +20,7 @@ export default function SwitchInput(props) {
                 onValueChange={item.onChange}
                 value={data.tags[item.value]}
             />
-            <Text style={{ fontWeight: 'bold',}}>{data.tags[item.value] ? item.yes : item.no}</Text>
+            <Text style={[{ fontWeight: 'bold',}, Platform.OS === 'ios' && { marginLeft: 7, }]}>{data.tags[item.value] ? item.yes : item.no}</Text>
         </View>
     )
 }
