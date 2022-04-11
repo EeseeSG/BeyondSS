@@ -520,6 +520,11 @@ export default function ProjectDetail(props) {
                             <View style={{ marginHorizontal: 30, }}>
                                 <Text style={[styles.header, { marginBottom: 15, }]}>Reservation Details:</Text>
                                 {
+                                    reservations.length === 0 && (
+                                        <Text>No reservations yet.</Text>
+                                    )
+                                }
+                                {
                                     reservations.map((reservation) => (
                                         <View style={{ marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
                                             <View style={{ flex: 1, }}>
@@ -611,6 +616,7 @@ export default function ProjectDetail(props) {
                     )
                 }
             </Animatable.View>
+            <View style={{ height: 50, }} />
         </ScrollView>
     )
 }

@@ -168,10 +168,10 @@ export default function SignInScreen({navigation}) {
 						placeholder={"Your Password"}
 						onChangeText={handlePasswordChange}
 						isValidInput={data.isValidPassword}
-						keyboardType={'email-address'}
 						autoCap={'none'}
 						validationText={'Password must be 6 characters long.'}
-						isSecureText={data.secureTextEntry}
+						isPassword={true}
+						secureTextEntry={data.secureTextEntry}
 						onSecureTextPress={updateSecureTextEntry}
 					/>
 

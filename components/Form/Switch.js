@@ -15,8 +15,8 @@ export default function SwitchInput(props) {
         <View style={{ flexDirection: 'row', flexWrap: 'wrap' , flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 15, }}>
             <Switch
                 trackColor={{ false: '#767577', true: Colors.dark }}
-                thumbColor={data.tags[item.value] ? Colors.primary : Colors.base}
-                ios_backgroundColor="#3e3e3e"
+                thumbColor={Colors.base}
+                ios_backgroundColor={"#3e3e3e"}
                 onValueChange={item.onChange}
                 value={data.tags[item.value]}
             />

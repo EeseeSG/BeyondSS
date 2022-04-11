@@ -501,7 +501,7 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: '#c2c2c2', // #f2f2f2
 		paddingBottom: 5,
-		alignItems: 'flex-end'
+		alignItems: 'flex-end',
 	},
 	actionError: {
 		flexDirection: 'row',
@@ -522,7 +522,7 @@ const styles = StyleSheet.create({
 	},
 	button: {
 		alignItems: 'center',
-		marginTop: 50
+		marginVertical: 50,
 	},
 	signIn: {
 		width: '100%',

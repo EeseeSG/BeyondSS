@@ -27,7 +27,8 @@ export default function CustomTextInput(props) {
         validationText='Please enter in the correct format.',
         numberOfLines=1,
         maxLength=1000,
-        isSecureText=false,
+        isPassword=false,
+        secureTextEntry=false,
         onSecureTextPress=() => {},
     } = props;
     return (
@@ -54,15 +55,15 @@ export default function CustomTextInput(props) {
                     multiline={numberOfLines > 1}
                     value={value}
                     maxLength={maxLength}
-                    secureTextEntry={isSecureText}
+                    secureTextEntry={secureTextEntry}
                 />
                 {
-                    isSecureText ? (
+                    isPassword ? (
                         <TouchableOpacity
                             onPress={onSecureTextPress}
                         >
                             {
-                                isSecureText
+                                secureTextEntry
                                 ? 
                                     <Feather 
                                         name="eye-off"
