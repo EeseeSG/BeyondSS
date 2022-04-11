@@ -4,12 +4,10 @@ import {
 	View, 
 	Text,  
 	TouchableOpacity, 
-	TextInput,
 	Platform,
 	StyleSheet,
 	ScrollView,
 	StatusBar,
-	Picker,
 	ActionSheetIOS,
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
@@ -28,15 +26,13 @@ import { getUserByPhone, getApplicationByPhone } from '../../database/User';
 import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 
-// DESIGN
-import Feather from 'react-native-vector-icons/Feather';
-
 // PUSH NOTIFICATION
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
 // COMPONENT
-import Dropdown from '../../components/Form/Dropdown';
+import CustomDropdown from '../../components/Form/Dropdown';
+import CustomTextInput from '../../components/Form/TextInput';
 
 
 const SignInScreen = ({navigation}) => {
@@ -252,97 +248,39 @@ const SignInScreen = ({navigation}) => {
 				style={styles.footer}
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
-					
-					<Text style={styles.text_footer}>Email</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="mail"
-							color="#05375a"
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Email"
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handleEmailChange(val.trim())}
-							autoComplete='email'
-							keyboardType='email-address'
-						/>
-						{
-							data.check_textInputChange 
-							&&
-							<Animatable.View
-								animation="bounceIn"
-							>
-								<Feather 
-									name="check-circle"
-									color="green"
-									size={20}
-								/>
-							</Animatable.View>
-						}
-					</View>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Full Name</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="user"
-							color="#05375a"
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Name"
-							style={styles.textInput}
-							onChangeText={(val) => handleNameChange(val.trim())}
-							autoComplete='name'
-						/>
-						{
-							data.check_nameChange 
-							&&
-							<Animatable.View
-								animation="bounceIn"
-							>
-								<Feather 
-									name="check-circle"
-									color="green"
-									size={20}
-								/>
-							</Animatable.View>
-						}
-					</View>
+					<CustomTextInput
+						header={"Email"}
+						fontIcon={"envelope"}
+						placeholder={"Your Email"}
+						onChangeText={handleEmailChange}
+						isValidInput={data.check_textInputChange}
+						keyboardType={'email-address'}
+						autoCap={'none'}
+					/>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Phone Number</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="phone"
-							color="#05375a"
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Phone Number"
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handleContactChange(val)}
-							keyboardType={'phone-pad'}
-							maxLength={8}
-						/>
-						{
-							data.check_contactChange
-							&&
-							<Animatable.View
-								animation="bounceIn"
-							>
-								<Feather 
-									name="check-circle"
-									color="green"
-									size={20}
-								/>
-							</Animatable.View>
-						}
-					</View>
+					<CustomTextInput
+						header={"Full Name"}
+						fontIcon={"user"}
+						placeholder={"Your Name"}
+						onChangeText={handleNameChange}
+						isValidInput={data.check_nameChange}
+						autoComplete={'name'}
+						autoCap={'words'}
+					/>
+
+					<CustomTextInput
+						header={"Phone Number"}
+						fontIcon={"phone"}
+						placeholder={"Your Phone Number"}
+						onChangeText={handleContactChange}
+						isValidInput={data.check_contactChange}
+						keyboardType={'phone-pad'}
+						maxLength={8}
+					/>
 
 
-					<Dropdown
+					<CustomDropdown
 						title={"User Type"}
 						selected={data.type}
 						onChange={handleTypeChange}

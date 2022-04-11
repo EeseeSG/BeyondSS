@@ -23,6 +23,9 @@ import * as Animatable from 'react-native-animatable';
 import { LinearGradient } from 'expo-linear-gradient';
 import Feather from 'react-native-vector-icons/Feather';
 
+// COMPONENTS
+import CustomTextInput from '../../components/Form/TextInput';
+
 // FIREBASE
 import firebase from 'firebase';
 require('firebase/firestore');
@@ -41,7 +44,7 @@ export default function SignInScreen({navigation}) {
 		isValidPassword: true,
 	});
     
-	const textInputChange = (val) => {
+	const handleEmailChange = (val) => {
 		if( val.trim().length >= 4 ) {
 			setData({
 				...data,
@@ -146,79 +149,31 @@ export default function SignInScreen({navigation}) {
 				style={[styles.footer, { backgroundColor: colors.background }]}
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
-					<Text style={[styles.text_footer, { color: colors.text, marginTop: 20, }]}>Email</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="user"
-							color={colors.text}
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Email"
-							placeholderTextColor="#666666"
-							keyboardType={'email-address'}
-							style={[styles.textInput, { color: colors.text }]}
-							autoCapitalize="none"
-							onChangeText={(val) => textInputChange(val.trim())}
-							onEndEditing={(e) => handleValidUser(e.nativeEvent.text)}
-						/>
-						{
-							data.check_textInputChange &&
-							<Animatable.View animation="bounceIn">
-								<Feather name="check-circle" color="green" size={20}/>
-							</Animatable.View>
-						}
-					</View>
-					{ 
-						!data.isValidUser &&
-						<Animatable.View animation="fadeInLeft" duration={500}>
-							<Text style={styles.errorMsg}>Please enter email in the correct format.</Text>
-						</Animatable.View>
-					}
+
+					<CustomTextInput
+						header={"Email"}
+						fontIcon={"envelope"}
+						placeholder={"Your Email"}
+						onChangeText={handleEmailChange}
+						isValidInput={data.check_textInputChange}
+						keyboardType={'email-address'}
+						autoCap={'none'}
+						validationText={'Please enter email in the correct format.'}
+					/>
+
 					
-
-					<Text style={[styles.text_footer, { color: colors.text, marginTop: 35 }]}>Password</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="lock"
-							color={colors.text}
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Password"
-							placeholderTextColor="#666666"
-							secureTextEntry={data.secureTextEntry}
-							style={[styles.textInput, {	color: colors.text }]}
-							autoCapitalize="none"
-							onChangeText={(val) => handlePasswordChange(val)}
-						/>
-						<TouchableOpacity
-							onPress={updateSecureTextEntry}
-						>
-							{
-								data.secureTextEntry 
-								? 
-									<Feather 
-										name="eye-off"
-										color="grey"
-										size={20}
-									/>
-								:
-									<Feather 
-										name="eye"
-										color="grey"
-										size={20}
-									/>
-							}
-						</TouchableOpacity>
-					</View>
-
-					{ 
-						!data.isValidPassword && 
-						<Animatable.View animation="fadeInLeft" duration={500}>
-							<Text style={styles.errorMsg}>Password must be 6 characters long.</Text>
-						</Animatable.View>
-					}
+					<CustomTextInput
+						header={"Password"}
+						fontIcon={"lock"}
+						placeholder={"Your Password"}
+						onChangeText={handlePasswordChange}
+						isValidInput={data.isValidPassword}
+						keyboardType={'email-address'}
+						autoCap={'none'}
+						validationText={'Password must be 6 characters long.'}
+						isSecureText={data.secureTextEntry}
+						onSecureTextPress={updateSecureTextEntry}
+					/>
 
 					<TouchableOpacity onPress={() => navigation.navigate('ForgetPasswordScreen')}>
 						<Text style={{color: '#333333', marginTop:15}}>Forgot password?</Text>

@@ -4,6 +4,7 @@ import {
     Text, 
     TextInput,
     StyleSheet,
+    TouchableOpacity,
 } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as Animatable from 'react-native-animatable';
@@ -20,11 +21,14 @@ export default function CustomTextInput(props) {
         keyboardType="default",
         autoCap="sentences",
         textColor="black",
-        iconColor=textColor,
+        iconColor="#05375a",
         onChangeText,
         isValidInput,
         validationText='Please enter in the correct format.',
         numberOfLines=1,
+        maxLength=1000,
+        isSecureText=false,
+        onSecureTextPress=() => {},
     } = props;
     return (
         <View>
@@ -49,12 +53,36 @@ export default function CustomTextInput(props) {
                     numberOfLines={numberOfLines}
                     multiline={numberOfLines > 1}
                     value={value}
+                    maxLength={maxLength}
+                    secureTextEntry={isSecureText}
                 />
                 {
-                    numberOfLines === 1 && (isValidInput && isValidInput !== null) && (
-                        <Animatable.View animation="bounceIn">
-                            <Feather name="check-circle" color="green" size={20}/>
-                        </Animatable.View>
+                    isSecureText ? (
+                        <TouchableOpacity
+                            onPress={onSecureTextPress}
+                        >
+                            {
+                                isSecureText
+                                ? 
+                                    <Feather 
+                                        name="eye-off"
+                                        color="grey"
+                                        size={20}
+                                    />
+                                :
+                                    <Feather 
+                                        name="eye"
+                                        color="grey"
+                                        size={20}
+                                    />
+                            }
+                        </TouchableOpacity>
+                    ) : (
+                        numberOfLines === 1 && (isValidInput && isValidInput !== null) && (
+                            <Animatable.View animation="bounceIn">
+                                <Feather name="check-circle" color="green" size={20}/>
+                            </Animatable.View>
+                        )
                     )
                 }
             </View>
@@ -95,13 +123,16 @@ const styles = StyleSheet.create({
 		borderBottomWidth: 1,
 		borderBottomColor: '#c2c2c2', // #f2f2f2
 		paddingBottom: 5,
-		alignItems: 'flex-end'
+		alignItems: 'center',
+        justifyContent: 'center',
 	},
 	textInput: {
 		flex: 1,
 		marginTop: Platform.OS === 'ios' ? 0 : -12,
 		paddingLeft: 10,
 		color: '#05375a',
+        minHeight: 35,
+        textAlignVertical: 'bottom'
 	},
 	errorMsg: {
 		color: '#FF0000',
