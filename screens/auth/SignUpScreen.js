@@ -10,6 +10,7 @@ import {
 	ScrollView,
 	StatusBar,
 	Picker,
+	ActionSheetIOS,
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -34,6 +35,10 @@ import Feather from 'react-native-vector-icons/Feather';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 
+// COMPONENT
+import Dropdown from '../../components/Form/Dropdown';
+
+
 const SignInScreen = ({navigation}) => {
 	const { colors } = useTheme();
 	const { register } = useContext(AuthContext);
@@ -43,6 +48,16 @@ const SignInScreen = ({navigation}) => {
 		contact: '',
 		type: '',
 	});
+	const choices = [
+        {
+            label: "Chef (providing food)",
+            value: "chef",
+        },
+        {
+            label: "Beneficiary (receiving food)",
+            value: "beneficiary",
+        }
+    ]
 
 	useEffect(() => {
 		async function registerForPushNotificationsAsync() {
@@ -205,6 +220,27 @@ const SignInScreen = ({navigation}) => {
         await WebBrowser.openBrowserAsync(link)
     }
 
+	const onIOSTypePress = () => {
+		const optionsList = ["Cancel", "Chef", "Beneficiary"]
+		return (
+			ActionSheetIOS.showActionSheetWithOptions(
+				{
+					options: optionsList,
+					cancelButtonIndex: 0,
+					userInterfaceStyle: 'dark'
+				},
+				buttonIndex => {
+					if (buttonIndex === 0) {
+					// cancel action
+					} else {
+						handleTypeChange(optionsList[buttonIndex])
+					}
+				}
+			)
+		)
+	}
+		
+
 	return (
 		<View style={[styles.container, { backgroundColor: colors.secondary, }]}>
 			<StatusBar backgroundColor={colors.secondary} barStyle="light-content"/>
@@ -305,31 +341,14 @@ const SignInScreen = ({navigation}) => {
 						}
 					</View>
 
-					<Text style={[styles.text_footer, {marginTop: 35}]}>Phone Number</Text>
-					<View style={styles.action}>
-						<Picker
-							selectedValue={data.type}
-							style={styles.textInput}
-							onValueChange={(itemValue, itemIndex) => handleTypeChange(itemValue)}
-						>
-							<Picker.Item label='Select your role...' value='' />
-							<Picker.Item label="Chef (providing food)" value="chef" />
-							<Picker.Item label="Beneficiary (receiving food)" value="beneficiary" />
-						</Picker>
-						{
-							data.check_typeChange
-							&&
-							<Animatable.View
-								animation="bounceIn"
-							>
-								<Feather 
-									name="check-circle"
-									color="green"
-									size={20}
-								/>
-							</Animatable.View>
-						}
-					</View>
+
+					<Dropdown
+						title={"User Type"}
+						selected={data.type}
+						onChange={handleTypeChange}
+						isValid={data.check_typeChange}
+						choices={choices}
+					/>
 
 					<View style={styles.textPrivate}>
 						<Text style={styles.color_textPrivate}>
@@ -417,7 +436,8 @@ const styles = StyleSheet.create({
 		flex: 1,
 		marginTop: Platform.OS === 'ios' ? 0 : -12,
 		paddingLeft: 10,
-		color: '#05375a'
+		color: '#05375a',
+		minHeight: 25,
 	},
 	button: {
 		alignItems: 'center',
