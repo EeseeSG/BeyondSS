@@ -362,7 +362,7 @@ const SignInScreen = ({navigation}) => {
 							<Text>Privacy policy</Text>
 						</TouchableOpacity>
 					</View>
-					<View style={styles.button}>
+					<View style={[styles.button, { marginBottom: 50, }]}>
 						<TouchableOpacity
 							style={styles.signIn}
 							onPress={handleRegistration}
