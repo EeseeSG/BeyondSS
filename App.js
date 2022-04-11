@@ -38,10 +38,11 @@ import * as Colors from './constants/Colors';
 import RootStackScreen from './screens/auth/RootStackScreen';
 import Tabs from './navigation/Tabs';
 import Settings from './screens/settings/Settings';
-import ProjectDetail from './screens/projects/ProjectDetail';
 import Explore from './screens/main/Explore';
-import NewProject from './screens/projects/NewProject';
 import Dashboard from './screens/admin/Dashboard';
+import ProjectDetail from './screens/projects/ProjectDetail';
+import NewProject from './screens/projects/NewProject';
+import UploadReceipt from './screens/projects/UploadReceipt';
 
 // INIT FIREBASE
 import { firebase } from './constants/Firebase';
@@ -142,6 +143,7 @@ export default function App() {
                       <Stack.Screen name="ProjectDetail" component={ProjectDetail} options={{ headerShown: false,}}/>
                       <Stack.Screen name="Start Giving" component={NewProject} />
                       <Stack.Screen name="Dashboard" component={Dashboard} />
+                      <Stack.Screen name="Upload Receipt" component={UploadReceipt} />
                     </Stack.Group>
                   </Stack.Navigator>
                 </>
