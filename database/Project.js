@@ -312,3 +312,31 @@ export const deleteReceipt = async (receipt_id) => {
         }
     }
 }
+
+export const getOutstandingReceipts = async () => {
+    return await firebase.firestore()
+        .collection('receipts')
+        .where('isApproved', '!=', true)
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
+export const getApprovedReceipts = async () => {
+    return await firebase.firestore()
+        .collection('receipts')
+        .where('isApproved', '==', true)
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}

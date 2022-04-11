@@ -40,6 +40,7 @@ import Tabs from './navigation/Tabs';
 import Settings from './screens/settings/Settings';
 import Explore from './screens/main/Explore';
 import Dashboard from './screens/admin/Dashboard';
+import ApproveReceipts from './screens/admin/ApproveReceipts';
 import ProjectDetail from './screens/projects/ProjectDetail';
 import NewProject from './screens/projects/NewProject';
 import UploadReceipt from './screens/projects/UploadReceipt';
@@ -144,6 +145,7 @@ export default function App() {
                       <Stack.Screen name="Start Giving" component={NewProject} />
                       <Stack.Screen name="Dashboard" component={Dashboard} />
                       <Stack.Screen name="Upload Receipt" component={UploadReceipt} />
+                      <Stack.Screen name="Approve Receipt" component={ApproveReceipts} />
                     </Stack.Group>
                   </Stack.Navigator>
                 </>

@@ -344,17 +344,26 @@ export default function Home({ navigation }) {
                     style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
                     resizeMode='cover'
                 />
-                <TouchableOpacity style={styles.swipeBtn} onPress={handleCTA}>
-                    <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>
-                        {isChef ? 
-                        'Start Giving!' : 
-                        isAdmin ? 
-                        'Dashboard' :
-                        isBeneficiary ?
-                        'Explore!' :
-                        'ERROR'}
-                    </Text>
-                </TouchableOpacity>
+                <View>
+                    <TouchableOpacity style={styles.swipeBtn} onPress={handleCTA}>
+                        <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>
+                            {isChef ? 
+                            'Start Giving!' : 
+                            isAdmin ? 
+                            'Dashboard' :
+                            isBeneficiary ?
+                            'Explore!' :
+                            'ERROR'}
+                        </Text>
+                    </TouchableOpacity>
+                    {
+                        isAdmin && (
+                            <TouchableOpacity style={styles.swipeBtn} onPress={() => navigation.navigate('Approve Receipt')}>
+                                <Text style={{ fontSize: 15, fontWeight: 'bold', color: '#fff' }}>Approve Receipts</Text>
+                            </TouchableOpacity>
+                        )
+                    }
+                </View>
             </View>
 
             <View>
@@ -489,7 +498,7 @@ const styles = StyleSheet.create({
         paddingVertical: 3, 
         borderRadius: 50, 
         height: 40, 
-        flex: 1, 
+
         justifyContent: 'center', 
         alignItems: 'center',
         margin: 15, 
