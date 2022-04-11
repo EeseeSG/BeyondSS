@@ -39,7 +39,7 @@ export default function SignInScreen({navigation}) {
 			let current_user = await UserData.currentUserData()
 			setCurrentUser(current_user);
 		}
-		return _getCurrentUser
+		return _getCurrentUser()
 	}, [])
 
     //=====================================================================================================================

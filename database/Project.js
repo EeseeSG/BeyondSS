@@ -265,3 +265,33 @@ export const acknowledgeDelivery = async (reservation_id) => {
         }
     }
 }
+
+export const uploadReceipt = async (data) => {
+    try {
+        await firebase.firestore()
+            .collection('receipts')
+            .add(data)
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
+
+export const getUploadedReceipt = async (project_id) => {
+    return await firebase.firestore()
+        .collection('receipts')
+        .where('project_id', '==', project_id)
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}

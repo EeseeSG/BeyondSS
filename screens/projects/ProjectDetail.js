@@ -615,6 +615,20 @@ export default function ProjectDetail(props) {
                             </LinearGradient>
                     )
                 }
+
+                {
+                    // FOR CHEF
+                    isChef && (
+                        <LinearGradient
+                            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)']}
+                            style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
+                        >
+                            <TouchableOpacity style={[styles.cardButton, { backgroundColor: colors.primary, }]} onPress={() => navigation.navigate('Upload Receipt', { project: data, currentUser: currentUser, })}>
+                                <Text style={[{ color: 'white', fontWeight: 'bold', paddingHorizontal: 20, }]}>Upload Receipt</Text>
+                            </TouchableOpacity>
+                        </LinearGradient>
+                    )
+                }
             </Animatable.View>
             <View style={{ height: 50, }} />
         </ScrollView>

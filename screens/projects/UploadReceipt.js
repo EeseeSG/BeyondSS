@@ -1,7 +1,16 @@
 // BASIC IMPORTS
 import React, { useState, useEffect } from 'react';
-import { Text, View, Image, TouchableOpacity, ScrollView, StyleSheet, Dimensions, } from 'react-native';
+import { 
+	Text, 
+	View, 
+	Image, 
+	TouchableOpacity, 
+	StyleSheet, 
+	Dimensions, 
+	FlatList,
+} from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
+import moment from 'moment';
 
 // STYLE SPECIFIC IMPORTS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,20 +21,17 @@ import * as ImagePicker from 'expo-image-picker';
 import { Camera } from 'expo-camera';
 
 // FIREBASE SPECIFIC IMPORTS
+import * as ProjectData from '../../database/Project';
 import firebase from 'firebase';
-import { FlatList } from 'react-native-gesture-handler';
 require('firebase/firestore');
 require("firebase/firebase-storage");
 
 
 export default function UploadReceipt(props) {
-
-	const { height: windowHeight, width: windowWidth } = Dimensions.get('window');
+	const { project, currentUser, } = props.route.params;
 
 	// user info
-	const [currentUser, setCurrentUser] = useState([]);
-	const [uploadedImages, setUploadedImages] = useState([]);
-	const [imageCount, setImageCount] = useState(0);
+	const [uploadedReceipts, setUploadedReceipts] = useState([]);
 
 	// Permissions
 	const [hasCameraPermission, setCameraPermission] = useState(null);
@@ -53,21 +59,14 @@ export default function UploadReceipt(props) {
 		})();
 	}, []);
 
-
 	useEffect(() => {
-		firebase.firestore()
-			.collection('users')
-			.doc(firebase.auth().currentUser.uid)
-			.onSnapshot((snapshot) => {
-				let _id = snapshot.id;
-				let data = snapshot.data();
-				setCurrentUser({ _id, ...data })
-				if(data.uploadedProof !== undefined) {
-					setUploadedImages(data.uploadedProof)
-					setImageCount(data.uploadedProof.length)
-				}
-			})
+		async function _getUploadedReceipts() {
+			let receipt_arr = await ProjectData.getUploadedReceipt(project._id)
+			setUploadedReceipts(receipt_arr)
+		}
+		return _getUploadedReceipts()
 	}, [])
+
 
 
 	const _resetAll = () => {
@@ -106,33 +105,10 @@ export default function UploadReceipt(props) {
 	// ## ==================================================================================================================================================== ##
 	// ## == FILE HANDLING == ##
 	// ## ==================================================================================================================================================== ##
-	const saveFirestore = async (snapshot) => {
-		firebase.firestore()
-			.collection('users')
-			.doc(currentUser._id)
-			.update({
-				uploadedProof: firebase.firestore.FieldValue.arrayUnion(snapshot),
-			})
-		props.navigation.goBack(); // navigate back
-	};
-	
-
 	const saveImage = async () => {
-
-		// check if limit of 5 is reached
-		if(imageCount >= 5) {
-            Popup.show({
-                type: 'warning',
-                title: 'Limit reached',
-                textBody: 'Maximum number of uploads reached. You may only upload up to 5 images.',
-                buttonText: 'Okay',
-                callback: () => Popup.hide()
-            })
-			return
-		}
-
-		// else, continue
-		const childPath = `profile_proof/${currentUser._id}/${imageCount}.png`;
+		const month_year = moment(project.datetime.seconds * 1000, 'YYYY-MM');
+		const image_id = moment()
+		const childPath = `receipts/${month_year}/${currentUser._id}-${project._id}/${image_id}.png`;
 
 		// Create blob for image
 		const response = await fetch(image); // uri will be the image source
@@ -151,8 +127,38 @@ export default function UploadReceipt(props) {
 
 		// get download url which is publicly accessed by everyone
 		const taskCompleted = () => {
-			task.snapshot.ref.getDownloadURL().then((snapshot) => {
-				saveFirestore(snapshot);
+			task.snapshot.ref.getDownloadURL().then(async (snapshot) => {
+				let data = {
+					createdAt: new Date(),
+					user: currentUser,
+					receipt_url: snapshot,
+					path: childPath,
+					project: project,
+					project_id: project._id,
+					isApproved: false,
+					isClaimed: false,
+				}
+				let result = await ProjectData.uploadReceipt(data)
+				if(result.success) {
+					Popup.show({
+						type: 'success',
+						title: 'Success!',
+						textBody: 'You have successfully uploaded the receipt. Please give us some time to process and get back to you on the claims.',
+						buttonText: 'Close',
+						callback: () => {
+							Popup.hide()
+							props.navigation.goBack()
+						}
+					})
+				} else {
+					Popup.show({
+						type: 'danger',
+						title: 'Error. Please try again.',
+						textBody: result.error,
+						buttonText: 'Close',
+						callback: () => Popup.hide()
+					})
+				}
 			})
 		}
 
@@ -169,11 +175,11 @@ export default function UploadReceipt(props) {
 	// ## == RENDER DISPLAY == ##
 	// ## ==================================================================================================================================================== ##
 	if (hasCameraPermission === null || hasGalleryPermission === null) {
-		return <View />;
+		return <Text>No access to camera and/or gallery</Text>;
 	}
 
 	if (hasCameraPermission === false || hasGalleryPermission === false) {
-		return <Text>No access to camera</Text>;
+		return <Text>No access to camera and/or gallery</Text>;
 	}
 
 	return (
@@ -184,8 +190,6 @@ export default function UploadReceipt(props) {
 					<View style={{ height: Dimensions.get('window').height, width: '100%', }}>
 						<View style={{ marginHorizontal: 10, }}>
 							<Text style={{ fontSize: 16, fontWeight: 'bold' }}>DISCLAIMER: </Text>
-							<Text style={{ color: 'black' }}>Please take note and double check for any <Text style={{ fontWeight: 'bold' }}>sensitive</Text> document / information that you are intending to upload.</Text>
-							<Text style={{ color: 'black', marginTop: 10, }}>When you upload any documents, you are deemed to have acknowledged and agree that TutorsSG shall not be responsible or liable, whether directly or indirectly, for any damages or loss caused or sustained by the user (yourself), in connection with any use of the uploaded information.​</Text>
 							<Text style={{ color: 'black', fontWeight: 'bold', marginTop: 10, }}>Please take reasonable efforts to mask any sensitive, confidential or private information​, whether yourself or other parties.</Text>
 						</View>
 						<TouchableOpacity style={[styles.primaryButton, styles.shadow, { margin: 10, }]} onPress={() => pickImage()}>
@@ -197,16 +201,16 @@ export default function UploadReceipt(props) {
 							<Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Take a Photo</Text>
 						</TouchableOpacity>
 						<View style={{ marginTop: 20, alignItems:'center' }}>
-							<Text style={{ fontWeight: 'bold', fontSize: 20, }}>Uploaded Images</Text>
+							<Text style={{ fontWeight: 'bold', fontSize: 20, marginBottom: 15, }}>Uploaded Receipts</Text>
 							<FlatList
 								numColumns={2}
-								data={uploadedImages}
-								ListEmptyComponent={() => (<Text>No images uploaded.</Text>)}
+								data={uploadedReceipts}
+								ListEmptyComponent={() => (<Text>No receipt uploaded.</Text>)}
 								keyExtractor={(_, index) => index.toString()}
 								renderItem={({item}) => (
 									<TouchableOpacity>
 										<Image
-											source={{ uri: item }}
+											source={{ uri: item.receipt_url }}
 											style={{ width: Dimensions.get('window').width / 2, aspectRatio: 1, resizeMode: 'cover' }}
 										/>
 									</TouchableOpacity>
@@ -235,17 +239,13 @@ export default function UploadReceipt(props) {
 							</View>
 						</View>
 					:
-						<View style={{ height: Dimensions.get('window').height, width: windowWidth }}>
+						<View style={{ flex: 1, }}>
 							<Camera 
 								ref={ref => setCamera(ref)}
 								style={styles.fixedRatio} 
 								type={type}
 							>
-								<TouchableOpacity style={{ position: 'absolute', top: 10, left: 10, backgroundColor: 'rgba(255,255,255,0.5)', width: 35, height: 35, borderRadius: 35/2, justifyContent: 'center', alignItems: 'center', }} onPress={() => setSelectImage(false)}>
-									<MaterialCommunityIcons name="arrow-left" size={25} color="#000064" />
-								</TouchableOpacity>
 								<View style={styles.buttonContainer}>
-
 									<TouchableOpacity style={styles.circularButton} onPress={() => pickImage()}>
 										<MaterialCommunityIcons name="panorama" size={25} color="#000064" />
 									</TouchableOpacity>
