@@ -131,7 +131,7 @@ export default function UploadReceipt(props) {
 				let data = {
 					createdAt: new Date(),
 					user: currentUser,
-					receipt_url: snapshot,
+					url: snapshot,
 					path: childPath,
 					project: project,
 					project_id: project._id,
@@ -210,7 +210,7 @@ export default function UploadReceipt(props) {
 								renderItem={({item}) => (
 									<TouchableOpacity>
 										<Image
-											source={{ uri: item.receipt_url }}
+											source={{ uri: item.url }}
 											style={{ width: Dimensions.get('window').width / 2, aspectRatio: 1, resizeMode: 'cover' }}
 										/>
 									</TouchableOpacity>

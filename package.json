@@ -10,12 +10,18 @@
     "eject": "expo eject"
   },
   "dependencies": {
+    "@react-native-community/datetimepicker": "3.5.2",
     "@react-navigation/bottom-tabs": "^6.0.9",
     "@react-navigation/native": "^6.0.6",
     "@react-navigation/stack": "^6.0.11",
     "expo": "~43.0.2",
+    "expo-camera": "~12.0.3",
+    "expo-device": "~4.0.3",
+    "expo-image-picker": "~11.0.3",
     "expo-linear-gradient": "~10.0.3",
     "expo-localization": "~11.0.0",
+    "expo-notifications": "~0.13.3",
+    "expo-updates": "~0.10.15",
     "expo-web-browser": "~10.0.3",
     "firebase": "8.2.3",
     "lottie-react-native": "4.0.3",
@@ -27,6 +33,7 @@
     "react-native-countdown-component": "^2.7.1",
     "react-native-element-dropdown": "^1.5.5",
     "react-native-gesture-handler": "~1.10.2",
+    "react-native-image-zoom-viewer": "^3.0.1",
     "react-native-linear-gradient": "^2.5.6",
     "react-native-paper": "^4.11.1",
     "react-native-popup-confirm-toast": "^2.0.3",
@@ -37,13 +44,7 @@
     "react-native-status-bar-height": "^2.6.0",
     "react-native-svg": "12.1.1",
     "react-native-user-avatar": "^1.0.7",
-    "react-native-vector-icons": "^9.0.0",
-    "@react-native-community/datetimepicker": "3.5.2",
-    "expo-notifications": "~0.13.3",
-    "expo-device": "~4.0.3",
-    "expo-updates": "~0.10.15",
-    "expo-image-picker": "~11.0.3",
-    "expo-camera": "~12.0.3"
+    "react-native-vector-icons": "^9.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

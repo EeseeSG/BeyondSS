@@ -7,7 +7,9 @@ import {
     TouchableOpacity, 
     ScrollView,
     Dimensions,
-    ActivityIndicator
+    ActivityIndicator,
+    Image,
+    Modal,
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -27,6 +29,7 @@ import LottieView from 'lottie-react-native';
 // DISPLAY
 import QuantityPicker from '../../components/Project/QuantityPicker';
 import StoreTags from '../../components/Project/StoreTags';
+import ImageViewer from 'react-native-image-zoom-viewer';
 
 // DATA
 import * as UserData from '../../database/User';
@@ -59,6 +62,7 @@ export default function ProjectDetail(props) {
     const [reservations, setReservations] = useState(null);
     const [currentReservations, setCurrentReservations] = useState(null);
     const [quantityReserved, setQuantityReserved] = useState(null);
+    const [uploadedReceipts, setUploadedReceipts] = useState(null);
 
     // get user data
     useEffect(() => {
@@ -78,7 +82,7 @@ export default function ProjectDetail(props) {
 
     // to load once all data is loaded
     useEffect(() => {
-        if(currentReservations !== null && quantityReserved !== null && currentReservationData !== null && currentReservationData !== undefined) {
+        if(currentReservations !== null && quantityReserved !== null && currentReservationData !== null && currentReservationData !== undefined && uploadedReceipts !== null) {
             setIsLoaded(true);
         }
     }, [currentReservations, quantityReserved, currentReservationData])
@@ -97,7 +101,6 @@ export default function ProjectDetail(props) {
             }
             return _getReservedTotal();
         }
-
     }, [reservations])
 
     // update user reserved amount
@@ -128,6 +131,33 @@ export default function ProjectDetail(props) {
         }
     }, [currentUser, reservations])
 
+    // search for receipts
+    useEffect(() => {
+        if(isChef || isAdmin) {
+            async function _getReceipt() {
+                firebase.firestore()
+                    .collection('receipts')
+                    .where('project_id', '==', data._id)
+                    .onSnapshot((snapshot) => {
+                        let receipt_arr = snapshot.docs.map(snap => {
+                            let _id = snap.id;
+                            let data = snap.data();
+                            return { ...data, _id }
+                        })
+                        let parsed_receipt_arr = receipt_arr.map((receipt, index) => {
+                            return {
+                                ...receipt,
+                                index,
+                            }
+                        })
+                        setUploadedReceipts(parsed_receipt_arr)
+                    })
+            }
+            return _getReceipt()
+        } else {
+            setUploadedReceipts([])
+        }
+    }, [isChef, isAdmin])
 
     //=====================================================================================================================
     //==  CURRENT USER ==
@@ -416,6 +446,94 @@ export default function ProjectDetail(props) {
         })
     }
 
+
+
+    //=====================================================================================================================
+    //==  RECEIPTS ==
+    //=====================================================================================================================
+    const [expandImage, setExpandImage] = useState(false);
+    const [imgSel, setImgSel] = useState(0);
+    const _handleReceiptPress = (item) => {
+        if(!item.isClaim && !item.isApproved) {
+            Popup.show({
+                type: 'danger',
+                title: 'Warning!',
+                textBody: 'Are you sure you would like to delete this receipt? This action cannot be undone',
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        }
+    }
+
+    const _enlargeImg = (item) => {
+        setImgSel(item.index)
+        setExpandImage(true)
+    }
+
+    const _renderExpandHeader = () => (
+        <TouchableOpacity style={[styles.iconContainer, { position: 'absolute', margin: 10, zIndex: 999, elevation: 999, }]} onPress={() => setExpandImage(false)}>
+            <MaterialCommunityIcons name="chevron-left" size={24} color={'black'} />
+        </TouchableOpacity>
+    )
+
+    const _renderExpandFooter = () => {
+        if(!uploadedReceipts[imgSel].isClaim && !uploadedReceipts[imgSel].isApproved) {
+            return (
+                <TouchableOpacity style={[styles.primaryButton, styles.shadow, { margin: 10, backgroundColor: 'red' }]} onPress={() => _modelDelete(imgSel)}>
+                    <Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Delete</Text>
+                </TouchableOpacity>
+            )
+        }
+        return null
+    } 
+    
+
+    const _modelDelete = (index) => {
+        let selection = uploadedReceipts.filter((item) => item.index === index)[0]
+        _promptDeleteReceipt(selection)
+    }
+
+    const _promptDeleteReceipt = (item) => {
+        setExpandImage(false)
+        Popup.show({
+            type: 'confirm',
+            title: 'Caution!',
+            textBody: 'You are about to delete this receipt. \n\nAre you sure you would like to proceed? This action cannot be undone.',
+            buttonText: 'Delete',
+            confirmText:'Cancel',
+            callback: () => {
+                _deleteReceipt(item)
+            }
+        })
+    }
+
+    const _deleteReceipt = async (item) => {
+        let result = await ProjectData.deleteReceipt(item._id)
+        if(result.success) {
+            Popup.show({
+                type: 'success',
+                title: 'Success!',
+                textBody: 'You have removed this receipt.',
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+
+            // remove from the page
+            let new_receipt_arr = uploadedReceipts.filter((receipt) => receipt._id !== item._id)
+            setUploadedReceipts(new_receipt_arr);
+
+        } else {
+            Popup.show({
+                type: 'danger',
+                title: 'Error. Please try again.',
+                textBody: result.error,
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        }  
+    }
+    
+
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
     //=====================================================================================================================
@@ -583,6 +701,62 @@ export default function ProjectDetail(props) {
                         )
                     }
 
+                    {
+                        // show receipts
+                        <View style={{ marginHorizontal: 30, }}>
+                            <Text style={styles.header}>Uploaded receipts</Text>
+                            <View style={{ flexDirection: 'row', flexWrap: 'wrap' , flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 15, justifyContent: 'space-between'}}>
+                                {
+                                    uploadedReceipts.length === 0 ? (
+                                        <Text>You have no receipts uploaded.</Text>
+                                    ) : (
+                                        uploadedReceipts.map((item) => (
+                                            <TouchableOpacity style={[item.isClaimed ? { borderColor: 'blue' } : item.isApproved ? { borderColor: 'green' } : { borderColor: 'grey' }, { borderWidth: 3, borderRadius: 5, }]} onPress={() => _enlargeImg(item)}>
+                                                {
+                                                    (!item.isClaimed && !item.isApproved) && (
+                                                        <TouchableOpacity style={{ position: 'absolute', left: 0, top: 0, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}  onPress={() => _deleteReceipt(item)}>
+                                                            <Feather 
+                                                                name={'x-octagon'}
+                                                                color={'red'}
+                                                                size={20}
+                                                            />
+                                                        </TouchableOpacity>
+                                                    )
+                                                }
+    
+                                                <View style={{ position: 'absolute', right: 0, top: 0, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
+                                                    <Feather 
+                                                        name={item.isClaimed ? 'check-circle' : item.isApproved ? 'check-circle' : 'loader'}
+                                                        color={item.isClaimed ? 'blue' : item.isApproved ? 'green' : 'grey'}
+                                                        size={20}
+                                                    />
+                                                </View>
+                                                <Image
+                                                    source={{ uri: item.url }}
+                                                    style={{ width: (Dimensions.get('window').width - 100) / 2, aspectRatio: 1, resizeMode: 'cover', }}
+                                                />
+                                                <View style={{ position: 'absolute', right: 0, bottom: 0, zIndex: 2, height: 25, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.9)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, }}>
+                                                    <Text style={[{ fontSize: 12, fontWeight: 'bold' }, item.isClaimed ? { color: 'blue' }  : item.isApproved ? { color: 'green' } : { color: 'grey' }]}>{item.isClaimed ? 'Claimed' : item.isApproved ? 'Approved' : 'Pending'}</Text>
+                                                </View>
+                                            </TouchableOpacity>
+                                        ))
+                                    )
+                                }
+                            </View>
+                        </View>
+                    }
+
+                    {/** EXPAND IMAGES */}
+                    <Modal visible={expandImage} transparent={true}>
+                        <ImageViewer 
+                            imageUrls={uploadedReceipts}
+                            index={imgSel}
+                            onChange={(ev) => setImgSel(ev)}
+                            renderHeader={_renderExpandHeader}
+                            renderFooter={_renderExpandFooter}
+                        />
+                    </Modal>
+
                 </ScrollView>
                 
                 {
@@ -713,5 +887,17 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
+    },
+    primaryButton: {
+        width: Dimensions.get('screen').width - 20,
+        borderRadius: 30, 
+        backgroundColor: '#9980D3', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        alignSelf: 'flex-start',
+        flexDirection: 'row',
+        marginHorizontal: 10,
+        marginBottom: 20,
+        height: 50, 
     },
 });

@@ -295,3 +295,20 @@ export const getUploadedReceipt = async (project_id) => {
             })
         })
 }
+
+export const deleteReceipt = async (receipt_id) => {
+    try {
+        await firebase.firestore()
+            .collection('receipts')
+            .doc(receipt_id)
+            .delete()
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
