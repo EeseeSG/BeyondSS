@@ -16,6 +16,7 @@ import moment from 'moment';
 // STYLE SPECIFIC IMPORTS
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
+import * as Colors from '../../constants/Colors';
 
 // CAMERA SPECIFIC IMPORTS
 import * as ImagePicker from 'expo-image-picker';
@@ -384,8 +385,8 @@ const styles = StyleSheet.create({
     },
     primaryButton: {
         width: Dimensions.get('screen').width - 20,
-        borderRadius: 10, 
-        backgroundColor: '#9980D3', 
+        borderRadius: 30, 
+        backgroundColor: Colors.primary, 
         justifyContent: 'center', 
         alignItems: 'center', 
         alignSelf: 'flex-start',
@@ -393,5 +394,4 @@ const styles = StyleSheet.create({
         marginHorizontal: 10,
         height: 50, 
     },
-
 })
