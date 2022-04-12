@@ -30,6 +30,7 @@ import LottieView from 'lottie-react-native';
 import QuantityPicker from '../../components/Project/QuantityPicker';
 import StoreTags from '../../components/Project/StoreTags';
 import ImageViewer from 'react-native-image-zoom-viewer';
+import ReceiptItem from '../../components/Project/ReceiptItem';
 
 // DATA
 import * as UserData from '../../database/User';
@@ -710,35 +711,11 @@ export default function ProjectDetail(props) {
                                     uploadedReceipts.length === 0 ? (
                                         <Text>You have no receipts uploaded.</Text>
                                     ) : (
-                                        uploadedReceipts.map((item) => (
-                                            <TouchableOpacity style={[item.isClaimed ? { borderColor: 'blue' } : item.isApproved ? { borderColor: 'green' } : { borderColor: 'grey' }, { borderWidth: 3, borderRadius: 5, }]} onPress={() => _enlargeImg(item)}>
-                                                {
-                                                    (!item.isClaimed && !item.isApproved) && (
-                                                        <TouchableOpacity style={{ position: 'absolute', left: 0, top: 0, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}  onPress={() => _deleteReceipt(item)}>
-                                                            <Feather 
-                                                                name={'x-octagon'}
-                                                                color={'red'}
-                                                                size={20}
-                                                            />
-                                                        </TouchableOpacity>
-                                                    )
-                                                }
-    
-                                                <View style={{ position: 'absolute', right: 0, top: 0, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}>
-                                                    <Feather 
-                                                        name={item.isClaimed ? 'check-circle' : item.isApproved ? 'check-circle' : 'loader'}
-                                                        color={item.isClaimed ? 'blue' : item.isApproved ? 'green' : 'grey'}
-                                                        size={20}
-                                                    />
-                                                </View>
-                                                <Image
-                                                    source={{ uri: item.url }}
-                                                    style={{ width: (Dimensions.get('window').width - 100) / 2, aspectRatio: 1, resizeMode: 'cover', }}
-                                                />
-                                                <View style={{ position: 'absolute', right: 0, bottom: 0, zIndex: 2, height: 25, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.9)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, }}>
-                                                    <Text style={[{ fontSize: 12, fontWeight: 'bold' }, item.isClaimed ? { color: 'blue' }  : item.isApproved ? { color: 'green' } : { color: 'grey' }]}>{item.isClaimed ? 'Claimed' : item.isApproved ? 'Approved' : 'Pending'}</Text>
-                                                </View>
-                                            </TouchableOpacity>
+                                        uploadedReceipts.map((item, index) => (
+                                            <ReceiptItem 
+                                                key={index}
+                                                data={item}
+                                            />
                                         ))
                                     )
                                 }

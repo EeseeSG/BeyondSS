@@ -147,7 +147,7 @@ export default function UploadReceipt(props) {
 			task.snapshot.ref.getDownloadURL().then(async (snapshot) => {
 				let data = {
 					createdAt: new Date(),
-					amount: amount,
+					amount: parseFloat(amount),
 					user: currentUser,
 					url: snapshot,
 					path: childPath,
