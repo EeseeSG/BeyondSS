@@ -30,10 +30,11 @@ export default function CustomTextInput(props) {
         isPassword=false,
         secureTextEntry=false,
         onSecureTextPress=() => {},
+        containerStyle={},
     } = props;
     return (
         <View>
-            <Text style={[styles.text_footer, { color: textColor, marginTop: 30, }]}>{header}</Text>
+            <Text style={[styles.text_footer, { color: textColor, marginTop: 30, }, containerStyle]}>{header}</Text>
             <View style={styles.action}>
                 {
                     numberOfLines === 1 && (

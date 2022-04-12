@@ -8,7 +8,6 @@ import {
 	StyleSheet,
 	ScrollView,
 	StatusBar,
-	ActionSheetIOS,
 } from 'react-native';
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -216,27 +215,6 @@ const SignInScreen = ({navigation}) => {
         await WebBrowser.openBrowserAsync(link)
     }
 
-	const onIOSTypePress = () => {
-		const optionsList = ["Cancel", "Chef", "Beneficiary"]
-		return (
-			ActionSheetIOS.showActionSheetWithOptions(
-				{
-					options: optionsList,
-					cancelButtonIndex: 0,
-					userInterfaceStyle: 'dark'
-				},
-				buttonIndex => {
-					if (buttonIndex === 0) {
-					// cancel action
-					} else {
-						handleTypeChange(optionsList[buttonIndex])
-					}
-				}
-			)
-		)
-	}
-		
-
 	return (
 		<View style={[styles.container, { backgroundColor: colors.secondary, }]}>
 			<StatusBar backgroundColor={colors.secondary} barStyle="light-content"/>
@@ -278,7 +256,6 @@ const SignInScreen = ({navigation}) => {
 						keyboardType={'phone-pad'}
 						maxLength={8}
 					/>
-
 
 					<CustomDropdown
 						title={"User Type"}

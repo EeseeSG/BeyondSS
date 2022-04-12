@@ -8,6 +8,7 @@ import {
 	StyleSheet, 
 	Dimensions, 
 	FlatList,
+	ScrollView,
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -26,6 +27,8 @@ import firebase from 'firebase';
 require('firebase/firestore');
 require("firebase/firebase-storage");
 
+import CustomTextInput from '../../components/Form/TextInput';
+
 
 export default function UploadReceipt(props) {
 	const { project, currentUser, } = props.route.params;
@@ -42,6 +45,10 @@ export default function UploadReceipt(props) {
 	const [camera, setCamera] = useState(null);
 	const [image, setImage] = useState(null);
 	const [type, setType] = useState(Camera.Constants.Type.back);
+
+	// receipt 
+	const [amount, setAmount] = useState(null)
+	const [isValidAmount, setIsValidAmount] = useState(null)
 
 
 	// ## ==================================================================================================================================================== ##
@@ -101,11 +108,21 @@ export default function UploadReceipt(props) {
 		};
 	};
 
-
 	// ## ==================================================================================================================================================== ##
 	// ## == FILE HANDLING == ##
 	// ## ==================================================================================================================================================== ##
 	const saveImage = async () => {
+		console.log(amount)
+		if(amount === '' || amount === null) {
+			Popup.show({
+				type: 'danger',
+				title: 'Invalid Input',
+				textBody: "Please enter amount spent inclusive of GST.",
+				buttonText: 'Close',
+				callback: () => Popup.hide()
+			})
+			return
+		}
 		const month_year = moment(project.datetime.seconds * 1000, 'YYYY-MM');
 		const image_id = moment()
 		const childPath = `receipts/${month_year}/${currentUser._id}-${project._id}/${image_id}.png`;
@@ -116,9 +133,9 @@ export default function UploadReceipt(props) {
 
 		// save into firebase storage
 		const task = firebase.storage()
-							.ref()
-							.child(childPath)
-							.put(blob);
+			.ref()
+			.child(childPath)
+			.put(blob);
 
 		// check how much has been transferred
 		const taskProgress = snapshot => {
@@ -130,6 +147,7 @@ export default function UploadReceipt(props) {
 			task.snapshot.ref.getDownloadURL().then(async (snapshot) => {
 				let data = {
 					createdAt: new Date(),
+					amount: amount,
 					user: currentUser,
 					url: snapshot,
 					path: childPath,
@@ -168,6 +186,18 @@ export default function UploadReceipt(props) {
 		}
 
 		task.on("state_change", taskProgress, taskError, taskCompleted);
+	}
+
+	// ## ==================================================================================================================================================== ##
+	// ## == RENDER DISPLAY == ##
+	// ## ==================================================================================================================================================== ##
+	const handleAmoutInput = (val) => {
+		if(val !== '') {
+			setAmount(val)
+			setIsValidAmount(true)
+		} else {
+			setIsValidAmount(false)
+		}
 	}
 
 
@@ -222,12 +252,21 @@ export default function UploadReceipt(props) {
 				:
 					image
 					?
-						<View>
-							<View style={[styles.cameraContainer, { marginVertical: 10, }]}>
+						<ScrollView>
+							<View style={styles.cameraContainer}>
 								<Image source={{ uri: image }} style={{ height: '100%', width: '100%', resizeMode: 'center', }}/>
 							</View>
-							<View>
-								<Text style={styles.photoText}>Satisfied with your image?</Text>
+							<View style={{ marginHorizontal: 20, }}>
+								<CustomTextInput
+									header={"Please enter amount"}
+									fontIcon={"dollar"}
+									placeholder={"Receipt Amount (Grand Total w GST)"}
+									onChangeText={handleAmoutInput}
+									isValidInput={isValidAmount}
+									keyboardType={'number-pad'}
+									autoCap={'none'}
+									containerStyle={{ marginTop: 0, }}
+								/>
 								<View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
 									<TouchableOpacity style={styles.confirmButton} onPress={() => _resetAll()}>
 										<MaterialCommunityIcons name={"camera-retake-outline"} size={25} color="grey" />
@@ -237,7 +276,7 @@ export default function UploadReceipt(props) {
 									</TouchableOpacity>
 								</View>
 							</View>
-						</View>
+						</ScrollView>
 					:
 						<View style={{ flex: 1, }}>
 							<Camera 
