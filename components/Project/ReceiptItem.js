@@ -39,7 +39,7 @@ export default function ReceiptItem(props) {
                     style={{ width: (Dimensions.get('window').width - 100) / 2, aspectRatio: 1, resizeMode: 'cover', }}
                 />
                 <View style={{ position: 'absolute', right: -2, bottom: -2, zIndex: 2, height: 25, borderRadius: 20, backgroundColor: 'rgba(255, 255, 255, 0.9)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: 5, }}>
-                    <Text style={[{ fontSize: 12, fontWeight: 'bold' }, item.isClaimed ? { color: 'blue' }  : item.isApproved ? { color: 'green' } : { color: 'grey' }]}>{item.isClaimed ? 'Claimed' : item.isApproved ? 'Approved' : 'Pending'}</Text>
+                    <Text style={[{ fontSize: 12, fontWeight: 'bold' }, item.isClaimed ? { color: 'blue' }  : item.isApproved ? { color: 'green' } : { color: 'grey' }]}>{item.isClaimed ? 'Paid' : item.isApproved ? 'Approved' : 'Pending'}</Text>
                 </View>
             </TouchableOpacity>
             <View style={{ justifyContent: 'center', alignItems: 'center', marginVertical: 5, }}>
