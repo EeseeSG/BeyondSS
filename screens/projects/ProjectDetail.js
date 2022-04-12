@@ -617,13 +617,15 @@ export default function ProjectDetail(props) {
                     }
 
                     {
-                        // show receipts
-                        <View style={{ marginHorizontal: 30, }}>
-                            <Text style={styles.header}>Uploaded receipts</Text>
-                            <ReceiptList
-                                data={uploadedReceipts}
-                            />
-                        </View>
+                        // show receipts upload option only to creator of event
+                        (data.user._id === currentUser._id) && (
+                            <View style={{ marginHorizontal: 30, }}>
+                                <Text style={styles.header}>Uploaded receipts</Text>
+                                <ReceiptList
+                                    data={uploadedReceipts}
+                                />
+                            </View>
+                        )
                     }
 
                 </ScrollView>
@@ -661,7 +663,7 @@ export default function ProjectDetail(props) {
 
                 {
                     // FOR CHEF
-                    isChef && (
+                    (data.user._id === currentUser._id) && (
                         <LinearGradient
                             colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.3)']}
                             style={{ position: 'absolute', bottom: 0, width: '100%', justifyContent: 'center', alignItems: 'center', }}
