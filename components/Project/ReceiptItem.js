@@ -11,13 +11,13 @@ import Feather from 'react-native-vector-icons/Feather';
 
 
 export default function ReceiptItem(props) {
-    const { data: item } = props;
+    const { data: item, onClickImg=() => {}, onClickDelete=() => {} } = props;
     return (
-        <View style={{ marginBottom: 15, }}>
-            <TouchableOpacity key={item._id} style={[item.isClaimed ? { borderColor: 'blue' } : item.isApproved ? { borderColor: 'green' } : { borderColor: 'grey' }, { borderWidth: 3, borderRadius: 5, }]} onPress={() => _enlargeImg(item)}>
+        <View style={{ marginBottom: 15, marginHorizontal: 5, }}>
+            <TouchableOpacity key={item._id} style={[item.isClaimed ? { borderColor: 'blue' } : item.isApproved ? { borderColor: 'green' } : { borderColor: 'grey' }, { borderWidth: 3, borderRadius: 5, }]} onPress={() => onClickImg(item)}>
                 {
                     (!item.isClaimed && !item.isApproved) && (
-                        <TouchableOpacity style={{ position: 'absolute', left: -2, top: -2, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}  onPress={() => _deleteReceipt(item)}>
+                        <TouchableOpacity style={{ position: 'absolute', left: -2, top: -2, zIndex: 2, width: 25, height: 25, borderRadius: 20, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center' }}  onPress={() => onClickDelete(item)}>
                             <Feather 
                                 name={'x-octagon'}
                                 color={'red'}

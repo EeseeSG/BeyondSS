@@ -28,6 +28,7 @@ require('firebase/firestore');
 require("firebase/firebase-storage");
 
 import CustomTextInput from '../../components/Form/TextInput';
+import ReceiptItem from '../../components/Project/ReceiptItem';
 
 
 export default function UploadReceipt(props) {
@@ -237,13 +238,12 @@ export default function UploadReceipt(props) {
 								data={uploadedReceipts}
 								ListEmptyComponent={() => (<Text>No receipt uploaded.</Text>)}
 								keyExtractor={(_, index) => index.toString()}
-								renderItem={({item}) => (
-									<TouchableOpacity>
-										<Image
-											source={{ uri: item.url }}
-											style={{ width: Dimensions.get('window').width / 2, aspectRatio: 1, resizeMode: 'cover' }}
-										/>
-									</TouchableOpacity>
+								renderItem={({item}, index) => (
+									<ReceiptItem 
+										key={index}
+										data={item}
+									/>
+
 
 								)}
 							/>

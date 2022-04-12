@@ -29,6 +29,7 @@ import LottieView from 'lottie-react-native';
 // DISPLAY
 import QuantityPicker from '../../components/Project/QuantityPicker';
 import StoreTags from '../../components/Project/StoreTags';
+import ReceiptList from '../../components/Project/ReceiptList';
 import ImageViewer from 'react-native-image-zoom-viewer';
 import ReceiptItem from '../../components/Project/ReceiptItem';
 
@@ -446,93 +447,6 @@ export default function ProjectDetail(props) {
             },
         })
     }
-
-
-
-    //=====================================================================================================================
-    //==  RECEIPTS ==
-    //=====================================================================================================================
-    const [expandImage, setExpandImage] = useState(false);
-    const [imgSel, setImgSel] = useState(0);
-    const _handleReceiptPress = (item) => {
-        if(!item.isClaim && !item.isApproved) {
-            Popup.show({
-                type: 'danger',
-                title: 'Warning!',
-                textBody: 'Are you sure you would like to delete this receipt? This action cannot be undone',
-                buttonText: 'Close',
-                callback: () => Popup.hide()
-            })
-        }
-    }
-
-    const _enlargeImg = (item) => {
-        setImgSel(item.index)
-        setExpandImage(true)
-    }
-
-    const _renderExpandHeader = () => (
-        <TouchableOpacity style={[styles.iconContainer, { position: 'absolute', margin: 10, zIndex: 999, elevation: 999, }]} onPress={() => setExpandImage(false)}>
-            <MaterialCommunityIcons name="chevron-left" size={24} color={'black'} />
-        </TouchableOpacity>
-    )
-
-    const _renderExpandFooter = () => {
-        if(!uploadedReceipts[imgSel].isClaim && !uploadedReceipts[imgSel].isApproved) {
-            return (
-                <TouchableOpacity style={[styles.primaryButton, styles.shadow, { margin: 10, backgroundColor: 'red' }]} onPress={() => _modelDelete(imgSel)}>
-                    <Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Delete</Text>
-                </TouchableOpacity>
-            )
-        }
-        return null
-    } 
-    
-
-    const _modelDelete = (index) => {
-        let selection = uploadedReceipts.filter((item) => item.index === index)[0]
-        _promptDeleteReceipt(selection)
-    }
-
-    const _promptDeleteReceipt = (item) => {
-        setExpandImage(false)
-        Popup.show({
-            type: 'confirm',
-            title: 'Caution!',
-            textBody: 'You are about to delete this receipt. \n\nAre you sure you would like to proceed? This action cannot be undone.',
-            buttonText: 'Delete',
-            confirmText:'Cancel',
-            callback: () => {
-                _deleteReceipt(item)
-            }
-        })
-    }
-
-    const _deleteReceipt = async (item) => {
-        let result = await ProjectData.deleteReceipt(item._id)
-        if(result.success) {
-            Popup.show({
-                type: 'success',
-                title: 'Success!',
-                textBody: 'You have removed this receipt.',
-                buttonText: 'Close',
-                callback: () => Popup.hide()
-            })
-
-            // remove from the page
-            let new_receipt_arr = uploadedReceipts.filter((receipt) => receipt._id !== item._id)
-            setUploadedReceipts(new_receipt_arr);
-
-        } else {
-            Popup.show({
-                type: 'danger',
-                title: 'Error. Please try again.',
-                textBody: result.error,
-                buttonText: 'Close',
-                callback: () => Popup.hide()
-            })
-        }  
-    }
     
 
     //=====================================================================================================================
@@ -706,33 +620,11 @@ export default function ProjectDetail(props) {
                         // show receipts
                         <View style={{ marginHorizontal: 30, }}>
                             <Text style={styles.header}>Uploaded receipts</Text>
-                            <View style={{ flexDirection: 'row', flexWrap: 'wrap' , flex: 1, justifyContent: 'flex-start', alignItems: 'center', marginTop: 15, justifyContent: 'space-between'}}>
-                                {
-                                    uploadedReceipts.length === 0 ? (
-                                        <Text>You have no receipts uploaded.</Text>
-                                    ) : (
-                                        uploadedReceipts.map((item, index) => (
-                                            <ReceiptItem 
-                                                key={index}
-                                                data={item}
-                                            />
-                                        ))
-                                    )
-                                }
-                            </View>
+                            <ReceiptList
+                                data={uploadedReceipts}
+                            />
                         </View>
                     }
-
-                    {/** EXPAND IMAGES */}
-                    <Modal visible={expandImage} transparent={true}>
-                        <ImageViewer 
-                            imageUrls={uploadedReceipts}
-                            index={imgSel}
-                            onChange={(ev) => setImgSel(ev)}
-                            renderHeader={_renderExpandHeader}
-                            renderFooter={_renderExpandFooter}
-                        />
-                    </Modal>
 
                 </ScrollView>
                 
