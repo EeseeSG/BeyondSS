@@ -7,7 +7,6 @@ import {
 	TouchableOpacity, 
 	StyleSheet, 
 	Dimensions, 
-	FlatList,
 	ScrollView,
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
@@ -29,7 +28,7 @@ require('firebase/firestore');
 require("firebase/firebase-storage");
 
 import CustomTextInput from '../../components/Form/TextInput';
-import ReceiptItem from '../../components/Project/ReceiptItem';
+import ReceiptList from '../../components/Project/ReceiptList';
 
 
 export default function UploadReceipt(props) {
@@ -71,7 +70,13 @@ export default function UploadReceipt(props) {
 	useEffect(() => {
 		async function _getUploadedReceipts() {
 			let receipt_arr = await ProjectData.getUploadedReceipt(project._id)
-			setUploadedReceipts(receipt_arr)
+			let parsed_receipt_arr = receipt_arr.map((receipt, index) => {
+				return {
+					...receipt,
+					index,
+				}
+			})
+			setUploadedReceipts(parsed_receipt_arr)
 		}
 		return _getUploadedReceipts()
 	}, [])
@@ -232,21 +237,10 @@ export default function UploadReceipt(props) {
 							<MaterialCommunityIcons name="camera" size={25} color="white"/>
 							<Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Take a Photo</Text>
 						</TouchableOpacity>
-						<View style={{ marginTop: 20, alignItems:'center' }}>
+						<View style={{ marginTop: 20, alignItems:'center', marginHorizontal: 30, }}>
 							<Text style={{ fontWeight: 'bold', fontSize: 20, marginBottom: 15, }}>Uploaded Receipts</Text>
-							<FlatList
-								numColumns={2}
+							<ReceiptList
 								data={uploadedReceipts}
-								ListEmptyComponent={() => (<Text>No receipt uploaded.</Text>)}
-								keyExtractor={(_, index) => index.toString()}
-								renderItem={({item}, index) => (
-									<ReceiptItem 
-										key={index}
-										data={item}
-									/>
-
-
-								)}
 							/>
 						</View>
 					</View>

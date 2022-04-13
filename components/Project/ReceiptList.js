@@ -146,4 +146,13 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         height: 50, 
     },
+    iconContainer: { 
+        width: 40, 
+        height: 40, 
+        backgroundColor: 'rgba(255,255,255,0.8)', 
+        borderRadius: 40, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        alignContent: 'center' 
+    },
 })
