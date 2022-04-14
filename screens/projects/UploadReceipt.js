@@ -119,7 +119,6 @@ export default function UploadReceipt(props) {
 	// ## == FILE HANDLING == ##
 	// ## ==================================================================================================================================================== ##
 	const saveImage = async () => {
-		console.log(amount)
 		if(amount === '' || amount === null) {
 			Popup.show({
 				type: 'danger',
@@ -130,7 +129,8 @@ export default function UploadReceipt(props) {
 			})
 			return
 		}
-		const month_year = moment(project.datetime.seconds * 1000, 'YYYY-MM');
+
+		const month_year = moment(project.datetime.seconds * 1000).format('YYYY-MM');
 		const image_id = moment()
 		const childPath = `receipts/${month_year}/${currentUser._id}-${project._id}/${image_id}.png`;
 
