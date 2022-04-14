@@ -31,6 +31,7 @@ export const getNewsData = async () => {
     return await firebase.firestore()
         .collection('news')
         .limit(10)
+        .orderBy('date', 'desc')
         .get()
         .then((snapshot) => {
             return snapshot.docs.map(project => {

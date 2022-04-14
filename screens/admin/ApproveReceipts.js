@@ -4,12 +4,13 @@ import {
     Text, 
     TouchableOpacity, 
     FlatList,
-    Platform,
+    Dimensions,
     StyleSheet,
     TextInput
 } from 'react-native';
-import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
+import { Popup } from 'react-native-popup-confirm-toast';
+import * as Colors from '../../constants/Colors';
 import Feather from 'react-native-vector-icons/Feather';
 import * as ProjectData from '../../database/Project';
 
@@ -21,8 +22,15 @@ export default function ApproveReceipts(props) {
     const [approvedReceipts, setApprovedReceipts] = useState(null);
     const [rawApprovedReceipts, setRawApprovedReceipts] = useState(null);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const [isActivated, setIsActivated] = useState(false);
+    const [infoModal, setInfoModal] = useState(null);
+    const [searchText, setSearchText] = useState(null);
 
-    // only get outstanding receipts requiring approvals
+
+
+	// =======================================================================================================================
+	// == FETCH DATA ==
+	// =======================================================================================================================
     useEffect(() => {
         return _getOutstandingReceipts()
     }, [])
@@ -39,6 +47,102 @@ export default function ApproveReceipts(props) {
         setRawApprovedReceipts(approved_receipts_arr)
     }
 
+
+	// =======================================================================================================================
+	// == APPROVE RECEIPT ==
+	// =======================================================================================================================
+    const _approveReceipt = (item) => {
+        Popup.show({
+            type: 'confirm',
+            title: 'Confirmation',
+            textBody: 'Are you sure you would like to accept this receipt? This action cannot be undone.',
+            buttonText: 'Confirm and submit',
+            confirmText: 'Close',
+            callback: () => _submitApproveReceipt(item),
+            cancelCallback: () => Popup.hide(),
+        })
+    }
+
+    const _submitApproveReceipt = async (item) => {
+        let status = await ProjectData.approveReceipt(item._id);
+        _removeOutstandingReceiptFromList(item._id)
+        if(status.success) {
+            Popup.show({
+                type: 'success',
+                title: 'Success',
+                textBody: 'You have approved the receipt. This will be routed for review and subsequent approval before disbursement.',
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        } else {
+            Popup.show({
+                type: 'danger',
+                title: 'Error. Please try again.',
+                textBody: status.error,
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        }
+    }
+
+
+	// =======================================================================================================================
+	// == REJECT RECEIPT ==
+	// =======================================================================================================================
+    const _rejectReceipt = (item) => {
+        Popup.show({
+            type: 'confirm',
+            title: 'Confirmation',
+            textBody: 'Are you sure you would like to reject this receipt? This action cannot be undone.',
+            buttonText: 'Confirm and submit',
+            confirmText: 'Close',
+            callback: () => _submitRejectReceipt(item),
+            cancelCallback: () => Popup.hide(),
+        })
+    }
+
+    const _submitRejectReceipt = async (item) => {
+        let status = await ProjectData.rejectReceipt(item._id);
+        _removeOutstandingReceiptFromList(item._id)
+        if(status.success) {
+            Popup.show({
+                type: 'success',
+                title: 'Success',
+                textBody: 'You have rejeced this receipt.',
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        } else {
+            Popup.show({
+                type: 'danger',
+                title: 'Error. Please try again.',
+                textBody: status.error,
+                buttonText: 'Close',
+                callback: () => Popup.hide()
+            })
+        }   
+    }
+
+
+	// =======================================================================================================================
+	// == HELPERS ==
+	// =======================================================================================================================
+    const handleSearch = (text) => {
+        if(selection === 0) {
+            var hook = setReceipts;
+            var target = rawReceipts;
+        } else {
+            var hook = setApprovedReceipts;
+            var target = rawApprovedReceipts;
+        }
+        if(text.length === 0) {
+            hook(target);
+            return
+        }
+        let filtered_results = target.filter((receipt) => receipt.user.contact.indexOf(text) !== -1);
+        hook(filtered_results);
+    }
+
     const handleOutstandingReceiptsRefresh = async () => {
         setIsRefreshing(true);
         await _getOutstandingReceipts();
@@ -51,53 +155,30 @@ export default function ApproveReceipts(props) {
         setIsRefreshing(false);
     }
 
-    const renderEmpty = () => {
-        if(selection === 1 && approvedReceipts === null) {
-            return (
-                <TouchableOpacity style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 20, }} onPress={_getApprovedReceipts}>
-                    <Text style={{ fontWeight: 'bold' }}>Get list of approved receipts</Text>
-                </TouchableOpacity>
-            )
+    const openInfoModal = (item) => {
+        setIsActivated(true)
+        setInfoModal(item)
+    }
+
+    const _closeModal = () => {
+        setIsActivated(false)
+        setInfoModal(null)
+    }
+
+    const _removeOutstandingReceiptFromList = (receipt_id) => {
+        let new_arr = rawReceipts.filter((i) => i._id != receipt_id);
+        setRawReceipts(new_arr);
+
+        if(searchText) {
+            handleSearch(searchText)
+        } else {
+            setReceipts(new_arr);
         }
-        return (
-            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 20, }}>
-                <Text style={{ fontWeight: 'bold' }}>{selection === 0 ? 'There are no outstanding receipts requiring approval' : 'There are no approved receipts'}</Text>
-            </View>
-        )
     }
 
-    const renderOutstandingReceipts = ({item}) => {
-        return (
-            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white' }}>
-                <Text>Receipt ID: {item._id}</Text>
-                <Text>Project ID: {item.project._id}</Text>
-                <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
-                <Text>Claimant Contact: {item.user.contact}</Text>
-            </View>
-        )
-    }
-
-    const renderApprovedReceipts = ({item}) => {
-        return (
-            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white' }}>
-                <Text>Receipt ID: {item._id}</Text>
-                <Text>Project ID: {item.project._id}</Text>
-                <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
-                <Text>Claimant Contact: {item.user.contact}</Text>
-                {/* <Text style={{ marginTop: 20, }}>Approval Date: {moment(item.approvalAt.seconds * 1000).format('LLL')}</Text> */}
-            </View>
-        )
-    }
-
-    const handleSearch = (text) => {
-        if(text.length === 0) {
-            setUsers(rawUsers);
-            return
-        }
-        let filtered_results = rawUsers.filter((user) => user.contact.indexOf(text) !== -1);
-        setUsers(filtered_results);
-    }
-
+	// =======================================================================================================================
+	// == RENDERERS ==
+	// =======================================================================================================================
     const renderHeader = () => (
         <View style={{ flexDirection: 'row', marginBottom: 10, paddingHorizontal: 20, }}>
             <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
@@ -109,7 +190,66 @@ export default function ApproveReceipts(props) {
         </View>
     )
 
+    const renderApprovedReceipts = ({item}) => {
+        return (
+            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white' }}>
+                <View style={{ flex: 1, }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => openInfoModal(item)}>
+                        <Feather name="info" color={'black'} size={20} />
+                        <Text style={{ marginLeft: 5, fontSize: 10, color: '#ACACAC', fontStyle: 'italic' }}>Tap for more details...</Text>
+                    </TouchableOpacity>
+                    <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
+                    <Text>Claimant Contact: {item.user.contact}</Text>
+                </View>
+                <Text style={{ marginTop: 20, }}>Approval made: {moment(item.approvedAt.seconds * 1000).format('LLL')}</Text>
+            </View>
+        )
+    }
 
+    const renderOutstandingReceipts = ({item}) => {
+        return (
+            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white', flexDirection: 'row' }}>
+                <View style={{ flex: 1, }}>
+                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => openInfoModal(item)}>
+                        <Feather name="info" color={'black'} size={20} />
+                        <Text style={{ marginLeft: 5, fontSize: 10, color: '#ACACAC', fontStyle: 'italic' }}>Tap for more details...</Text>
+                    </TouchableOpacity>
+                    <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
+                    <Text>Claimant Contact: {item.user.contact}</Text>
+                    
+                </View>
+                <View style={{ flexDirection: 'row', justifyContent: 'center', alignItems: 'center' }}>
+                    <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _approveReceipt(item)}>
+                        <Feather name="check-square" color={'green'} size={30} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={{ marginHorizontal: 10, }} onPress={() => _rejectReceipt(item)}>
+                        <Feather name="x-square" color={'red'} size={30} />
+                    </TouchableOpacity>
+                </View>
+            </View>
+        )
+    }
+
+    const renderEmpty = () => {
+        if(selection === 1 && approvedReceipts === null) {
+            return (
+                <View style={{ justifyContent: 'center', alignItems: 'center', marginTop: 30, }}>
+                    <TouchableOpacity style={{ justifyContent: 'center', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 20, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, backgroundColor: Colors.primary }} onPress={_getApprovedReceipts}>
+                        <Text style={{ fontWeight: 'bold', color: '#fff' }}>Get list of approved receipts</Text>
+                    </TouchableOpacity>
+                </View>
+            )
+        }
+        return (
+            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 20, }}>
+                <Text style={{ fontWeight: 'bold' }}>{selection === 0 ? 'There are no outstanding receipts requiring approval' : 'There are no approved receipts'}</Text>
+            </View>
+        )
+    }
+
+	// =======================================================================================================================
+	// == DISPLAY ==
+	// =======================================================================================================================
     return (
         <View>
             <View style={styles.action}>
@@ -119,7 +259,7 @@ export default function ApproveReceipts(props) {
                     size={20}
                 />
                 <TextInput 
-                    placeholder="Search by ..."
+                    placeholder="Search by contact number..."
                     style={styles.textInput}
                     onChangeText={(val) => handleSearch(val)}
                     keyboardType={'phone-pad'}
@@ -138,6 +278,22 @@ export default function ApproveReceipts(props) {
                 onRefresh={selection === 0 ? handleOutstandingReceiptsRefresh : handleApprovedReceiptRefresh}
                 refreshing={isRefreshing}
             />
+            {
+                isActivated && (
+                    <View style={{ backgroundColor: 'rgba(0,0,0,0.7)', position: 'absolute', flex: 1, top: 0, left: 0, width: Dimensions.get('window').width, height: Dimensions.get('window').height, justifyContent: 'center', alignItems: 'center' }}>
+                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, marginTop: -100 }}>
+                            <TouchableOpacity style={{ flexDirection: 'row', marginBottom: 10, }} onPress={_closeModal}>
+                                <View style={{ flex: 1, }} >
+                                    <Text style={{ fontWeight: 'bold' }}>Details</Text>
+                                </View>
+                                <Feather name="x" color={'black'} size={20} />
+                            </TouchableOpacity>
+                            <Text selectable>Receipt ID: {infoModal._id}</Text>
+                            <Text selectable>Project ID: {infoModal.project._id}</Text>
+                        </View>
+                    </View>
+                )
+            }
         </View>
     )
 }
@@ -165,4 +321,21 @@ const styles = StyleSheet.create({
 		paddingLeft: 10,
 		color: '#05375a'
 	},
+    modalButton: {
+        flex: 1,
+        height: 48,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 20,
+        borderRadius: 8,
+        backgroundColor: '#702c91',
+    },
+    modalTextButton: {
+        color: '#ffffff',
+        fontSize: 16,
+        fontWeight: '600',
+        fontStyle: 'normal',
+        textAlign: 'center',
+        lineHeight: 20,
+    },
 })

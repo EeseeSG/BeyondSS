@@ -316,7 +316,8 @@ export const deleteReceipt = async (receipt_id) => {
 export const getOutstandingReceipts = async () => {
     return await firebase.firestore()
         .collection('receipts')
-        .where('isApproved', '!=', true)
+        .where('isApproved', '==', null)
+        .orderBy('createdAt', 'asc')
         .get()
         .then((snapshot) => {
             return snapshot.docs.map(snap => {
@@ -331,6 +332,7 @@ export const getApprovedReceipts = async () => {
     return await firebase.firestore()
         .collection('receipts')
         .where('isApproved', '==', true)
+        .orderBy('createdAt', 'desc')
         .get()
         .then((snapshot) => {
             return snapshot.docs.map(snap => {
@@ -339,4 +341,45 @@ export const getApprovedReceipts = async () => {
                 return { ...data, _id }
             })
         })
+}
+
+
+export const approveReceipt = async (receipt_id) => {
+    try {
+        await firebase.firestore()
+            .collection('receipts')
+            .doc(receipt_id)
+            .update({
+                isApproved: true,
+                approvedAt: new Date(),
+            })
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
+}
+
+export const rejectReceipt = async (receipt_id) => {
+    try {
+        await firebase.firestore()
+            .collection('receipts')
+            .doc(receipt_id)
+            .update({
+                isApproved: false,
+                approvedAt: new Date(),
+            })
+        return {
+            success: true,
+        }
+    } catch(error) {
+        return {
+            success: false,
+            error,
+        }
+    }
 }

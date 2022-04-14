@@ -160,8 +160,8 @@ export default function UploadReceipt(props) {
 					path: childPath,
 					project: project,
 					project_id: project._id,
-					isApproved: false,
-					isClaimed: false,
+					isApproved: null,
+					isClaimed: null,
 				}
 				let result = await ProjectData.uploadReceipt(data)
 				if(result.success) {

@@ -558,8 +558,8 @@ export default function ProjectDetail(props) {
                                     )
                                 }
                                 {
-                                    reservations.map((reservation) => (
-                                        <View style={{ marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
+                                    reservations.map((reservation, index) => (
+                                        <View key={index} style={{ marginVertical: 5, paddingHorizontal: 15, paddingVertical: 10, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 10, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
                                             <View style={{ flex: 1, }}>
                                                 <Text style={{ fontSize: 18, fontWeight: 'bold', marginVertical: 5, }}>{reservation.user.name}</Text>
                                                 <Text style={{ fontSize: 16, }}>+65 {reservation.user.contact}</Text>
