@@ -324,16 +324,21 @@ export default function Home({ navigation }) {
             <View style={{ marginHorizontal: 10, marginTop: 40, }}>
                 <View style={{ flexDirection: 'row' }}>
                     <UserAvatar name={currentUser.name}/>
-                    <Text style={[styles.greetings, { color: colors.primary, marginBottom: 5, }]}>
+                    <Text style={[defaultStyles.h1, { color: colors.primary, marginBottom: 5, }]}>
                         {"  "}Hi {currentUser.name} 
                     </Text>
                 </View>
-                <Text style={[styles.title, { marginBottom: 10, }]}>
-                    {isChef ? 
-                    'How would you like to help?' : 
-                    isAdmin ? 
-                    'Manage users':
-                    'How can we help?'
+                <Text style={[defaultStyles.h2, { marginBottom: 10, }]}>
+                    {
+                        isChef ? (
+                            'How would you like to help?'
+                        ) : (
+                            isAdmin ? (
+                                'Manage users'
+                            ) : (
+                                'How can we help?'
+                            )
+                        )
                     }
                     </Text>
             </View>

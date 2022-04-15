@@ -7,4 +7,16 @@ export const defaultStyles = StyleSheet.create({
         width: '100%',
         height: '100%',
     },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold'
+    },
+    h1: {
+        fontSize: 22,
+        fontWeight: 'bold',
+    },
+    h2: {
+        fontSize: 20,
+        fontWeight: 'bold',
+    }
 })
