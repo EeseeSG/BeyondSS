@@ -75,7 +75,19 @@ export default function Profile({ navigation }) {
                             let data = snap.data();
                             return { ...data, _id }
                         }));
-                        setReservations(reservations_arr);
+                        let parsed_reservations_arr = reservations_arr.map((reservation) => {
+                            return ({
+                                ...reservation.project,
+                                reserved: reservation.reserved,
+                                reservation_data: [
+                                    {
+                                        user: reservation.user,
+                                        reserved: reservation.reserved
+                                    }
+                                ],
+                            })
+                        });
+                        setReservations(parsed_reservations_arr);
                         setUpcomingIsLoaded(true);
                     })
             }
@@ -160,7 +172,19 @@ export default function Profile({ navigation }) {
                             let data = snap.data();
                             return { ...data, _id }
                         }));
-                        setReservationsHistory(reservations_arr);
+                        let parsed_reservations_arr = reservations_arr.map((reservation) => {
+                            return ({
+                                ...reservation.project,
+                                reserved: reservation.reserved,
+                                reservation_data: [
+                                    {
+                                        user: reservation.user,
+                                        reserved: reservation.reserved
+                                    }
+                                ],
+                            })
+                        });
+                        setReservationsHistory(parsed_reservations_arr);
                         setIsLoaded(true);
                     })
             }
