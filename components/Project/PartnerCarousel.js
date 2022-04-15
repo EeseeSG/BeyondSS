@@ -7,6 +7,7 @@ import {
     Image, 
     FlatList, 
 } from 'react-native';
+import { defaultStyles } from '../../constants/defaultStyles';
 import * as WebBrowser from 'expo-web-browser';
 
 

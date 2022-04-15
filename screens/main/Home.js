@@ -36,6 +36,8 @@ require('firebase/firestore');
 // COMPONENTS
 import CollectionItem from '../../components/Project/CollectionItem';
 import ActivityItem from '../../components/Project/ActivityItem';
+import Card from '../../components/Container/Card';
+import Section from '../../components/Container/Section';
 
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
@@ -320,15 +322,15 @@ export default function Home({ navigation }) {
     }
 
     return (
-        <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, paddingHorizontal: 10, paddingTop: 10, }}>
-            <View style={{ marginHorizontal: 10, marginTop: 40, }}>
-                <View style={{ flexDirection: 'row' }}>
-                    <UserAvatar name={currentUser.name}/>
-                    <Text style={[defaultStyles.h1, { color: colors.primary, marginBottom: 5, }]}>
+        <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, paddingTop: 10, }}>
+            <View style={{ marginHorizontal: 20, marginTop: 40, }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, }}>
+                    <UserAvatar name={currentUser.name} />
+                    <Text style={[defaultStyles.h1, { color: colors.primary, }]}>
                         {"  "}Hi {currentUser.name} 
                     </Text>
                 </View>
-                <Text style={[defaultStyles.h2, { marginBottom: 10, }]}>
+                <Text style={defaultStyles.h2}>
                     {
                         isChef ? (
                             'How would you like to help?'
@@ -343,7 +345,7 @@ export default function Home({ navigation }) {
                     </Text>
             </View>
 
-            <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, }}>
+            <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, marginHorizontal: 10, }}>
                 <Image
                     source={require('../../assets/home_chef_transparent.png')}
                     style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
@@ -371,89 +373,101 @@ export default function Home({ navigation }) {
                 </View>
             </View>
 
-            <View>
-                <Carousel
-                    ref={carousel}
-                    data={banners}
-                    renderItem={({ item }) => renderBanner(item)}
-                    sliderWidth={Dimensions.get('window').width - 20}
-                    itemWidth={300}
-                    slideStyle={{ marginTop: 30, }}
-                    loop={true}
-                    enableSnap={true}
-                    autoplay={true}
-                    autoplayInterval={5000}
-                />
-            </View>
 
-            <View style={{ flex: 1, marginHorizontal: 10, marginTop: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
-                <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                    <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Hosting</Text>
-                </View>
-                <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                        <Text style={{ fontSize: 26, color: 'black', opacity: 0.8, fontWeight: 'bold' }}>{beneficiary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                        <Text style={{ color: 'black', opacity: 0.6, }}>beneficiaries</Text>
+            <Carousel
+                ref={carousel}
+                data={banners}
+                renderItem={({ item }) => renderBanner(item)}
+                sliderWidth={Dimensions.get('window').width}
+                itemWidth={300}
+                slideStyle={{ marginVertical: 30, }}
+                loop={true}
+                enableSnap={true}
+                autoplay={true}
+                autoplayInterval={5000}
+            />
+
+            <Section>
+                <Card>
+                    <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
+                        <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Hosting</Text>
                     </View>
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{chefs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                        <Text style={{ color: 'black', opacity: 0.6, }}>chef volunteers</Text>
+                    <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
+                            <Text style={{ fontSize: 26, color: 'black', opacity: 0.8, fontWeight: 'bold' }}>{beneficiary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={{ color: 'black', opacity: 0.6, }}>beneficiaries</Text>
+                        </View>
+                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{chefs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={{ color: 'black', opacity: 0.6, }}>chef volunteers</Text>
+                        </View>
                     </View>
+                </Card>
+            </Section>
+
+            <Section>
+                <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
+                {
+                    (isChef || isAdmin) ? (
+                        activities.length ? (
+                            <FlatList
+                                horizontal
+                                keyExtractor={(_, index) => index.toString()}
+                                data={activities}
+                                renderItem={renderActivityItem}
+                            />
+                        ) : (
+                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                                <Text>{isChef ? 'You have not made any activities. Start one now!' : 'There are no activities.'}</Text>
+                            </View>
+                        )
+                    ) : (
+                        reservations.length ? (
+                            <FlatList
+                                horizontal
+                                keyExtractor={(_, index) => index.toString()}
+                                data={reservations}
+                                renderItem={renderReservedItem}
+                            />
+                        ) : (
+                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                                <Text>You have not made any reservation. Make one now!</Text>
+                            </View>
+                        )
+                    )
+                }
+            </Section>
+
+            <Section style={{ margin: 0, marginHorizontal: 0, marginLeft: 10, }}>
+                <Text style={styles.header}>Partners</Text>
+                <View style={[ defaultStyles.card, defaultStyles.shadow, defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 10, borderTopStartRadius: 10, marginLeft: 10, }]}>
+                    <PartnerCarousel
+                        data={partners}
+                    />
                 </View>
-            </View>
-                            
-            <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
-            {
-                (isChef || isAdmin) ? (
-                    activities.length ? (
-                        <FlatList
-                            horizontal
-                            keyExtractor={(_, index) => index.toString()}
-                            data={activities}
-                            renderItem={renderActivityItem}
-                        />
-                    ) : (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
-                            <Text>{isChef ? 'You have not made any activities. Start one now!' : 'There are no activities.'}</Text>
-                        </View>
-                    )
-                ) : (
-                    reservations.length ? (
-                        <FlatList
-                            horizontal
-                            keyExtractor={(_, index) => index.toString()}
-                            data={reservations}
-                            renderItem={renderReservedItem}
-                        />
-                    ) : (
-                        <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
-                            <Text>You have not made any reservation. Make one now!</Text>
-                        </View>
-                    )
-                )
-            }
+            </Section>
 
-            <Text style={styles.header}>Partners</Text>
-            <View style={{ backgroundColor: '#fff', borderRadius: 5, }}>
-                <PartnerCarousel
-                    data={partners}
-                />
-            </View>
+            <Section>
+                <Text style={styles.header}>Latest News</Text>
+                {
+                    news.map((item, index) => (
+                        <Card 
+                            key={index} 
+                            style={[{ paddingHorizontal: 10, paddingVertical: 6, }]} 
+                            isPressable 
+                            onPress={() => _handlePressButtonAsync(item.url)}
+                        >
+                            <View style={{ flexDirection: 'row', marginVertical: 5, }}>
+                                <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
+                                <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
+                            </View>
+                            <Text style={{ fontSize: 12, }} selectable>{item.desc}</Text>
+                            <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.5)', fontSize: 12, fontWeight: 'bold' }}>Read More...</Text>
+                        </Card>
+                    ))
+                }
+            </Section>
 
-
-            <Text style={styles.header}>Latest News</Text>
-            {
-                news.map((item, index) => (
-                    <TouchableOpacity key={index} style={{ margin: 5, paddingHorizontal: 10, paddingVertical: 6, borderWidth: 0.5, borderColor: '#ccc', borderRadius: 5, backgroundColor: '#fff' }} onPress={() => _handlePressButtonAsync(item.url)}>
-                        <View style={{ flexDirection: 'row', marginVertical: 5, }}>
-                            <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
-                            <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
-                        </View>
-                        <Text style={{ fontSize: 12, }} selectable>{item.desc}</Text>
-                        <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.5)', fontSize: 12, fontWeight: 'bold' }}>Read More...</Text>
-                    </TouchableOpacity>
-                ))
-            }
             <TouchableOpacity style={{ margin: 10, justifyContent: 'center', alignItems: 'flex-end' }} onPress={() => _handlePressButtonAsync('https://www.beyond.org.sg/')}>
                 <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.7)', fontWeight: 'bold' }}>View more...</Text>
             </TouchableOpacity>
