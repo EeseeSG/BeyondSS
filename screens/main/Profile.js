@@ -20,6 +20,8 @@ import UserAvatar from 'react-native-user-avatar';
 // CUSTOM
 import CollectionItem from '../../components/Project/CollectionItem';
 import ActivityItem from '../../components/Project/ActivityItem';
+import Section from '../../components/Container/Section';
+import Card from '../../components/Container/Card';
 
 // DATA
 import * as ProjectData from '../../database/Project';
@@ -256,103 +258,108 @@ export default function Profile({ navigation }) {
             </View>
             <ScrollView contentContainerStyle={{ paddingBottom: 100, }}>
                 {/** STATISTICS */}
-                <View style={{ flex: 1, marginHorizontal: 20, marginVertical: 35, paddingVertical: 10, borderRadius: 10, backgroundColor: '#fff', borderWidth: 0.5, borderColor: '#ccc' }}>
-                    <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
-                            {
-                                isBeneficiary ? (
-                                    reservations.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                ) : (
-                                    activities.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                )
-                            }
-                            </Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>pending</Text>
+                <Section>
+                    <Card style={{ marginVertical: 20, }}>
+                        <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
+                                <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
+                                {
+                                    isBeneficiary ? (
+                                        reservations.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    ) : (
+                                        activities.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    )
+                                }
+                                </Text>
+                                <Text style={{ color: 'black', opacity: 0.6, }}>pending</Text>
+                            </View>
+                            <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                                <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
+                                {
+                                    isBeneficiary ? (
+                                        reservationsHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    ) : (
+                                        activitiesHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                                    )
+                                }
+                                </Text>
+                                <Text style={{ color: 'black', opacity: 0.6, }}>{isBeneficiary ? 'received' : 'completed'}</Text>
+                            </View>
                         </View>
-                        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>
-                            {
-                                isBeneficiary ? (
-                                    reservationsHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                ) : (
-                                    activitiesHistory.length.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                                )
-                            }
-                            </Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>{isBeneficiary ? 'received' : 'completed'}</Text>
-                        </View>
+                    </Card>
+                </Section>
+
+                <Section>
+                    <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10, marginHorizontal: 10, }}>
+                        <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
+                            <Text>Upcoming</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={[selection === 1 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(1)}>
+                            <Text>Past</Text>
+                        </TouchableOpacity>
                     </View>
-                </View>
 
-                <View style={{ flexDirection: 'row', flex: 1, marginBottom: 10, paddingHorizontal: 20, }}>
-                    <TouchableOpacity style={[selection === 0 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(0)}>
-                        <Text>Upcoming</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={[selection === 1 ? { borderBottomColor: '#ccc', borderBottomWidth: 1, paddingBottom: 10,} : {  }, { flex: 1, justifyContent: 'center', alignItems: 'center' }]} onPress={() => setSelection(1)}>
-                        <Text>Past</Text>
-                    </TouchableOpacity>
-                </View>
-
-                {
-                    selection === 0 ? (
-                        isBeneficiary ? (
-                            reservations.length !== 0 ? (
-                                reservations.map((reservation, i) => (
-                                    <CollectionItem 
-                                        key={i}
-                                        data={reservation} 
-                                        user_id={currentUser._id}
-                                        navigation={navigation}
-                                    />
-                                ))
+                    {
+                        selection === 0 ? (
+                            isBeneficiary ? (
+                                reservations.length !== 0 ? (
+                                    reservations.map((reservation, i) => (
+                                        <CollectionItem 
+                                            key={i}
+                                            data={reservation} 
+                                            user_id={currentUser._id}
+                                            navigation={navigation}
+                                        />
+                                    ))
+                                ) : (
+                                    <RenderCollectionOnEmpty />
+                                )
                             ) : (
-                                <RenderCollectionOnEmpty />
+                                activities.length !== 0 ? (
+                                    activities.map((activity, i) => (
+                                        <ActivityItem 
+                                            key={i}
+                                            data={activity} 
+                                            user_id={currentUser._id}
+                                            navigation={navigation}
+                                        />
+                                    ))
+                                ) : (
+                                    <RenderCollectionOnEmpty />
+                                )
                             )
                         ) : (
-                            activities.length !== 0 ? (
-                                activities.map((activity, i) => (
-                                    <ActivityItem 
-                                        key={i}
-                                        data={activity} 
-                                        user_id={currentUser._id}
-                                        navigation={navigation}
-                                    />
-                                ))
+                            isBeneficiary ? (
+                                reservationsHistory.length !== 0 ? (
+                                    reservationsHistory.map((hist, i) => (
+                                        <CollectionItem 
+                                            key={i}
+                                            data={hist} 
+                                            user_id={currentUser._id}
+                                            navigation={navigation}
+                                        />
+                                    ))
+                                ) : (
+                                    <RenderCollectionOnEmpty />
+                                )
                             ) : (
-                                <RenderCollectionOnEmpty />
+                                activitiesHistory.length !== 0 ? (
+                                    activitiesHistory.map((hist, i) => (
+                                        <ActivityItem 
+                                            key={i}
+                                            data={hist} 
+                                            user_id={currentUser._id}
+                                            navigation={navigation}
+                                        />
+                                    ))
+                                ) : (
+                                    <RenderCollectionOnEmpty />
+                                )
                             )
                         )
-                    ) : (
-                        isBeneficiary ? (
-                            reservationsHistory.length !== 0 ? (
-                                reservationsHistory.map((hist, i) => (
-                                    <CollectionItem 
-                                        key={i}
-                                        data={hist} 
-                                        user_id={currentUser._id}
-                                        navigation={navigation}
-                                    />
-                                ))
-                            ) : (
-                                <RenderCollectionOnEmpty />
-                            )
-                        ) : (
-                            activitiesHistory.length !== 0 ? (
-                                activitiesHistory.map((hist, i) => (
-                                    <ActivityItem 
-                                        key={i}
-                                        data={hist} 
-                                        user_id={currentUser._id}
-                                        navigation={navigation}
-                                    />
-                                ))
-                            ) : (
-                                <RenderCollectionOnEmpty />
-                            )
-                        )
-                    )
-                }
+                    }
+
+                </Section>
 
             </ScrollView>
         </View>

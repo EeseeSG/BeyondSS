@@ -9,6 +9,7 @@ export const defaultStyles = StyleSheet.create({
     },
     section: {
         marginHorizontal: 10,
+        paddingVertical: 10,
     },
     title: {
         fontSize: 28,
@@ -17,14 +18,17 @@ export const defaultStyles = StyleSheet.create({
     h1: {
         fontSize: 22,
         fontWeight: 'bold',
+        marginBottom: 10,
     },
     h2: {
         fontSize: 20,
         fontWeight: 'bold',
+        marginBottom: 10,
     },
     h3: {
         fontSize: 18,
         fontWeight: 'bold',
+        marginBottom: 10,
     },
     shadow: {
         shadowColor: '#7F5DF0',

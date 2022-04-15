@@ -406,7 +406,7 @@ export default function Home({ navigation }) {
             </Section>
 
             <Section>
-                <Text style={styles.header}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
+                <Text style={defaultStyles.h3}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
                 {
                     (isChef || isAdmin) ? (
                         activities.length ? (
@@ -439,21 +439,21 @@ export default function Home({ navigation }) {
             </Section>
 
             <Section style={{ margin: 0, marginHorizontal: 0, marginLeft: 10, }}>
-                <Text style={styles.header}>Partners</Text>
-                <View style={[ defaultStyles.card, defaultStyles.shadow, defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 10, borderTopStartRadius: 10, marginLeft: 10, }]}>
+                <Text style={defaultStyles.h3}>Partners</Text>
+                <Card style={[ defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 10, borderTopStartRadius: 10, marginLeft: 10, marginTop: 10, }]}>
                     <PartnerCarousel
                         data={partners}
                     />
-                </View>
+                </Card>
             </Section>
 
             <Section>
-                <Text style={styles.header}>Latest News</Text>
+                <Text style={defaultStyles.h3}>Latest News</Text>
                 {
                     news.map((item, index) => (
                         <Card 
                             key={index} 
-                            style={[{ paddingHorizontal: 10, paddingVertical: 6, }]} 
+                            style={[{ paddingHorizontal: 10, }]} 
                             isPressable 
                             onPress={() => _handlePressButtonAsync(item.url)}
                         >

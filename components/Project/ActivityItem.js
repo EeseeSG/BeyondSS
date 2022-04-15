@@ -14,7 +14,7 @@ export default function ActivityItem(props) {
     const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
     const { data: item, style={}, navigation } = props;
     return (
-        <View key={item._id} style={{ width: windowWidth, ...style }}>
+        <View key={item._id} style={{ width: windowWidth - 20, ...style }}>
             <TouchableOpacity style={{ borderWidth: 2, borderColor: 'green', margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
                 <View style={{ flexDirection: 'row', marginRight: 15, }}>
                     <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
