@@ -60,6 +60,13 @@ export const defaultStyles = StyleSheet.create({
     textBold: {
         fontWeight: 'bold'
     },
+    buttonPrimary: { 
+        padding: 10, 
+        margin: 5, 
+        borderWidth: 1, 
+        borderRadius: 10, 
+        borderColor: '#ccc', 
+    },
     shadow: {
         shadowColor: '#7F5DF0',
         shadowOffset: {

@@ -155,7 +155,19 @@ export default function Home({ navigation }) {
                             let data = snap.data();
                             return { ...data, _id }
                         }));
-                        setReservations(reservations_arr);
+                        let parsed_reservations_arr = reservations_arr.map((reservation) => {
+                            return ({
+                                ...reservation.project,
+                                reserved: reservation.reserved,
+                                reservation_data: [
+                                    {
+                                        user: reservation.user,
+                                        reserved: reservation.reserved
+                                    }
+                                ],
+                            })
+                        });
+                        setReservations(parsed_reservations_arr);
                         setEventIsLoaded(true);
                     })
             }
@@ -265,7 +277,6 @@ export default function Home({ navigation }) {
     //==  HANDLE UPCOMING ==
     //=====================================================================================================================
     const renderProjectItem = ({ item }) => {
-        // console.log(item)
         return (
             <ProjectItem 
                 data={item} 
@@ -297,6 +308,14 @@ export default function Home({ navigation }) {
         }
     }
 
+    const RenderCollectionOnEmpty = () => (
+        <View style={{ justifyContent: 'center', alignItems: 'center', padding: 20, marginTop: 10, }}>
+            <Text>You have not made any reservation. Make one now!</Text>
+            <TouchableOpacity style={[defaultStyles.buttonPrimary, defaultStyles.shadow, { backgroundColor: colors.primary, margin: 20, paddingHorizontal: 20, }]} onPress={() => navigation.navigate('Explore')}>
+                <Text style={{ color: '#fff' }}>Explore</Text>
+            </TouchableOpacity>
+        </View>
+    )
 
     //=====================================================================================================================
     //==  RENDER DISPLAY ==
@@ -415,6 +434,7 @@ export default function Home({ navigation }) {
                                 keyExtractor={(_, index) => index.toString()}
                                 data={reservations}
                                 renderItem={renderProjectItem}
+                                ListEmptyComponent={RenderCollectionOnEmpty}
                             />
                         ) : (
                             <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>

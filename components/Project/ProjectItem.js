@@ -14,8 +14,9 @@ import { defaultStyles } from '../../constants/defaultStyles';
 
 export default function ProjectItem(props) {
     const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
-    const { data: item, user_id, style={}, navigation } = props;
-    const hasApplied = item.beneficiaries.indexOf(user_id) !== -1;
+    const { data: item, user_id, style={}, navigation, } = props;
+    const checkApplied = item.reservation_data.filter((i) => i.user._id === user_id)
+    const hasApplied = checkApplied.length != 0;
 
     const onPressNote = () => {
         const parseTags = item.tags.join(',\n')
@@ -34,7 +35,7 @@ export default function ProjectItem(props) {
                 {
                     hasApplied && (
                         <View style={{ width: 25, height: 25, borderWidth: 1, borderColor: 'green', borderRadius: 30, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 0, top: -10, }}>
-                            <Text style={{ fontSize: 12, color: 'green', fontWeight: 'bold' }}>{item.reservation_data.filter((i) => i.user._id === user_id)[0].reserved}</Text>
+                            <Text style={{ fontSize: 12, color: 'green', fontWeight: 'bold' }}>{checkApplied[0].reserved}</Text>
                         </View>
                     )
                 }

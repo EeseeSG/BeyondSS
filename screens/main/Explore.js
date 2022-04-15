@@ -13,8 +13,6 @@ import firebase from 'firebase';
 require('firebase/firestore');
 
 import ProjectItem from '../../components/Project/ProjectItem';
-import Section from '../../components/Container/Section';
-
 
 
 export default function Explore(props) {
@@ -166,12 +164,3 @@ export default function Explore(props) {
         </View>
     )
 }
-
-const styles = StyleSheet.create({
-    sectionHeader: { 
-        fontSize: 16, 
-        fontWeight: 'bold', 
-        marginTop: 7, 
-        marginBottom: 3, 
-    }
-})
