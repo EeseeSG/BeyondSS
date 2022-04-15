@@ -13,6 +13,8 @@ import firebase from 'firebase';
 require('firebase/firestore');
 
 import ProjectItem from '../../components/Project/ProjectItem';
+import Section from '../../components/Container/Section';
+
 
 
 export default function Explore(props) {
@@ -147,13 +149,14 @@ export default function Explore(props) {
                 setSelected={handleSelect}
             />
             <View style={{ alignItems: 'flex-end', marginRight: 25, marginBottom: 10, }}>
-                <Text style={{ color: 'black', opacity: 0.7, fontStyle: 'italic' }}>Showing {projects.length} of {rawProjects.length} results</Text>
+                <Text style={defaultStyles.small}>Showing {projects.length} of {rawProjects.length} results</Text>
             </View>
             <FlatList
                 horizontal={false}
                 keyExtractor={(_, index) => index.toString()}
                 data={projects}
                 renderItem={renderItem}
+                contentContainerStyle={{ marginHorizontal: 10, }}
                 showsVerticalScrollIndicator={false}
                 ListFooterComponent={() => null}
                 ListFooterComponentStyle={{ paddingBottom: 90, }}

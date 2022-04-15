@@ -13,22 +13,52 @@ export const defaultStyles = StyleSheet.create({
     },
     title: {
         fontSize: 28,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+        color: Colors.textColor,
+    },
+    subtitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: Colors.textColor,
     },
     h1: {
         fontSize: 22,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: Colors.textColor,
     },
     h2: {
         fontSize: 20,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: Colors.textColor,
     },
     h3: {
         fontSize: 18,
         fontWeight: 'bold',
         marginBottom: 10,
+        color: Colors.textColor,
+    },
+    h4: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 10,
+        color: Colors.textColor,
+    },
+    small: {
+        fontSize: 12,
+        fontStyle: 'italic',
+        color: Colors.textColor,
+    },
+    text: {
+        color: Colors.textColor,
+    },
+    textLight: {
+        color: Colors.textColor,
+        opacity: 0.6
+    },
+    textBold: {
+        fontWeight: 'bold'
     },
     shadow: {
         shadowColor: '#7F5DF0',

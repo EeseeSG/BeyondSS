@@ -16,7 +16,7 @@ import { Popup } from 'react-native-popup-confirm-toast';
 
 // DESIGN
 import { defaultStyles } from '../../constants/defaultStyles';
-import { useTheme } from 'react-native-paper';
+import { Colors, useTheme } from 'react-native-paper';
 import UserAvatar from 'react-native-user-avatar';
 
 // DISPLAY
@@ -34,8 +34,7 @@ import firebase from 'firebase';
 require('firebase/firestore');
 
 // COMPONENTS
-import CollectionItem from '../../components/Project/CollectionItem';
-import ActivityItem from '../../components/Project/ActivityItem';
+import ProjectItem from '../../components/Project/ProjectItem';
 import Card from '../../components/Container/Card';
 import Section from '../../components/Container/Section';
 
@@ -265,9 +264,10 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     //==  HANDLE UPCOMING ==
     //=====================================================================================================================
-    const renderActivityItem = ({ item }) => {
+    const renderProjectItem = ({ item }) => {
+        // console.log(item)
         return (
-            <ActivityItem 
+            <ProjectItem 
                 data={item} 
                 user_id={currentUser._id}
                 navigation={navigation}
@@ -275,18 +275,6 @@ export default function Home({ navigation }) {
             />
         )
     }
-
-    const renderReservedItem = ({ item }) => {
-        return (
-            <CollectionItem 
-                data={item} 
-                user_id={currentUser._id}
-                navigation={navigation}
-                style={{ width: windowWidth - 20 }}
-            />
-        )
-    }
-
 
     const handleCTA = () => {
         if(isAdmin) {
@@ -373,7 +361,6 @@ export default function Home({ navigation }) {
                 </View>
             </View>
 
-
             <Carousel
                 ref={carousel}
                 data={banners}
@@ -389,17 +376,17 @@ export default function Home({ navigation }) {
 
             <Section>
                 <Card>
-                    <View style={{ marginHorizontal: 15, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', }}>
-                        <Text style={{ fontSize: 14, color: 'black', opacity: 0.4, flex: 1, }}>Hosting</Text>
+                    <View style={{ marginHorizontal: 15, }}>
+                        <Text style={defaultStyles.textLight}>Hosting</Text>
                     </View>
                     <View style={{ flexDirection: 'row', flex: 1, paddingVertical: 10, }}>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', borderRightWidth: 0.5, borderRightColor: '#ccc' }}>
-                            <Text style={{ fontSize: 26, color: 'black', opacity: 0.8, fontWeight: 'bold' }}>{beneficiary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>beneficiaries</Text>
+                            <Text style={defaultStyles.subtitle} numberOfLines={1}>{beneficiary.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={defaultStyles.text} numberOfLines={1}>beneficiaries</Text>
                         </View>
                         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text style={{ fontSize: 26, fontWeight: 'bold' }}>{chefs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
-                            <Text style={{ color: 'black', opacity: 0.6, }}>chef volunteers</Text>
+                            <Text style={defaultStyles.subtitle} numberOfLines={1}>{chefs.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</Text>
+                            <Text style={defaultStyles.text} numberOfLines={1}>volunteers</Text>
                         </View>
                     </View>
                 </Card>
@@ -414,7 +401,7 @@ export default function Home({ navigation }) {
                                 horizontal
                                 keyExtractor={(_, index) => index.toString()}
                                 data={activities}
-                                renderItem={renderActivityItem}
+                                renderItem={renderProjectItem}
                             />
                         ) : (
                             <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
@@ -427,7 +414,7 @@ export default function Home({ navigation }) {
                                 horizontal
                                 keyExtractor={(_, index) => index.toString()}
                                 data={reservations}
-                                renderItem={renderReservedItem}
+                                renderItem={renderProjectItem}
                             />
                         ) : (
                             <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
@@ -457,19 +444,19 @@ export default function Home({ navigation }) {
                             isPressable 
                             onPress={() => _handlePressButtonAsync(item.url)}
                         >
-                            <View style={{ flexDirection: 'row', marginVertical: 5, }}>
-                                <Text style={{ flex: 1, fontWeight: 'bold', fontSize: 16, }} selectable>{item.title}</Text>
-                                <Text style={{ color: 'rgba(0,0,0,0.6)', fontStyle: 'italic', fontSize: 12,}} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', }}>
+                                <Text style={defaultStyles.h4} selectable>{item.title}</Text>
+                                <Text style={defaultStyles.small} selectable>{moment(item.date.seconds * 1000).format('LL')}</Text>
                             </View>
-                            <Text style={{ fontSize: 12, }} selectable>{item.desc}</Text>
-                            <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.5)', fontSize: 12, fontWeight: 'bold' }}>Read More...</Text>
+                            <Text style={defaultStyles.textLight} numberOfLines={3} selectable>{item.desc}</Text>
+                            <Text style={[defaultStyles.small, { alignSelf: 'flex-end', margin: 5, color: colors.dark }]}>Read More...</Text>
                         </Card>
                     ))
                 }
             </Section>
 
             <TouchableOpacity style={{ margin: 10, justifyContent: 'center', alignItems: 'flex-end' }} onPress={() => _handlePressButtonAsync('https://www.beyond.org.sg/')}>
-                <Text style={{ flex: 1, alignSelf: 'flex-end', margin: 3, color: 'rgba(0,0,255,0.7)', fontWeight: 'bold' }}>View more...</Text>
+                <Text style={[defaultStyles.small, { alignSelf: 'flex-end', marginHorizontal: 5, color: colors.dark }]}>View more...</Text>
             </TouchableOpacity>
 
 

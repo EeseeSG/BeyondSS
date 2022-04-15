@@ -13,13 +13,12 @@ import {
 // DESIGN
 import Icon from 'react-native-vector-icons/Ionicons';
 import { defaultStyles } from '../../constants/defaultStyles';
-import { useTheme } from 'react-native-paper';
+import { Colors, useTheme } from 'react-native-paper';
 import { currentUserData } from '../../database/User';
 import UserAvatar from 'react-native-user-avatar';
 
 // CUSTOM
-import CollectionItem from '../../components/Project/CollectionItem';
-import ActivityItem from '../../components/Project/ActivityItem';
+import ProjectItem from '../../components/Project/ProjectItem';
 import Section from '../../components/Container/Section';
 import Card from '../../components/Container/Card';
 
@@ -251,10 +250,10 @@ export default function Profile({ navigation }) {
         <View style={defaultStyles.container}>
             <View style={[styles.profileCard, styles.shadow]}>
                 <TouchableOpacity style={styles.flushRightContainer} onPress={goToSettings}>
-                    <Icon color='#A9A9A9' name='settings-outline' size={30}/>
+                    <Icon color={colors.light} name='settings-outline' size={30}/>
                 </TouchableOpacity>
                 <UserAvatar size={80} name={currentUser.name}/>
-                <Text style={styles.profileName}>{currentUser.name}</Text>
+                <Text style={[defaultStyles.h3, { marginTop: 20, }]}>{currentUser.name}</Text>
             </View>
             <ScrollView contentContainerStyle={{ paddingBottom: 100, }}>
                 {/** STATISTICS */}
@@ -304,7 +303,7 @@ export default function Profile({ navigation }) {
                             isBeneficiary ? (
                                 reservations.length !== 0 ? (
                                     reservations.map((reservation, i) => (
-                                        <CollectionItem 
+                                        <ProjectItem 
                                             key={i}
                                             data={reservation} 
                                             user_id={currentUser._id}
@@ -317,7 +316,7 @@ export default function Profile({ navigation }) {
                             ) : (
                                 activities.length !== 0 ? (
                                     activities.map((activity, i) => (
-                                        <ActivityItem 
+                                        <ProjectItem 
                                             key={i}
                                             data={activity} 
                                             user_id={currentUser._id}
@@ -332,7 +331,7 @@ export default function Profile({ navigation }) {
                             isBeneficiary ? (
                                 reservationsHistory.length !== 0 ? (
                                     reservationsHistory.map((hist, i) => (
-                                        <CollectionItem 
+                                        <ProjectItem 
                                             key={i}
                                             data={hist} 
                                             user_id={currentUser._id}
@@ -345,7 +344,7 @@ export default function Profile({ navigation }) {
                             ) : (
                                 activitiesHistory.length !== 0 ? (
                                     activitiesHistory.map((hist, i) => (
-                                        <ActivityItem 
+                                        <ProjectItem 
                                             key={i}
                                             data={hist} 
                                             user_id={currentUser._id}

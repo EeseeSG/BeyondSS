@@ -9,6 +9,7 @@ import {
 import moment from 'moment';
 import * as Colors from '../../constants/Colors';
 import { Popup } from 'react-native-popup-confirm-toast';
+import { defaultStyles } from '../../constants/defaultStyles';
 
 
 export default function ProjectItem(props) {
@@ -28,7 +29,7 @@ export default function ProjectItem(props) {
     }
 
     return (
-        <View style={{ width: windowWidth, ...style }}>
+        <View style={{ width: windowWidth - 20, ...style }}>
             <TouchableOpacity style={[(hasApplied || user_id === item.user._id) ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
                 {
                     hasApplied && (
@@ -37,36 +38,31 @@ export default function ProjectItem(props) {
                         </View>
                     )
                 }
-                <View style={{ flexDirection: 'row', marginRight: 15, }}>
-                    <Text style={{ fontWeight: 'bold', fontSize: 20, marginVertical: 5, flex: 1, }}>{item.title}</Text>
+                <View style={{ flexDirection: 'row', }}>
+                    <Text style={[defaultStyles.h3, { flex: 1, marginRight: 5, }]}>{item.title}</Text>
                     {
                         item.tags.length > 0 && (
-                            <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', paddingHorizontal: 8, paddingVertical: 3, borderWidth: 0.5, borderRadius: 5, borderColor: 'green', }} onPress={onPressNote}>
-                                <Text style={{ color: 'green', fontWeight: 'bold', }}>
-                                    + {item.tags.length}
+                            <TouchableOpacity style={{ justifyContent: 'center', alignContent: 'center', height: 30, width: 30, borderWidth: 0.5, borderRadius: 5, borderColor: 'green', }} onPress={onPressNote}>
+                                <Text style={[defaultStyles.small, { color: 'green', textAlign: 'center' }]}>
+                                    +{item.tags.length}
                                 </Text>
                             </TouchableOpacity>
                         )
                     }
                 </View>
-                <Text style={{ fontSize: 14, color: Colors.dark }}>{moment(item.datetime.seconds * 1000).format('LLL')}</Text>
-                <Text>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
-
-                <View style={{ flexDirection: 'row', flex: 1, marginTop: 10, }}>
-                    <View style={{ flex: 1, }}>
-                        <Text style={{ color: Colors.dark }}>Collect at:</Text>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold', color: Colors.dark, marginLeft: 5, }}>{item.location}</Text>
-                    </View>
-                    <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end' }}>
-                        <Text style={{ fontSize: 22, marginRight: 5, color: Colors.primary, fontWeight: 'bold', marginRight: 10, }}>{(item.count - item.reserved).toString()}</Text>
-                        <Text style={{ fontSize: 17, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
+                <View style={{ marginHorizontal: 7, }}>
+                    <View style={{ flexDirection: 'row', flex: 1, marginVertical: 10, }}>
+                        <View style={{ flex: 1, marginRight: 5, }}>
+                            <Text style={[defaultStyles.text, defaultStyles.textBold, defaultStyles.textLight]} numberOfLines={3}>{item.location.trim()}</Text>
+                            <Text style={[defaultStyles.text, defaultStyles.textLight]}>{moment(item.datetime.seconds * 1000).format('LLL')}</Text>
+                            <Text style={defaultStyles.textLight}>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
+                        </View>
+                        <View style={{ marginRight: 10, alignItems: 'flex-end', justifyContent: 'flex-end'}}>
+                            <Text style={[defaultStyles.h2, { color: Colors.primary }]}>{item.reserved} / {item.count}</Text>
+                            <Text style={defaultStyles.small}>reserved</Text>
+                        </View>
                     </View>
                 </View>
-                <View style={{ marginTop: 10, }}>
-                    <Text style={{ color: Colors.dark }}>Message:</Text>
-                    <Text style={{ color: '#000', marginLeft: 5, }} numberOfLines={3}>{item.message}</Text>
-                </View>
-
             </TouchableOpacity>
         </View>
     )
