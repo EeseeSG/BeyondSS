@@ -6,11 +6,13 @@ import {
     FlatList,
     Dimensions,
     StyleSheet,
-    TextInput
+    TextInput,
+    Image
 } from 'react-native';
 import moment from 'moment';
 import { Popup } from 'react-native-popup-confirm-toast';
 import * as Colors from '../../constants/Colors';
+import { defaultStyles } from '../../constants/defaultStyles';
 import Feather from 'react-native-vector-icons/Feather';
 import * as ProjectData from '../../database/Project';
 
@@ -26,6 +28,9 @@ export default function ApproveReceipts(props) {
     const [infoModal, setInfoModal] = useState(null);
     const [searchText, setSearchText] = useState(null);
 
+    // receipt
+    const [imageReceipt, setImageReceipt] = useState(null);
+    const [showImageModal, setShowImageModal] = useState(false);
 
 
 	// =======================================================================================================================
@@ -192,28 +197,28 @@ export default function ApproveReceipts(props) {
 
     const renderApprovedReceipts = ({item}) => {
         return (
-            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white' }}>
+            <TouchableOpacity style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white' }} onPress={() => openInfoModal(item)}>
                 <View style={{ flex: 1, }}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => openInfoModal(item)}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Feather name="info" color={'black'} size={20} />
-                        <Text style={{ marginLeft: 5, fontSize: 10, color: '#ACACAC', fontStyle: 'italic' }}>Tap for more details...</Text>
-                    </TouchableOpacity>
+                        <Text style={[defaultStyles.small, { marginLeft: 5, }]}>Tap for more details...</Text>
+                    </View>
                     <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
                     <Text>Claimant Contact: {item.user.contact}</Text>
                 </View>
                 <Text style={{ marginTop: 20, }}>Approval made: {moment(item.approvedAt.seconds * 1000).format('LLL')}</Text>
-            </View>
+            </TouchableOpacity>
         )
     }
 
     const renderOutstandingReceipts = ({item}) => {
         return (
-            <View style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white', flexDirection: 'row' }}>
+            <TouchableOpacity style={{ flex: 1, marginVertical: 10, marginHorizontal: 20, borderColor: '#ccc', borderWidth: 0.5, borderRadius: 15, paddingHorizontal: 15, paddingVertical: 10, backgroundColor: 'white', flexDirection: 'row' }} onPress={() => openInfoModal(item)}>
                 <View style={{ flex: 1, }}>
-                    <TouchableOpacity style={{ flexDirection: 'row', alignItems: 'center' }} onPress={() => openInfoModal(item)}>
+                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <Feather name="info" color={'black'} size={20} />
-                        <Text style={{ marginLeft: 5, fontSize: 10, color: '#ACACAC', fontStyle: 'italic' }}>Tap for more details...</Text>
-                    </TouchableOpacity>
+                        <Text style={[defaultStyles.small, { marginLeft: 5, }]}>Tap for more details...</Text>
+                    </View>
                     <Text style={{ marginTop: 20, }}>Claimant: {item.user.name}</Text>
                     <Text>Claimant Contact: {item.user.contact}</Text>
                     
@@ -226,7 +231,7 @@ export default function ApproveReceipts(props) {
                         <Feather name="x-square" color={'red'} size={30} />
                     </TouchableOpacity>
                 </View>
-            </View>
+            </TouchableOpacity>
         )
     }
 
@@ -281,15 +286,24 @@ export default function ApproveReceipts(props) {
             {
                 isActivated && (
                     <View style={{ backgroundColor: 'rgba(0,0,0,0.7)', position: 'absolute', flex: 1, top: 0, left: 0, width: Dimensions.get('window').width, height: Dimensions.get('window').height, justifyContent: 'center', alignItems: 'center' }}>
-                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, marginTop: -100 }}>
+                        <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10, marginTop: -100, width: Dimensions.get('window').width * 0.95, height: Dimensions.get('window').height * 0.8, justifyContent: 'center', alignItems: 'center' }}>
                             <TouchableOpacity style={{ flexDirection: 'row', marginBottom: 10, }} onPress={_closeModal}>
                                 <View style={{ flex: 1, }} >
                                     <Text style={{ fontWeight: 'bold' }}>Details</Text>
                                 </View>
                                 <Feather name="x" color={'black'} size={20} />
                             </TouchableOpacity>
-                            <Text selectable>Receipt ID: {infoModal._id}</Text>
-                            <Text selectable>Project ID: {infoModal.project._id}</Text>
+                            <View style={{ marginBottom: 20, }}>
+                                <Text selectable>Receipt ID: {infoModal._id}</Text>
+                                <Text selectable>Project ID: {infoModal.project._id}</Text>
+                            </View>
+                            <Image 
+                                source={{ uri: infoModal.url }}
+                                style={{ width: '75%', height: '75%', resizeMode: 'contain', borderWidth: 0.5, borderColor: '#ccc' }}
+                            />
+                            <View style={{ marginTop: 20, }}>
+                                <Text style={defaultStyles.h2}>Amount entered: ${infoModal.amount}</Text>
+                            </View>
                         </View>
                     </View>
                 )
