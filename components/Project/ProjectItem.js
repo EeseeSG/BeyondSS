@@ -59,7 +59,7 @@ export default function ProjectItem(props) {
                             <Text style={defaultStyles.textLight}>({moment(item.datetime.seconds * 1000).fromNow()})</Text>
                         </View>
                         <View style={{ marginRight: 10, alignItems: 'flex-end', justifyContent: 'flex-end'}}>
-                            <Text style={[defaultStyles.h2, { color: Colors.primary }]}>{item.reserved} / {item.count}</Text>
+                            <Text style={[defaultStyles.h2, defaultStyles.noMargin, { color: Colors.primary }]}>{item.reserved} / {item.count}</Text>
                             <Text style={defaultStyles.small}>reserved</Text>
                         </View>
                     </View>

@@ -30,8 +30,7 @@ import LottieView from 'lottie-react-native';
 import QuantityPicker from '../../components/Project/QuantityPicker';
 import StoreTags from '../../components/Project/StoreTags';
 import ReceiptList from '../../components/Project/ReceiptList';
-import ImageViewer from 'react-native-image-zoom-viewer';
-import ReceiptItem from '../../components/Project/ReceiptItem';
+import Section from '../../components/Container/Section';
 
 // DATA
 import * as UserData from '../../database/User';
@@ -483,36 +482,48 @@ export default function ProjectDetail(props) {
                 animation="fadeInUpBig" 
                 style={[styles.detailsContainer, styles.shadow]}
             >
-                <ScrollView contentContainerStyle={{ paddingBottom: 100, }} showsVerticalScrollIndicator={false}>
-                    <View style={[styles.categoryContainer, styles.shadow, { backgroundColor: colors.background, }]}>
-                        <Text style={{ fontStyle: 'italic' }}>Brought to you by <Text style={{ fontWeight: 'bold', fontStyle: 'normal' }}>Beyond Social Services</Text></Text>
-                    </View>
-                    <DisplayTimer />
-                    <View style={{ marginLeft: 30, marginTop: 10, }}>
-                        <Text style={{ fontSize: 24, fontWeight: 'bold', marginVertical: 5, flex: 1, marginRight: 30, }}>{data.title}</Text>
-                        <View style={{ flexDirection: 'row', marginRight: 20, alignItems: 'flex-end', margin: 10, }}>
-                            <Text style={{ fontSize: 22, color: 'black', opacity: 0.7, }}>= </Text>
-                            <Text style={{ fontSize: 22, color: colors.primary, fontWeight: 'bold', marginRight: 5, }}>{(data.count - quantityReserved).toString()}</Text>
-                            <Text style={{ fontSize: 20, fontStyle: 'italic', justifyContent: 'flex-end', color: 'black', opacity: 0.7, }}>left</Text>
+                <ScrollView contentContainerStyle={{ paddingBottom: 100, marginHorizontal: 20, }} showsVerticalScrollIndicator={false}>
+
+                    <Section>
+                        <View style={[styles.categoryContainer, styles.shadow, { backgroundColor: colors.background, }]}>
+                            <Text style={defaultStyles.text}>Brought to you by <Text style={[defaultStyles.textBold]}>Beyond Social Services</Text></Text>
                         </View>
+                    </Section>
+
+                    <DisplayTimer />
+
+                    <Section>
+                        <Text style={defaultStyles.h1}>{data.title}</Text>
+                    </Section>
+
+                    <Section>
+                        <View style={{ flexDirection: 'row', alignItems: 'flex-end', }}>
+                            <Text style={[defaultStyles.h1, defaultStyles.textBold, {color: colors.primary, marginRight: 10, }]}>{(data.count - quantityReserved).toString()}</Text>
+                            <Text style={[defaultStyles.h4, defaultStyles.textLight]}>left</Text>
+                        </View>
+                    </Section>
+
+                    <Section>
                         <StoreTags
                             tags={data.tags}
-                            style={{ marginTop: 5, }}
                         />
-                        <View style={{ marginTop: 10, }}>
-                            <Text style={{ fontStyle: 'italic', }}>Chef  <Text style={[styles.header, { fontStyle: 'normal', fontSize: 18, }]}>{data.user.name}</Text></Text>
-                        </View>
-                        <View style={{ marginBottom: 10 }}>
-                            <Text style={styles.header}>Collect at:</Text>
-                            <Text>{data.location}</Text>
-                            <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
-                        </View>
-                    </View>
+                    </Section>
 
+                    <Section>
+                        <Text style={defaultStyles.h4}>Chef <Text style={[defaultStyles.text, defaultStyles.textBold]}>{data.user.name}</Text></Text>
+                    </Section>
+
+                    <Section>
+                        <Text style={defaultStyles.h4}>Collect at:</Text>
+                        <Text>{data.location}</Text>
+                        <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
+                    </Section>
+
+                    <Section>
                     {
                         (isBeneficiary || isAdmin) && (
-                            <View style={{ marginHorizontal: 30, }}>
-                                <Text style={styles.header}>Change reservation quantity to:</Text>
+                            <View>
+                                <Text style={defaultStyles.h4}>Change reservation quantity to:</Text>
                                 <QuantityPicker
                                     quantity={quantity}
                                     setQuantity={setQuantity}
@@ -542,11 +553,16 @@ export default function ProjectDetail(props) {
                             </View>
                         )
                     }
+                    </Section>
 
-                    <View style={{ marginHorizontal: 30, marginBottom: 10, }}>
-                        <Text style={styles.header}>Message from Chef:</Text>
-                        <Text style={{ textAlign: 'justify', }}>{data.message.trim().length === 0 ? 'No message.' : data.message}</Text>
-                    </View>
+
+                    <Section>
+                        <View>
+                            <Text style={defaultStyles.h4}>Message from Chef:</Text>
+                            <Text style={defaultStyles.text}>{data.message.trim().length === 0 ? 'No message.' : data.message}</Text>
+                        </View>
+                    </Section>
+
 
                     {
                         (isAdmin || isChef) && (
@@ -715,9 +731,7 @@ const styles = StyleSheet.create({
         borderRadius: 100, 
         justifyContent: 'center', 
         alignItems: 'center',
-        marginHorizontal: 30,
-        marginTop: 30,
-        marginBottom: 15,
+        marginVertical: 20,
     },
     header: {
         fontSize: 16,
