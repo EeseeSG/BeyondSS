@@ -523,10 +523,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10, 
         paddingVertical: 3, 
         borderRadius: 50, 
-        height: 40, 
-
+        height: 40,
         justifyContent: 'center', 
         alignItems: 'center',
         margin: 15, 
+        minWidth: 120,
     },
 })
