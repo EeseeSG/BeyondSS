@@ -15,6 +15,7 @@ export default function CustomTextInput(props) {
     const {
         header,
         fontIcon,
+        fontIconSize=20,
         value,
         placeholder=header,
         placeholderTextColor="#666666",
@@ -41,7 +42,7 @@ export default function CustomTextInput(props) {
                         <FontAwesome 
                             name={fontIcon}
                             color={iconColor}
-                            size={20}
+                            size={fontIconSize}
                         />
                     )
                 }

@@ -352,7 +352,7 @@ export default function Home({ navigation }) {
                     </Text>
             </View>
 
-            <View style={{ marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, marginHorizontal: 10, }}>
+            <View style={[defaultStyles.shadow, { marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, marginHorizontal: 10, }]}>
                 <Image
                     source={require('../../assets/home_chef_transparent.png')}
                     style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
         borderRadius: 60,
     },
     swipeBtn: { 
-        backgroundColor: 'rgba(0,0,0,0.6)', 
+        backgroundColor: 'rgba(0,0,0,0.4)', 
         paddingHorizontal: 10, 
         paddingVertical: 3, 
         borderRadius: 50, 

@@ -31,7 +31,7 @@ export default function ProjectItem(props) {
 
     return (
         <View style={{ width: windowWidth - 20, ...style }}>
-            <TouchableOpacity style={[(hasApplied || user_id === item.user._id) ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 5, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
+            <TouchableOpacity style={[defaultStyles.shadow, (hasApplied || user_id === item.user._id) ? { borderWidth: 2, borderColor: 'green'} : { borderWidth: 0.5, borderColor: '#ccc' }, { margin: 10, borderRadius: 10, paddingHorizontal: 10, paddingVertical: 15, backgroundColor: '#fff' }]} onPress={() => navigation.navigate('ProjectDetail', { data: item })}>
                 {
                     hasApplied && (
                         <View style={{ width: 25, height: 25, borderWidth: 1, borderColor: 'green', borderRadius: 30, backgroundColor: 'white', justifyContent: 'center', alignItems: 'center', position: 'absolute', right: 0, top: -10, }}>

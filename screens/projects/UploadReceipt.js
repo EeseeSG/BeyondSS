@@ -16,6 +16,7 @@ import moment from 'moment';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Colors from '../../constants/Colors';
+import { defaultStyles } from '../../constants/defaultStyles';
 
 // CAMERA SPECIFIC IMPORTS
 import * as ImagePicker from 'expo-image-picker';
@@ -29,6 +30,7 @@ require("firebase/firebase-storage");
 
 import CustomTextInput from '../../components/Form/TextInput';
 import ReceiptList from '../../components/Project/ReceiptList';
+import Section from '../../components/Container/Section';
 
 
 export default function UploadReceipt(props) {
@@ -222,18 +224,17 @@ export default function UploadReceipt(props) {
 	return (
 		<View style={[styles.container, {backgroundColor: 'white'}]}>
 			{ 
-				!selectImage
-				?
-					<View style={{ height: Dimensions.get('window').height, width: '100%', }}>
-						<View style={{ marginHorizontal: 10, }}>
-							<Text style={{ fontSize: 16, fontWeight: 'bold' }}>DISCLAIMER: </Text>
-							<Text style={{ color: 'black', fontWeight: 'bold', marginTop: 10, }}>Please take reasonable efforts to mask any sensitive, confidential or private information​, whether yourself or other parties.</Text>
+				!selectImage ? (
+					<Section style={{ height: Dimensions.get('window').height, width: '100%', }}>
+						<View style={{ margin: 10, }}>
+							<Text style={defaultStyles.h4}>DISCLAIMER: </Text>
+							<Text style={defaultStyles.text}>Please take reasonable efforts to mask any sensitive, confidential or private information​, whether yourself or other parties.</Text>
 						</View>
-						<TouchableOpacity style={[styles.primaryButton, styles.shadow, { margin: 10, }]} onPress={() => pickImage()}>
+						<TouchableOpacity style={[styles.primaryButton, defaultStyles.shadow, { margin: 10, }]} onPress={() => pickImage()}>
 							<MaterialCommunityIcons name="panorama" size={25} color="white"/>
 							<Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Choose from Gallery</Text>
 						</TouchableOpacity>
-						<TouchableOpacity style={[styles.primaryButton, styles.shadow, { margin: 10, }]} onPress={() => setSelectImage(true)}>
+						<TouchableOpacity style={[styles.primaryButton, defaultStyles.shadow, { margin: 10, }]} onPress={() => setSelectImage(true)}>
 							<MaterialCommunityIcons name="camera" size={25} color="white"/>
 							<Text style={{ marginLeft: 10, fontWeight: 'bold', color: 'white' }}>Take a Photo</Text>
 						</TouchableOpacity>
@@ -243,18 +244,18 @@ export default function UploadReceipt(props) {
 								data={uploadedReceipts}
 							/>
 						</View>
-					</View>
-				:
-					image
-					?
+					</Section>
+				) : (
+					image ? (
 						<ScrollView>
 							<View style={styles.cameraContainer}>
 								<Image source={{ uri: image }} style={{ height: '100%', width: '100%', resizeMode: 'center', }}/>
 							</View>
-							<View style={{ marginHorizontal: 20, }}>
+							<View style={{ margin: 20, }}>
 								<CustomTextInput
 									header={"Please enter amount"}
 									fontIcon={"dollar"}
+									fontIconSize={16}
 									placeholder={"Receipt Amount (Grand Total w GST)"}
 									onChangeText={handleAmoutInput}
 									isValidInput={isValidAmount}
@@ -272,7 +273,7 @@ export default function UploadReceipt(props) {
 								</View>
 							</View>
 						</ScrollView>
-					:
+					) : (
 						<View style={{ flex: 1, }}>
 							<Camera 
 								ref={ref => setCamera(ref)}
@@ -298,8 +299,9 @@ export default function UploadReceipt(props) {
 								</View>
 							</Camera>
 						</View>
+					)
+				)
 			}
-
 		</View>
 	);
 };
@@ -319,7 +321,7 @@ const styles = StyleSheet.create({
         fontSize: 20, 
     },
 	cameraContainer: {
-        height: (Dimensions.get('window').height - 70) * 0.8,
+        height: (Dimensions.get('window').height - 70) * 0.7,
         width: Dimensions.get('window').width,
     },
 	fixedRatio: {
@@ -368,17 +370,8 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         margin: 10,
     },
-	shadow: {
-        // ios
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 1 },
-        shadowOpacity: 0.2,
-        shadowRadius: 1,  
-        // android
-        elevation: 5,
-    },
     primaryButton: {
-        width: Dimensions.get('screen').width - 20,
+        width: Dimensions.get('screen').width - 40,
         borderRadius: 30, 
         backgroundColor: Colors.primary, 
         justifyContent: 'center', 

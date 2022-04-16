@@ -519,10 +519,9 @@ export default function ProjectDetail(props) {
                         <Text>{moment(data.datetime.seconds * 1000).format('LLL')}</Text>
                     </Section>
 
-                    <Section>
                     {
                         (isBeneficiary || isAdmin) && (
-                            <View>
+                            <Section>
                                 <Text style={defaultStyles.h4}>Change reservation quantity to:</Text>
                                 <QuantityPicker
                                     quantity={quantity}
@@ -550,23 +549,20 @@ export default function ProjectDetail(props) {
                                         )
                                     )
                                 }
-                            </View>
+                            </Section>
                         )
                     }
-                    </Section>
 
 
                     <Section>
-                        <View>
-                            <Text style={defaultStyles.h4}>Message from Chef:</Text>
-                            <Text style={defaultStyles.text}>{data.message.trim().length === 0 ? 'No message.' : data.message}</Text>
-                        </View>
+                        <Text style={defaultStyles.h4}>Message from Chef:</Text>
+                        <Text style={defaultStyles.text}>{data.message.trim().length === 0 ? 'No message.' : data.message}</Text>
                     </Section>
 
 
                     {
                         (isAdmin || isChef) && (
-                            <View style={{ marginHorizontal: 30, }}>
+                            <Section>
                                 <Text style={[styles.header, { marginBottom: 15, }]}>Reservation Details:</Text>
                                 {
                                     reservations.length === 0 && (
@@ -628,19 +624,19 @@ export default function ProjectDetail(props) {
                                         </View>
                                     ))
                                 }
-                            </View>
+                            </Section>
                         )
                     }
 
                     {
                         // show receipts upload option only to creator of event
                         (data.user._id === currentUser._id) && (
-                            <View style={{ marginHorizontal: 30, }}>
+                            <Section>
                                 <Text style={styles.header}>Uploaded receipts</Text>
                                 <ReceiptList
                                     data={uploadedReceipts}
                                 />
-                            </View>
+                            </Section>
                         )
                     }
 
