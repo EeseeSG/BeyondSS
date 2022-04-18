@@ -3,15 +3,19 @@ import {
     View, 
     FlatList, 
     Text,
-    StyleSheet,
 } from 'react-native';
-import { defaultStyles } from '../../constants/defaultStyles';
-import * as ProjectData from '../../database/Project';
-import MultiSelect from '../../components/Search/MultiSelect';
 import { useIsFocused } from '@react-navigation/native';
+
+// DESIGN
+import { defaultStyles } from '../../constants/defaultStyles';
+
+// DATABASE
+import * as ProjectData from '../../database/Project';
 import firebase from 'firebase';
 require('firebase/firestore');
 
+// COMPONENTS
+import MultiSelect from '../../components/Search/MultiSelect';
 import ProjectItem from '../../components/Project/ProjectItem';
 
 
@@ -24,6 +28,8 @@ export default function Explore(props) {
     const [category, setCategory] = useState([]);
     const [selected, setSelected] = useState([]);
     const isFocused = useIsFocused();
+
+
 
     useEffect(() => {
         return _getProjectData()

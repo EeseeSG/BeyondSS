@@ -4,7 +4,6 @@ import {
     View, 
     Text, 
     TouchableOpacity, 
-    TextInput,
     Platform,
     StyleSheet ,
     StatusBar,
@@ -21,7 +20,6 @@ import * as Animatable from 'react-native-animatable';
 
 // DESIGN
 import { LinearGradient } from 'expo-linear-gradient';
-import Feather from 'react-native-vector-icons/Feather';
 
 // COMPONENTS
 import CustomTextInput from '../../components/Form/TextInput';
@@ -29,6 +27,7 @@ import CustomTextInput from '../../components/Form/TextInput';
 // FIREBASE
 import firebase from 'firebase';
 require('firebase/firestore');
+
 
 export default function SignInScreen({navigation}) {
 	const { colors } = useTheme();

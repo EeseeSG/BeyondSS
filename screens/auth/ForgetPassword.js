@@ -1,10 +1,9 @@
 // ESSENTIALS
-import React, { useState, useContext, } from 'react';
+import React, { useState, } from 'react';
 import { 
     View, 
     Text, 
     TouchableOpacity, 
-    TextInput,
     Platform,
     StyleSheet ,
     StatusBar,
@@ -13,15 +12,14 @@ import {
 import { useTheme } from 'react-native-paper';
 import { Popup } from 'react-native-popup-confirm-toast';
 
-// AUTH PROVIDER
-import { AuthContext } from '../../navigation/AuthProvider';
-
 // ANIMATION
 import * as Animatable from 'react-native-animatable';
 
 // DESIGN
 import { LinearGradient } from 'expo-linear-gradient';
-import Feather from 'react-native-vector-icons/Feather';
+
+// COMPONENTS
+import CustomTextInput from '../../components/Form/TextInput';
 
 // FIREBASE
 import firebase from 'firebase';
@@ -96,36 +94,16 @@ export default function ForgetPasswordScreen({navigation}) {
 			>
 				<ScrollView showsVerticalScrollIndicator={false}>
 
-				<	Text style={styles.text_footer}>Email</Text>
-					<View style={styles.action}>
-						<Feather 
-							name="mail"
-							color="#05375a"
-							size={20}
-						/>
-						<TextInput 
-							placeholder="Your Email"
-							style={styles.textInput}
-							autoCapitalize="none"
-							onChangeText={(val) => handleEmailChange(val.trim())}
-							autoComplete='email'
-							keyboardType='email-address'
-						/>
-						{
-							data.check_textInputChange 
-							&&
-							<Animatable.View
-								animation="bounceIn"
-							>
-								<Feather 
-									name="check-circle"
-									color="green"
-									size={20}
-								/>
-							</Animatable.View>
-						}
-					</View>
-					
+					<CustomTextInput
+						header={"Email"}
+						fontIcon={"envelope"}
+						placeholder={"Your Email"}
+						onChangeText={handleEmailChange}
+						isValidInput={data.check_textInputChange}
+						keyboardType={'email-address'}
+						autoCap={'none'}
+						validationText={'Please enter email in the correct format.'}
+					/>					
 		
 					<View style={styles.button}>
 						<TouchableOpacity
@@ -191,22 +169,11 @@ const styles = StyleSheet.create({
 		paddingBottom: 5,
 		alignItems: 'flex-end'
 	},
-	actionError: {
-		flexDirection: 'row',
-		marginTop: 10,
-		borderBottomWidth: 1,
-		borderBottomColor: '#FF0000',
-		paddingBottom: 5
-	},
 	textInput: {
 		flex: 1,
 		marginTop: Platform.OS === 'ios' ? 0 : -12,
 		paddingLeft: 10,
 		color: '#05375a',
-	},
-	errorMsg: {
-		color: '#FF0000',
-		fontSize: 14,
 	},
 	button: {
 		alignItems: 'center',

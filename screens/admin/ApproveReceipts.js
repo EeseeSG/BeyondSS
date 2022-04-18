@@ -326,30 +326,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 5,
 	},
-    text_footer: {
-		color: '#05375a',
-		fontSize: 18
-	},
     textInput: {
 		flex: 1,
 		paddingLeft: 10,
 		color: '#05375a'
 	},
-    modalButton: {
-        flex: 1,
-        height: 48,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginTop: 20,
-        borderRadius: 8,
-        backgroundColor: '#702c91',
-    },
-    modalTextButton: {
-        color: '#ffffff',
-        fontSize: 16,
-        fontWeight: '600',
-        fontStyle: 'normal',
-        textAlign: 'center',
-        lineHeight: 20,
-    },
 })

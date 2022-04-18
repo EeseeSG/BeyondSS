@@ -12,7 +12,7 @@ import {
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
 
-// STYLE SPECIFIC IMPORTS
+// DESIGN
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as Colors from '../../constants/Colors';
@@ -28,6 +28,7 @@ import firebase from 'firebase';
 require('firebase/firestore');
 require("firebase/firebase-storage");
 
+// COMPONENTS
 import CustomTextInput from '../../components/Form/TextInput';
 import ReceiptList from '../../components/Project/ReceiptList';
 import Section from '../../components/Container/Section';
@@ -307,18 +308,11 @@ export default function UploadReceipt(props) {
 };
 
 const styles = StyleSheet.create({
-
     container: {
         flex: 1,
         height: '100%',
         width: Dimensions.get('window').width,
         backgroundColor: 'white',
-    },
-	headerText: {
-        color: 'white', 
-        marginLeft: 20, 
-        fontWeight: 'bold', 
-        fontSize: 20, 
     },
 	cameraContainer: {
         height: (Dimensions.get('window').height - 70) * 0.7,
@@ -326,13 +320,6 @@ const styles = StyleSheet.create({
     },
 	fixedRatio: {
         flex: 1,
-    },
-    resultContainer: {
-        flexDirection: 'row',
-        width: Dimensions.get('window').width,
-        justifyContent: 'center',
-        alignItems: 'center',
-        alignContent: 'center',
     },
     circularButton: {
         borderWidth: 1,
@@ -354,10 +341,6 @@ const styles = StyleSheet.create({
 		position: 'absolute',
 		bottom: 0,
 		width: '100%'
-    },
-    photoText: {
-        fontSize: 20,
-        textAlign: 'center',
     },
     confirmButton: {
         borderWidth: 1,

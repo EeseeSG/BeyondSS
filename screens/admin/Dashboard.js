@@ -256,10 +256,6 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         borderRadius: 5,
 	},
-    text_footer: {
-		color: '#05375a',
-		fontSize: 18
-	},
     textInput: {
 		flex: 1,
 		paddingLeft: 10,

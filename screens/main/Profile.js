@@ -7,13 +7,12 @@ import {
     TouchableOpacity, 
     ActivityIndicator,
     ScrollView,
-    Dimensions
 } from 'react-native';
 
 // DESIGN
 import Icon from 'react-native-vector-icons/Ionicons';
 import { defaultStyles } from '../../constants/defaultStyles';
-import { Colors, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import { currentUserData } from '../../database/User';
 import UserAvatar from 'react-native-user-avatar';
 
@@ -29,7 +28,6 @@ require('firebase/firestore');
 
 export default function Profile({ navigation }) {
     const { colors } = useTheme();
-    const { width: windowWidth, height: windowHeight } = Dimensions.get('window');
     const [selection, setSelection] = useState(0);
     const [isChef, setIsChef] = useState(false);
     const [isBeneficiary, setIsBeneficiary] = useState(false);
@@ -394,20 +392,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row-reverse', 
         width: '100%' 
     },
-    image: { 
-        width: 100, 
-        height: 100, 
-        backgroundColor: '#ccc', 
-        borderWidth: 1, 
-        borderColor: '#ccc', 
-        borderRadius: 100 
-    },
-    text: { 
-        marginTop: 50 
-    },
-    avatar: { 
-        marginTop: 10 
-    },
     profileCard: {
         padding: 20,
         borderBottomStartRadius: 30,
@@ -416,35 +400,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#ffffff'
     },
-    profileName: {
-        fontSize: 18,
-        marginTop: 10,
-        fontWeight: 'bold',
-    },
-    buttonGroup: {
-        flexDirection: 'row',
-        marginVertical: 20,
-    },
-    button: {
-        width: '100%',
-        borderRadius: 20,
-        padding: 20,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    actionButton: {
-        flex: 1,
-        flexDirection: 'row',
-        width: '100%',
-		height: 50,
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderRadius: 50,
-        marginHorizontal: 5,
-        borderWidth: 1,
-        backgroundColor: 'white',
-        borderColor: '#A9A9A9'
-	},
     shadow: {
         shadowColor: "#000",
         shadowOffset: {

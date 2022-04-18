@@ -18,6 +18,7 @@ import * as APP_SETTINGS from '../../app.json';
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
 import { currentUserData } from '../../database/User';
+import { ABOUT_US_URL, TERMS_AND_CONDITION_URL, PRIVACY_POLICY_URL } from '../../constants/Default';
 
 // SETTIGNS COMPONENETS
 import SettingsBlock from '../../components/Settings/SettingBlocks';
@@ -91,17 +92,17 @@ export default function Settings({ navigation }) {
                 <SettingsBlock
                     icon='ios-information-circle-outline'
                     text='About Us'
-                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/')}
+                    onPress={() => _openWebBrowser(ABOUT_US_URL)}
                 />
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Terms and Conditions'
-                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}
+                    onPress={() => _openWebBrowser(TERMS_AND_CONDITION_URL)}
                 />
                 <SettingsBlock
                     icon='ios-document-text-outline'
                     text='Privacy Policy'
-                    onPress={() => _openWebBrowser('https://www.beyond.org.sg/privacypolicyandstatutoryinfo/')}
+                    onPress={() => _openWebBrowser(PRIVACY_POLICY_URL)}
                 />
                 <SettingStatic
                     icon='ios-folder-outline'

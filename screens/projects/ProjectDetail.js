@@ -8,8 +8,6 @@ import {
     ScrollView,
     Dimensions,
     ActivityIndicator,
-    Image,
-    Modal,
 } from 'react-native';
 import { Popup } from 'react-native-popup-confirm-toast';
 import moment from 'moment';
@@ -734,20 +732,6 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginTop: 20,
     },
-    sizeContainer: {
-        height: 40,
-        marginVertical: 10,
-        flexDirection: 'row',
-    },
-    sizeButton: { 
-        borderRadius: 30, 
-        height: '100%', 
-        marginHorizontal: 10, 
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        minWidth: Dimensions.get('window').width / 5,
-    },
     cardButton: {
         marginHorizontal: 20,
         marginVertical: 20, 
@@ -768,17 +752,5 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
-    },
-    primaryButton: {
-        width: Dimensions.get('screen').width - 20,
-        borderRadius: 30, 
-        backgroundColor: '#9980D3', 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        alignSelf: 'flex-start',
-        flexDirection: 'row',
-        marginHorizontal: 10,
-        marginBottom: 20,
-        height: 50, 
     },
 });

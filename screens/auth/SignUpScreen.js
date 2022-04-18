@@ -18,7 +18,7 @@ import * as WebBrowser from 'expo-web-browser';
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
 
-// USER
+// DATABASE
 import { getUserByPhone, getApplicationByPhone } from '../../database/User';
 
 // ANIMATION

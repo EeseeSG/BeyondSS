@@ -13,10 +13,11 @@ import {
 } from 'react-native';
 import * as WebBrowser from 'expo-web-browser';
 import { Popup } from 'react-native-popup-confirm-toast';
+import moment from 'moment';
 
 // DESIGN
 import { defaultStyles } from '../../constants/defaultStyles';
-import { Colors, useTheme } from 'react-native-paper';
+import { useTheme } from 'react-native-paper';
 import UserAvatar from 'react-native-user-avatar';
 
 // DISPLAY
@@ -27,9 +28,6 @@ import PartnerCarousel from '../../components/Project/PartnerCarousel';
 import * as UserData from '../../database/User';
 import * as IndexData from '../../database/Index';
 import * as ProjectData from '../../database/Project';
-import moment from 'moment';
-
-// DATABASE
 import firebase from 'firebase';
 require('firebase/firestore');
 
@@ -485,38 +483,9 @@ export default function Home({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    greetings: {
-        fontSize: 20,
-        fontWeight: 'bold'
-    },
     title: {
         fontSize: 22,
         fontWeight: 'bold',
-    },
-    header: {
-        marginTop: 30,
-        marginBottom: 20,
-        fontSize: 18,
-        textTransform: 'capitalize',
-        fontWeight: 'bold',
-    },
-    shadow: {
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        elevation: 5,
-    },
-    cartBtn: { 
-        backgroundColor: '#fff', 
-        width: 40, 
-        height: 40, 
-        justifyContent: 'center', 
-        alignItems: 'center', 
-        borderRadius: 60,
     },
     swipeBtn: { 
         backgroundColor: 'rgba(0,0,0,0.4)', 
