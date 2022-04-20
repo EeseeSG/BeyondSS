@@ -256,18 +256,6 @@ export default function ProjectDetail(props) {
         if(data.datetime.seconds > moment().unix()) {
             return (
                 <View>
-                    <Text style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 10, }}>Available soon!</Text>
-                    <CountDown
-                        until={data.datetime.seconds - moment().unix()}
-                        onPress={checkAvailability}
-                        size={20}
-                    />
-                </View>
-            )
-        }
-        if(data.datetime.seconds > moment().unix()) {
-            return (
-                <View>
                     <Text style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 10, }}>Whilst stock last!</Text>
                     <CountDown
                         until={data.datetime.seconds - moment().unix()}
@@ -278,7 +266,11 @@ export default function ProjectDetail(props) {
                 </View>
             )
         }
-        return null  // fall back
+        return (
+            <View>
+                <Text style={{ fontWeight: 'bold', textAlign: 'center', marginBottom: 10, }}>Session Over</Text>
+            </View>
+        )
     }
 
     const checkAvailability = () => {

@@ -328,6 +328,22 @@ export const getOutstandingReceipts = async () => {
         })
 }
 
+export const getOutstandingReceiptsByChef = async (user_id) => {
+    return await firebase.firestore()
+        .collection('receipts')
+        .where('user._id', '==', user_id)
+        .where('isApproved', '==', null)
+        .orderBy('createdAt', 'asc')
+        .get()
+        .then((snapshot) => {
+            return snapshot.docs.map(snap => {
+                let _id = snap.id;
+                let data = snap.data();
+                return { ...data, _id }
+            })
+        })
+}
+
 export const getApprovedReceipts = async () => {
     return await firebase.firestore()
         .collection('receipts')

@@ -138,8 +138,8 @@ export default function SignInScreen({navigation}) {
 	// == DISPLAY ==
 	// =======================================================================================================================
 	return (
-		<View style={[styles.container, { backgroundColor: colors.secondary, }]}>
-			<StatusBar backgroundColor={colors.secondary} barStyle="light-content"/>
+		<View style={[styles.container, { backgroundColor: colors.primary, }]}>
+			<StatusBar backgroundColor={colors.primary} barStyle="light-content"/>
 			<View style={styles.header}>
 				<Text style={styles.text_header}>Welcome!</Text>
 			</View>
@@ -183,7 +183,7 @@ export default function SignInScreen({navigation}) {
 							onPress={loginHandle}
 						>
 							<LinearGradient
-								colors={[colors.secondary, colors.primary]}
+								colors={[colors.primary, colors.darkGrey]}
 								style={styles.signIn}
 							>
 								<Text style={[styles.textSign, { color:'#fff' }]}>Sign In</Text>

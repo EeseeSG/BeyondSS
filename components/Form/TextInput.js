@@ -38,7 +38,7 @@ export default function CustomTextInput(props) {
             <Text style={[styles.text_footer, { color: textColor, marginTop: 30, }, containerStyle]}>{header}</Text>
             <View style={styles.action}>
                 {
-                    numberOfLines === 1 && (
+                    (fontIcon === null || numberOfLines === 1) && (
                         <FontAwesome 
                             name={fontIcon}
                             color={iconColor}

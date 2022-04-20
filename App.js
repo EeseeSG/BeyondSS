@@ -124,7 +124,7 @@ export default function App() {
       translucent={false}
       isLoaded={!isLoading}
       logoImage={require("./assets/splash.png")}
-      backgroundColor={!isLoading ? Colors.secondary : '#D9D9D9'}
+      backgroundColor={!isLoading ? Colors.primary : '#D9D9D9'}
       logoHeight={150}
       logoWidth={150}
     >

@@ -21,9 +21,10 @@ import * as UserData from '../../database/User';
 // COMPONENT
 import CustomTextInput from '../../components/Form/TextInput';
 import CustomDateTimeInput from '../../components/Form/DateInput';
-import CustomSwitchInput from '../../components/Form/Switch';
+import CustomCheckBox from '../../components/Form/CheckBox';
 import { sendPushNotification } from '../../components/Helper/PushNotifications';
 import { uuidv4 } from '../../components/Helper/UUID';
+import { defaultStyles } from '../../constants/defaultStyles';
 
 
 export default function SignInScreen({navigation}) {
@@ -366,7 +367,7 @@ export default function SignInScreen({navigation}) {
 
                 <CustomTextInput
                     header={"Food Name"}
-                    fontIcon={"terminal"}
+                    fontIcon={null}
                     placeholder={"Enter name of food"}
                     onChangeText={nameHandler}
                     isValidInput={data.isValidName}
@@ -376,7 +377,7 @@ export default function SignInScreen({navigation}) {
 
 				<CustomTextInput
                     header={"How many would you like to distribute?"}
-                    fontIcon={"calculator"}
+                    fontIcon={null}
                     placeholder={"Enter the amount to be distributed"}
                     onChangeText={numberHandler}
                     isValidInput={data.isValidCount}
@@ -386,7 +387,7 @@ export default function SignInScreen({navigation}) {
 
                 <CustomTextInput
                     header={"Collection Location"}
-                    fontIcon={"user-o"}
+                    fontIcon={null}
                     placeholder={"Please enter location of collection"}
                     onChangeText={locationHandler}
                     isValidInput={data.isValidLocation}
@@ -397,7 +398,7 @@ export default function SignInScreen({navigation}) {
 
 				<CustomDateTimeInput 
 					header={"Date and Time"}
-					fontIcon={"calendar"}
+                    fontIcon={null}
 					date={data.datetime}
 					setDate={dateHandler}
 					isValidInput={data.isValidDate}
@@ -407,7 +408,7 @@ export default function SignInScreen({navigation}) {
 
                 <CustomTextInput
                     header={"Message (optional)"}
-                    fontIcon={"user-o"}
+                    fontIcon={null}
                     placeholder={"Enter any message you would like to convey"}
                     onChangeText={messageHandler}
                     isValidInput={true}
@@ -422,7 +423,7 @@ export default function SignInScreen({navigation}) {
 					keyExtractor={(_, index) => index.toString()}
 					contentContainerStyle={{ marginHorizontal: 20, }}
 					renderItem={({item}) => (
-						<CustomSwitchInput
+						<CustomCheckBox
 							data={data}
 							item={item}
 						/>
@@ -431,13 +432,14 @@ export default function SignInScreen({navigation}) {
 
 				
 				<Text style={[styles.text_footer, { color: 'black', marginTop: 30, }]}>Allergens</Text>
+				<Text style={defaultStyles.small}>Please indicate if the meal contains:</Text>
 				<FlatList
 					numColumns={2}
 					data={allergen_tags}
 					keyExtractor={(_, index) => index.toString()}
 					contentContainerStyle={{ marginHorizontal: 20, }}
 					renderItem={({item}) => (
-						<CustomSwitchInput
+						<CustomCheckBox
 							data={data}
 							item={item}
 						/>
@@ -450,7 +452,7 @@ export default function SignInScreen({navigation}) {
                         onPress={submitHandler}
                     >
                         <LinearGradient
-                            colors={[colors.secondary, colors.primary]}
+                            colors={[colors.primary, colors.darkGrey]}
                             style={styles.signIn}
                         >
                             <Text style={[styles.textSign, { color:'#fff' }]}>Create</Text>

@@ -18,7 +18,8 @@ import moment from 'moment';
 // DESIGN
 import { defaultStyles } from '../../constants/defaultStyles';
 import { useTheme } from 'react-native-paper';
-import UserAvatar from 'react-native-user-avatar';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+
 
 // DISPLAY
 import Carousel from 'react-native-snap-carousel';
@@ -35,6 +36,7 @@ require('firebase/firestore');
 import ProjectItem from '../../components/Project/ProjectItem';
 import Card from '../../components/Container/Card';
 import Section from '../../components/Container/Section';
+import RoundCTA from '../../components/Button/RoundCTA';
 
 // AUTH PROVIDER
 import { AuthContext } from '../../navigation/AuthProvider';
@@ -139,6 +141,7 @@ export default function Home({ navigation }) {
     //=====================================================================================================================
     const [reservations, setReservations] = useState([]);
     const [activities, setActivities] = useState([]);
+    const [receipts, setReceipts] = useState([]);
     const [eventisLoaded, setEventIsLoaded] = useState(false);
     useEffect(() => {
         if(currentUser) {
@@ -194,6 +197,9 @@ export default function Home({ navigation }) {
                                 setActivities(activities_arr);
                                 setEventIsLoaded(true);
                             });
+                        
+                        let receipts_arr = await ProjectData.getOutstandingReceiptsByChef(currentUser._id);
+                        setReceipts(receipts_arr)
                     })
             }
             async function _getAllUpcomingActivities() {
@@ -328,17 +334,25 @@ export default function Home({ navigation }) {
 
     return (
         <ScrollView style={defaultStyles.container} contentContainerStyle={{ paddingBottom: 90, paddingTop: 10, }}>
-            <View style={{ marginHorizontal: 20, marginTop: 40, }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 10, }}>
-                    <UserAvatar name={currentUser.name} />
-                    <Text style={[defaultStyles.h1, { color: colors.primary, }]}>
-                        {"  "}Hi {currentUser.name} 
-                    </Text>
+
+            {/** ===========================================================================================
+             * ==== HERO SECTION
+             =========================================================================================== */}
+            <Section style={{ height: 300, justifyContent: 'flex-end', }}>
+                <View style={{ width: Dimensions.get('screen').width * 0.3, height: Dimensions.get('screen').width * 0.8, position: 'absolute', bottom: 0, left: 20, zIndex: 1, elevation: 5, shadowColor: 'transparent', }}>
+                    <Image
+                        source={require("../../assets/graphic/chef-img.png")}
+                        style={{ width: '100%', height: '100%', resizeMode: 'contain', }}
+                    />
                 </View>
-                <Text style={defaultStyles.h2}>
+                <View style={{ width: Dimensions.get('screen').width * 0.5, alignSelf: 'flex-end', marginBottom: 15, }}>
+                    <Text style={[defaultStyles.h1, { color: colors.textColor, }]} numberOfLines={1}>
+                        Hi {currentUser.name}!
+                    </Text>
+                    <Text>
                     {
                         isChef ? (
-                            'How would you like to help?'
+                            'Thank you for your help in preparing meals for the less privileged in Singapore! \n\nYou currently have:'
                         ) : (
                             isAdmin ? (
                                 'Manage users'
@@ -348,9 +362,42 @@ export default function Home({ navigation }) {
                         )
                     }
                     </Text>
-            </View>
+                </View>
+                <Card style={{ flexDirection: 'row', paddingVertical: 15, paddingHorizontal: 25, justifyContent: 'flex-end', flex: 0, }}>
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={[defaultStyles.title, defaultStyles.noMargin, { color: colors.primary }]}>{isChef ? (activities.length) : '4'}</Text>
+                        <Text style={{ textAlign: 'center' }}>Ongoing{'\n'}Sessions</Text>
+                    </View>
+                    <View style={{ marginVertical: 10, marginHorizontal: 15, width: 1, backgroundColor: colors.light }} />
+                    <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+                        <Text style={[defaultStyles.title, defaultStyles.noMargin, { color: colors.primary }]}>{receipts.length}</Text>
+                        <Text style={{ textAlign: 'center' }}>Pending{'\n'}Claims</Text>
+                    </View>
+                </Card>
+            </Section>
 
-            <View style={[defaultStyles.shadow, { marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, marginHorizontal: 10, }]}>
+            {/** ===========================================================================================
+             * ==== CTA SECTION
+             =========================================================================================== */}
+            <Section style={{ flexDirection: 'row' }}>
+                <RoundCTA
+                    iconName={'food'}
+                    onPress={() => navigation.navigate('Start Giving')}
+                    text={'Schedule a Meal'}
+                />
+                <RoundCTA
+                    iconName={'receipt'}
+                    onPress={() => {}}
+                    text={'Submit a Claim'}
+                />
+                <RoundCTA
+                    iconName={'food'}
+                    onPress={() => {}}
+                    text={'View Completed Meals'}
+                />
+            </Section>
+
+            {/* <View style={[defaultStyles.shadow, { marginTop: 50, backgroundColor: '#fff', flexDirection: 'row', justifyContent: 'center', alignItems: 'center', borderTopStartRadius: 60, borderBottomEndRadius: 60, borderTopEndRadius: 25, borderBottomStartRadius: 25, marginHorizontal: 10, }]}>
                 <Image
                     source={require('../../assets/home_chef_transparent.png')}
                     style={{ width: windowWidth * 0.55, height: windowWidth * 0.45, marginTop: -20 }}
@@ -376,8 +423,11 @@ export default function Home({ navigation }) {
                         )
                     }
                 </View>
-            </View>
+            </View> */}
 
+            {/** ===========================================================================================
+             * ==== BANNER SECTION
+             =========================================================================================== */}
             <Carousel
                 ref={carousel}
                 data={banners}
@@ -391,6 +441,9 @@ export default function Home({ navigation }) {
                 autoplayInterval={5000}
             />
 
+            {/** ===========================================================================================
+             * ==== STATISTICS SECTION
+             =========================================================================================== */}
             <Section>
                 <Card>
                     <View style={{ marginHorizontal: 15, }}>
@@ -409,8 +462,13 @@ export default function Home({ navigation }) {
                 </Card>
             </Section>
 
-            <Section>
+
+            {/** ===========================================================================================
+             * ==== ACTIVITIES SECTION
+             =========================================================================================== */}
+            <Section style={{ margin: 0, marginHorizontal: 0, marginLeft: 10, }}>
                 <Text style={defaultStyles.h3}>Your {isBeneficiary ? 'collections' : 'activities'} ({isBeneficiary ? reservations.length.toString() : activities.length.toString()})</Text>
+                <Card style={[ defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 20, borderTopStartRadius: 20, marginLeft: 10, marginTop: 10, }]}>
                 {
                     (isChef || isAdmin) ? (
                         activities.length ? (
@@ -421,7 +479,7 @@ export default function Home({ navigation }) {
                                 renderItem={renderProjectItem}
                             />
                         ) : (
-                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20, marginBottom: 20,}}>
                                 <Text>{isChef ? 'You have not made any activities. Start one now!' : 'There are no activities.'}</Text>
                             </View>
                         )
@@ -435,23 +493,32 @@ export default function Home({ navigation }) {
                                 ListEmptyComponent={RenderCollectionOnEmpty}
                             />
                         ) : (
-                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20,}}>
+                            <View style={{ justifyContent: 'center', alignItems: 'center', paddingHorizontal: 10, paddingTop: 20, marginBottom: 20,}}>
                                 <Text>You have not made any reservation. Make one now!</Text>
                             </View>
                         )
                     )
                 }
+                </Card>
             </Section>
 
+
+            {/** ===========================================================================================
+             * ==== PARTNERS SECTION
+             =========================================================================================== */}
             <Section style={{ margin: 0, marginHorizontal: 0, marginLeft: 10, }}>
                 <Text style={defaultStyles.h3}>Partners</Text>
-                <Card style={[ defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 10, borderTopStartRadius: 10, marginLeft: 10, marginTop: 10, }]}>
+                <Card style={[ defaultStyles.noBorderRadius, defaultStyles.noMargin, { backgroundColor: '#fff', borderBottomStartRadius: 20, borderTopStartRadius: 20, marginLeft: 10, marginTop: 10, }]}>
                     <PartnerCarousel
                         data={partners}
                     />
                 </Card>
             </Section>
 
+
+            {/** ===========================================================================================
+             * ==== NEWS SECTION
+             =========================================================================================== */}
             <Section>
                 <Text style={defaultStyles.h3}>Latest News</Text>
                 {
@@ -471,31 +538,11 @@ export default function Home({ navigation }) {
                         </Card>
                     ))
                 }
+                <TouchableOpacity style={{ margin: 10, justifyContent: 'center', alignItems: 'flex-end' }} onPress={() => _handlePressButtonAsync('https://www.beyond.org.sg/')}>
+                    <Text style={[defaultStyles.small, { alignSelf: 'flex-end', marginHorizontal: 5, color: colors.dark }]}>View more...</Text>
+                </TouchableOpacity>
             </Section>
-
-            <TouchableOpacity style={{ margin: 10, justifyContent: 'center', alignItems: 'flex-end' }} onPress={() => _handlePressButtonAsync('https://www.beyond.org.sg/')}>
-                <Text style={[defaultStyles.small, { alignSelf: 'flex-end', marginHorizontal: 5, color: colors.dark }]}>View more...</Text>
-            </TouchableOpacity>
-
 
         </ScrollView>
     )
 }
-
-const styles = StyleSheet.create({
-    title: {
-        fontSize: 22,
-        fontWeight: 'bold',
-    },
-    swipeBtn: { 
-        backgroundColor: 'rgba(0,0,0,0.4)', 
-        paddingHorizontal: 10, 
-        paddingVertical: 3, 
-        borderRadius: 50, 
-        height: 40,
-        justifyContent: 'center', 
-        alignItems: 'center',
-        margin: 15, 
-        minWidth: 120,
-    },
-})

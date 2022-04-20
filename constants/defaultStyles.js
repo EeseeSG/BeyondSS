@@ -81,7 +81,7 @@ export const defaultStyles = StyleSheet.create({
         flex: 1, 
         margin: 10,
         paddingVertical: 10, 
-        borderRadius: 10, 
+        borderRadius: 20, 
         backgroundColor: '#fff', 
         borderWidth: 0.5, 
         borderColor: '#ccc',

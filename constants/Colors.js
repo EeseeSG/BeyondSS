@@ -1,7 +1,10 @@
 export const dark = "#0F2C67";
-export const base = "#FCF8F5";
-export const primary = "#CD1818";
-export const secondary = "#F3950D";
+export const base = "#f1f6fa";
+export const primary = "#76a3cb";
+export const secondary = "#eca92f";
 export const light = "#A4A4A4";
 export const darkGrey = '#565656';
 export const textColor = 'rgba(0,0,0,0.87)';  // 87% of pure black
+export const success = "#4CBB17";
+export const pending = '#FFAA33';
+export const error = "#FA5F55";

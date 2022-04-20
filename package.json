@@ -44,7 +44,8 @@
     "react-native-status-bar-height": "^2.6.0",
     "react-native-svg": "12.1.1",
     "react-native-user-avatar": "^1.0.7",
-    "react-native-vector-icons": "^9.0.0"
+    "react-native-vector-icons": "^9.0.0",
+    "expo-checkbox": "~2.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"

@@ -25,8 +25,8 @@ const height_logo = width * 0.55;
 export default function SplashScreen({navigation}) {
 	const { colors } = useTheme();
 	return (
-		<View style={[styles.container, { backgroundColor: colors.secondary, }]}>
-			<StatusBar backgroundColor={colors.secondary} barStyle="light-content"/>
+		<View style={[styles.container, { backgroundColor: colors.primary, }]}>
+			<StatusBar backgroundColor={colors.primary} barStyle="light-content"/>
 			<View style={styles.header}>
 				<Animatable.View
 					animation="bounceIn"
@@ -49,7 +49,7 @@ export default function SplashScreen({navigation}) {
 				<View style={styles.button}>
 					<TouchableOpacity onPress={()=> navigation.navigate('SignInScreen')}>
 						<LinearGradient
-							colors={[colors.secondary, colors.primary]}
+							colors={[colors.primary, colors.darkGrey]}
 							style={styles.signIn}
 						>
 							<View style={styles.textContainer}>
