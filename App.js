@@ -1,21 +1,18 @@
 // ESSENTIALS
 import React, { useState, useEffect, } from 'react';
-import { 
-  View, 
-  StatusBar, 
-  Platform, 
-  LogBox,
-} from 'react-native';
-LogBox.ignoreLogs(['Setting a timer']);
+import { View, StatusBar, Platform, LogBox, } from 'react-native';
+LogBox.ignoreLogs([
+  "Setting a timer",
+  "ViewPropTypes will be removed",
+  "ColorPropType will be removed",
+]);
+
+
 import { Root, } from 'react-native-popup-confirm-toast';
 import AnimatedSplash from "react-native-animated-splash-screen";
 
 // AUTH PROVIDER
 import { AuthProvider } from './navigation/AuthProvider';
-
-// VERSION
-import currentVersion from './constants/Version';
-import * as Localization from 'expo-localization';
 
 // NAVIGATION AND THEME
 import { 
@@ -28,8 +25,8 @@ import {
   DefaultTheme as NavigationDefaultTheme,
   DarkTheme as NavigationDarkTheme
 } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-const Stack = createStackNavigator();
+import { createNativeStackNavigator  } from '@react-navigation/native-stack';
+const Stack = createNativeStackNavigator();
 
 // STYLING
 import * as Colors from './constants/Colors';
@@ -46,7 +43,7 @@ import NewProject from './screens/projects/NewProject';
 import UploadReceipt from './screens/projects/UploadReceipt';
 
 // INIT FIREBASE
-import { firebase } from './constants/Firebase';
+import { firebase } from './firebase';
 
 // NOTIFICATIONS
 import * as Notifications from 'expo-notifications';

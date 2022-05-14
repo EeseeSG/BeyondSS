@@ -1,92 +1,40 @@
 {
   "project_info": {
-    "project_number": "736791086604",
-    "project_id": "bss-sg",
-    "storage_bucket": "bss-sg.appspot.com"
+    "project_number": "300744757593",
+    "project_id": "lessonplan-sg",
+    "storage_bucket": "lessonplan-sg.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:736791086604:android:32d4256dac082ebec31029",
+        "mobilesdk_app_id": "1:300744757593:android:57f787e953ca24cade7c48",
         "android_client_info": {
-          "package_name": "com.aaronkoh.gobeyond"
+          "package_name": "com.aaronkoh.lessonplan"
         }
       },
       "oauth_client": [
         {
-          "client_id": "736791086604-g5mqhtjgnsh28a7mijkog24j2jef1na7.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.aaronkoh.gobeyond",
-            "certificate_hash": "c6fbed45e01968cf31aebf208da05ac3caee0c2a"
-          }
-        },
-        {
-          "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+          "client_id": "300744757593-1kq3umrf0uftlr00ef2l4gflahih5o4g.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAZ_r_lmsKEHRU-QS-Q4-uXt6JtmseczEs"
+          "current_key": "AIzaSyAe5UIZViA57L9uvJ6QnrJNXxXQNdYhy3c"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
+              "client_id": "300744757593-1kq3umrf0uftlr00ef2l4gflahih5o4g.apps.googleusercontent.com",
               "client_type": 3
             },
             {
-              "client_id": "736791086604-a5tipln6c97i1diaq0vju6aa3ff8i9kq.apps.googleusercontent.com",
+              "client_id": "300744757593-245v4b29ocm872p07uhaggrk5q8j1b38.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.beyondss.beyondss"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:736791086604:android:cfa69d3b32d65556c31029",
-        "android_client_info": {
-          "package_name": "com.beyondss.beyondss"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "736791086604-mlhge48i72d42m13e3g6vi5bdri1p3vg.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.beyondss.beyondss",
-            "certificate_hash": "c6fbed45e01968cf31aebf208da05ac3caee0c2a"
-          }
-        },
-        {
-          "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyAZ_r_lmsKEHRU-QS-Q4-uXt6JtmseczEs"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "736791086604-m67kuqgp1hmg35d33av4h77glbq1mf4i.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "736791086604-a5tipln6c97i1diaq0vju6aa3ff8i9kq.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.beyondss.beyondss"
+                "bundle_id": "com.aaronkoh.lessonplan"
               }
             }
           ]

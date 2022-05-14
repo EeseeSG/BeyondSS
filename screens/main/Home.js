@@ -22,7 +22,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 
 // DISPLAY
-import Carousel from 'react-native-snap-carousel';
+// import Carousel from 'react-native-snap-carousel';
 import PartnerCarousel from '../../components/Project/PartnerCarousel';
 
 // DATA
@@ -428,7 +428,7 @@ export default function Home({ navigation }) {
             {/** ===========================================================================================
              * ==== BANNER SECTION
              =========================================================================================== */}
-            <Carousel
+            {/* <Carousel
                 ref={carousel}
                 data={banners}
                 renderItem={({ item }) => renderBanner(item)}
@@ -439,7 +439,7 @@ export default function Home({ navigation }) {
                 enableSnap={true}
                 autoplay={true}
                 autoplayInterval={5000}
-            />
+            /> */}
 
             {/** ===========================================================================================
              * ==== STATISTICS SECTION

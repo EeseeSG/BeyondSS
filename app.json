@@ -1,10 +1,11 @@
 {
   "expo": {
-    "name": "GoingBeyond",
-    "slug": "gobeyond",
-    "version": "1.1.0",
+    "name": "LessonPlan",
+    "slug": "lessonplan",
+    "version": "0.0.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -18,7 +19,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.aaronkoh.gobeyond",
+      "bundleIdentifier": "com.aaronkoh.lessonplan",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "NSCameraUsageDescription": "Enable Camera Access so that you can capture and upload profile photos",
@@ -29,10 +30,10 @@
     "android": {
       "icon": "./assets/icon.png",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.png",
+        "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#FFFFFF"
       },
-      "package": "com.aaronkoh.gobeyond",
+      "package": "com.aaronkoh.lessonplan",
       "googleServicesFile": "./google-services.json",
       "versionCode": 2,
       "permissions": ["CAMERA", "RECORD_AUDIO", "READ_CONTACTS", "READ_PHONE_STATE"]

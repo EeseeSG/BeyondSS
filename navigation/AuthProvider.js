@@ -1,6 +1,6 @@
 import React, { createContext, useState } from 'react';
 import { Popup } from 'react-native-popup-confirm-toast';
-import { firebase } from '../constants/Firebase';
+import { firebase } from '../firebase';
 import { Platform } from 'react-native';
 
 // PUSH NOTIFICATION

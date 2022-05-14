@@ -1,6 +1,6 @@
 import firebase from 'firebase';
 require('firebase/firestore');
-import { firebaseConfig } from '../constants/Firebase';
+import { firebaseConfig } from '../firebase';
 import { uuidv4 } from '../components/Helper/UUID';
 
 // GENERAL
